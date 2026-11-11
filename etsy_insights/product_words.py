@@ -30,7 +30,56 @@ DICTIONARY: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("mouse pad", ("mousepad",)),
     ("apron", ()),
     ("backpack", ()),
+    ("necklace", ("pendant", "name necklace")),
+    ("bracelet", ("bangle", "charm bracelet")),
+    ("earrings", ("earring",)),
+    ("keychain", ("key chain", "keyring", "key ring")),
+    ("candle", ()),
+    ("coaster", ()),
+    ("wall clock", ("clock",)),
+    ("rug", ("area rug",)),
+    ("towel", ("beach towel", "hand towel", "tea towel")),
+    ("shower curtain", ()),
+    ("doormat", ("door mat", "welcome mat")),
+    ("tapestry", ("wall tapestry",)),
+    ("flag", ("garden flag",)),
+    ("cutting board", ("chopping board", "charcuterie board")),
+    ("sweatpants", ("joggers", "jogger")),
+    ("leggings", ()),
+    ("polo", ("polo shirt",)),
+    ("long sleeve shirt", ("long sleeve tee", "long sleeve t shirt")),
+    ("bib", ("baby bib",)),
+    ("pet bandana", ("dog bandana",)),
+    ("pet bowl", ("dog bowl", "cat bowl")),
+    ("pet bed", ("dog bed", "cat bed")),
+    ("laptop sleeve", ("laptop case",)),
+    ("wallet", ()),
+    ("greeting card", ("birthday card", "christmas card", "thank you card")),
+    ("postcard", ()),
+    ("calendar", ()),
+    ("wine glass", ()),
+    ("can cooler", ("koozie", "can koozie")),
 )
+ENTRIES: dict[str, tuple[str, ...]] = {main: (main, *synonyms) for main, synonyms in DICTIONARY}
+
+# Nama kategori yang tampil di halaman Catalog (bahasa Inggris).
+CATEGORY_NAMES: dict[str, str] = {
+    "sweatshirt": "Sweatshirts", "hoodie": "Hoodies", "t shirt": "T-shirts", "tank top": "Tank tops",
+    "mug": "Mugs", "tumbler": "Tumblers", "water bottle": "Water bottles", "tote bag": "Tote bags",
+    "poster": "Posters", "canvas": "Canvas prints", "blanket": "Blankets", "pillow": "Pillows",
+    "phone case": "Phone cases", "sticker": "Stickers", "ornament": "Ornaments", "hat": "Hats",
+    "baby bodysuit": "Baby bodysuits", "socks": "Socks", "notebook": "Notebooks", "puzzle": "Puzzles",
+    "mouse pad": "Mouse pads", "apron": "Aprons", "backpack": "Backpacks", "necklace": "Necklaces",
+    "bracelet": "Bracelets", "earrings": "Earrings", "keychain": "Keychains", "candle": "Candles",
+    "coaster": "Coasters", "wall clock": "Wall clocks", "rug": "Rugs", "towel": "Towels",
+    "shower curtain": "Shower curtains", "doormat": "Doormats", "tapestry": "Tapestries", "flag": "Flags",
+    "cutting board": "Cutting boards", "sweatpants": "Sweatpants", "leggings": "Leggings",
+    "polo": "Polo shirts", "long sleeve shirt": "Long sleeve shirts", "bib": "Bibs",
+    "pet bandana": "Pet bandanas", "pet bowl": "Pet bowls", "pet bed": "Pet beds",
+    "laptop sleeve": "Laptop sleeves", "wallet": "Wallets", "greeting card": "Greeting cards",
+    "postcard": "Postcards", "calendar": "Calendars", "wine glass": "Wine glasses", "can cooler": "Can coolers",
+    "other": "Other",
+}
 
 _SEPARATORS = re.compile(r"[-_/&]")
 _NOT_WORD = re.compile(r"[^\w\s]|_")
@@ -99,3 +148,18 @@ def words_for_title(title: str) -> list[str]:
         if hits and (best is None or max(hits) > best[0]):
             best = (max(hits), entry)
     return list(dict.fromkeys(best[1])) if best else []
+
+
+def category_for(title: str) -> str:
+    """Kategori katalog = kata utama dari kata benda utama judul, atau "other"."""
+    words = words_for_title(title)
+    return words[0] if words else "other"
+
+
+def category_slug(main: str) -> str:
+    return main.replace(" ", "-")
+
+
+def category_from_slug(slug: str) -> str | None:
+    main = slug.replace("-", " ")
+    return main if main in CATEGORY_NAMES else None
