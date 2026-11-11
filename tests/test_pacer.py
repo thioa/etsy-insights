@@ -25,8 +25,8 @@ def test_same_seed_same_sequence():
 
 def test_remaining_quota():
     c = Config()
-    assert remaining_quota(c, 30) == 20 and remaining_quota(c, 70) == 0
-    assert remaining_quota(c, 0, max_keywords=3) == 3 and remaining_quota(c, 49, max_keywords=3) == 1
+    assert remaining_quota(c, 10) == 5 and remaining_quota(c, 20) == 0
+    assert remaining_quota(c, 0, max_keywords=3) == 3 and remaining_quota(c, 14, max_keywords=3) == 1
 
 
 def test_cooldown_end():

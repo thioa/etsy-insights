@@ -15,14 +15,14 @@ class ConfigError(Exception):
 
 @dataclass(frozen=True)
 class Config:
-    kuota_harian: int = 50
+    kuota_harian: int = 15  # pencarian per hari
     durasi_sesi_menit: int = 45
     jeda_antar_keyword_detik: tuple[float, float] = (20, 60)
     istirahat_setiap: tuple[int, int] = (8, 12)
     istirahat_detik: tuple[float, float] = (120, 300)
     kecepatan_ketik_ms: tuple[float, float] = (60, 180)
     waktu_baca_detik: tuple[float, float] = (5, 15)
-    keyword_terkait_maks: int = 10
+    keyword_terkait_maks: int = 200  # keyword panen per pencarian
     kedalaman_maks: int = 2
     cek_ulang_setelah_hari: int = 30
     pendinginan_jam: int = 24
@@ -33,7 +33,7 @@ class Config:
 
 # Batas keras: (minimum, maksimum). Untuk rentang, minimum berlaku pada batas bawah.
 HARD_LIMITS: dict[str, tuple[float | None, float | None]] = {
-    "kuota_harian": (None, 100),
+    "kuota_harian": (None, 30),
     "durasi_sesi_menit": (None, 60),
     "jeda_antar_keyword_detik": (15, None),
     "kecepatan_ketik_ms": (40, None),

@@ -1,8 +1,9 @@
 # Pengaturan Etsy Insights. Hapus sebuah baris untuk memakai nilai default.
 # Angka yang melewati batas keras otomatis dikoreksi (dan diberi peringatan).
 
-# Jumlah keyword yang dicek per hari (tanggal Mac). Batas keras: maks 100.
-kuota_harian = 50
+# Jumlah pencarian per hari (tanggal Mac). Setiap pencarian memanen ±130-180 keyword terkait.
+# Batas keras: maks 30.
+kuota_harian = 15
 
 # Lama maksimal satu sesi, termasuk jeda dan istirahat. Batas keras: maks 60.
 durasi_sesi_menit = 45
@@ -22,8 +23,8 @@ kecepatan_ketik_ms = [60, 180]
 # Lama "membaca" hasil dalam detik [min, maks]. Batas keras: min tidak di bawah 3.
 waktu_baca_detik = [5, 15]
 
-# Berapa keyword terkait yang dimasukkan ke antrean dari setiap keyword.
-keyword_terkait_maks = 10
+# Maksimal keyword terkait yang disimpan per pencarian.
+keyword_terkait_maks = 200
 
 # Seberapa jauh menelusuri keyword terkait dari keyword Anda. Batas keras: maks 3.
 kedalaman_maks = 2

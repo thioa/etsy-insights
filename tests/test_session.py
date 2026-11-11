@@ -101,7 +101,7 @@ def test_not_logged_in():
 def test_quota_used_up_and_partially_used():
     clock, store, page = setup("a", "b", "c")
     sid = store.start_session(T0)
-    for _ in range(48):
+    for _ in range(13):
         store.increment_checked(sid)
     store.end_session(sid, T0, "kuota_tercapai", None)
     s = run_session(make_deps(store, page, clock))
@@ -128,7 +128,7 @@ def test_long_break_schedule():
 def test_format_summary():
     clock, store, page = setup("a", "b", "c", outcomes={"c": "captcha"})
     text = format_summary(run_session(make_deps(store, page, clock)))
-    assert "Keyword dicek: 3" in text and "Sisa kuota hari ini: 47" in text and "Masa pendinginan sampai" in text
+    assert "Keyword dicek: 3" in text and "Sisa kuota hari ini: 12" in text and "Masa pendinginan sampai" in text
 
 
 def test_unexpected_error_returns_keyword_and_closes_session():

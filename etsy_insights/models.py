@@ -6,17 +6,50 @@ from datetime import datetime
 from typing import Any, Literal, Protocol
 
 CompetitionKind = Literal["count", "level"]  # level: 1=Rendah, 2=Sedang, 3=Tinggi
+CONVERSION_LEVEL_TEXT = {0: "Sangat rendah", 1: "Rendah", 2: "Biasa", 3: "Tinggi", 4: "Sangat tinggi"}
 
 
 @dataclass(frozen=True)
 class KeywordMetrics:
     has_data: bool
     search_volume: int | None = None
-    conversion_rate: float | None = None  # pecahan 0..1
+    conversion_rate: float | None = None  # queryCvr Etsy (pecahan); hanya untuk hasil cari
     competition_value: float | None = None
     competition_kind: CompetitionKind | None = None
     trend: tuple[float, ...] = ()  # terlama -> terbaru
     related: tuple[str, ...] = ()
+    conversion_level: int | None = None  # level Etsy 0..4 (Very low..Very high)
+    wow_pct: float | None = None  # perubahan minggu-ke-minggu (%)
+
+
+@dataclass(frozen=True)
+class RelatedKeyword:
+    keyword: str
+    search_volume: int | None
+    competition_value: float | None
+    conversion_level: int | None
+
+
+@dataclass(frozen=True)
+class EtsyQuota:
+    total: int | None
+    remaining: int | None
+    low_threshold: int | None
+    reached: bool
+    search_allowed: bool
+
+    @property
+    def exhausted(self) -> bool:
+        low = (self.remaining is not None and self.low_threshold is not None
+               and self.remaining <= self.low_threshold)
+        return self.reached or not self.search_allowed or low
+
+
+@dataclass(frozen=True)
+class ParsedSearch:
+    main: KeywordMetrics
+    related: tuple[RelatedKeyword, ...] = ()
+    quota: EtsyQuota | None = None
 
 
 @dataclass(frozen=True)
@@ -62,6 +95,7 @@ class ResultRow:
     status: str
     checked_at: datetime
     metrics: KeywordMetrics
+    kind: str = "search"  # "search" | "panen"
 
 
 class NotLoggedIn(Exception):

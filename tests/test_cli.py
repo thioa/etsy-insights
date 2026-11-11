@@ -16,7 +16,7 @@ def project(tmp_path, keywords="boho wall art\nmacrame\n", config=""):
 def test_cli_status(tmp_path, capsys):
     assert main(["status"], base_dir=project(tmp_path), now=lambda: T0) == 0
     out = capsys.readouterr().out
-    assert "Antrean: 2 menunggu" in out and "Hari ini: 0/50 keyword dicek" in out
+    assert "Antrean: 2 menunggu" in out and "Hari ini: 0/15 keyword dicek" in out
 
 
 def test_cli_export(tmp_path, capsys):
