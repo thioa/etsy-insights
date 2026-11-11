@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Any, Literal, Protocol
 
 CompetitionKind = Literal["count", "level"]  # level: 1=Rendah, 2=Sedang, 3=Tinggi
-CONVERSION_LEVEL_TEXT = {0: "Sangat rendah", 1: "Rendah", 2: "Biasa", 3: "Tinggi", 4: "Sangat tinggi"}
+CONVERSION_LEVEL_TEXT = {0: "Very low", 1: "Low", 2: "Typical", 3: "High", 4: "Very high"}
 
 
 @dataclass(frozen=True)

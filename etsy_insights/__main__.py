@@ -39,9 +39,9 @@ def _open_store(base: Path, now: datetime) -> Store:
 
 def _reason_text(code: str | None) -> str:
     if code is None:
-        return "belum selesai"
+        return "not finished"
     if code == "error":
-        return "Sesi berhenti karena kesalahan tak terduga. Lihat log di folder logs/."
+        return "The session stopped because of an unexpected error. See the log."
     try:
         return REASON_TEXT[StopReason(code)]
     except ValueError:
@@ -92,17 +92,17 @@ def _status(base: Path, cfg: Config, now: datetime) -> int:
     store = _open_store(base, now)
     counts = store.status_counts()
     checked = store.checked_on(now.date(), now.tzinfo)
-    print(f"Antrean: {counts.get('pending', 0)} menunggu, {counts.get('harvested', 0)} hasil panen, "
-          f"{counts.get('done', 0)} sudah dicari, {counts.get('no_data', 0)} tanpa data, "
-          f"{counts.get('failed', 0)} gagal")
-    print(f"Hari ini: {checked}/{cfg.kuota_harian} keyword dicek (sisa {remaining_quota(cfg, checked)})")
+    print(f"Queue: {counts.get('pending', 0)} queued, {counts.get('harvested', 0)} harvested, "
+          f"{counts.get('done', 0)} searched, {counts.get('no_data', 0)} no data, "
+          f"{counts.get('failed', 0)} failed")
+    print(f"Today: {checked}/{cfg.kuota_harian} searches (left {remaining_quota(cfg, checked)})")
     cooldown = store.active_cooldown_until(now)
     if cooldown is not None:
-        print(f"Masa pendinginan sampai: {cooldown.astimezone():%Y-%m-%d %H:%M}")
+        print(f"Cooldown until: {cooldown.astimezone():%Y-%m-%d %H:%M}")
     last = store.last_session()
     if last is not None:
-        print(f"Sesi terakhir: {last['started_at'].astimezone():%Y-%m-%d %H:%M}, "
-              f"{last['checked_count']} keyword. {_reason_text(last['stop_reason'])}")
+        print(f"Last session: {last['started_at'].astimezone():%Y-%m-%d %H:%M}, "
+              f"{last['checked_count']} keywords. {_reason_text(last['stop_reason'])}")
     store.close()
     return 0
 
@@ -112,7 +112,7 @@ def _export(base: Path, cfg: Config, now: datetime) -> int:
     path = export_excel(score_all(store.latest_results(), cfg), store.all_results(), upcoming(store, cfg),
                         base / "hasil", now.date(), profiles=build_profiles(store))
     store.close()
-    print(f"File Excel: {path}")
+    print(f"Excel file: {path}")
     return 0
 
 
@@ -141,14 +141,14 @@ def _run(base: Path, cfg: Config, now_fn: Callable[[], datetime], uji: bool, ign
     try:
         with session_lock(base / "data" / "sesi.lock") as locked:
             if not locked:
-                print("Sesi lain sedang berjalan. Tunggu sampai selesai.")
+                print("Another session is running. Wait until it finishes.")
                 return 1
             cooldown = store.active_cooldown_until(now_fn())
             if ignore_cooldown and cooldown is not None:
-                print(f"PERINGATAN: masa pendinginan masih berlaku sampai {cooldown.astimezone():%Y-%m-%d %H:%M}. "
-                      "Etsy baru saja menampilkan tanda bahaya; melanjutkan sekarang menambah risiko akun.")
-                if input_fn("Ketik YA untuk tetap menjalankan: ").strip() != "YA":
-                    print("Dibatalkan.")
+                print(f"WARNING: cooldown is active until {cooldown.astimezone():%Y-%m-%d %H:%M}. "
+                      "Etsy just showed a warning; continuing now adds risk to your account.")
+                if input_fn("Type YES to run anyway: ").strip() != "YES":
+                    print("Cancelled.")
                     return 1
             log = _make_logger(base, now_fn())
             rng = random.Random()
@@ -167,15 +167,15 @@ def _run(base: Path, cfg: Config, now_fn: Callable[[], datetime], uji: bool, ign
 
 def main(argv: list[str] | None = None, *, base_dir: Path | None = None,
          now: Callable[[], datetime] | None = None, input_fn: Callable[[str], str] = input) -> int:
-    parser = argparse.ArgumentParser(prog="etsy_insights", description="Pencari peluang keyword Etsy")
+    parser = argparse.ArgumentParser(prog="etsy_insights", description="Etsy keyword opportunity finder")
     sub = parser.add_subparsers(dest="command", required=True)
-    run = sub.add_parser("run", help="Jalankan sesi harian (pencarian pelan di Chrome 'Etsy Riset')")
-    run.add_argument("--uji", action="store_true", help=f"Hanya {UJI_SEARCHES} pencarian untuk uji coba")
+    run = sub.add_parser("run", help="Run the daily session (slow searches in the 'Etsy Riset' Chrome)")
+    run.add_argument("--uji", action="store_true", help=f"Test run: only {UJI_SEARCHES} searches")
     run.add_argument("--abaikan-pendinginan", action="store_true",
-                     help="Jalankan meski masa pendinginan masih berlaku (minta konfirmasi YA)")
-    sub.add_parser("status", help="Tampilkan antrean, kuota hari ini, dan sesi terakhir")
-    sub.add_parser("export", help="Buat file Excel hasil terbaru")
-    sub.add_parser("kenali", help="Rekam data halaman Marketplace Insights saat Anda mencari manual")
+                     help="Run even during cooldown (asks you to type YES)")
+    sub.add_parser("status", help="Show the queue, today's searches and the last session")
+    sub.add_parser("export", help="Create the latest Excel file")
+    sub.add_parser("kenali", help="Recording mode: record Marketplace Insights data while you search by hand")
     args = parser.parse_args(argv)
 
     base = Path(base_dir) if base_dir else PROJECT_ROOT
@@ -183,7 +183,7 @@ def main(argv: list[str] | None = None, *, base_dir: Path | None = None,
     try:
         cfg, warnings = load_config(base / "config.toml")
         for warning in warnings:
-            print(f"Peringatan config: {warning}")
+            print(f"Config warning: {warning}")
         if args.command == "run":
             return _run(base, cfg, now_fn, args.uji, args.abaikan_pendinginan, input_fn)
         if args.command == "status":
@@ -195,14 +195,14 @@ def main(argv: list[str] | None = None, *, base_dir: Path | None = None,
         print(str(exc))
         return 1
     except PlaywrightError as exc:
-        print(f"Chrome tertutup atau tidak merespons: {exc}\nJalankan lagi perintahnya untuk mencoba ulang.")
+        print(f"Chrome closed or not responding: {exc}\nRun the command again to retry.")
         return 1
     except KeyboardInterrupt:
-        print("\nDihentikan.")
+        print("\nStopped.")
         return 130
     except Exception as exc:  # pesan yang bisa dibaca, bukan traceback
-        print(f"Terjadi kesalahan tak terduga: {type(exc).__name__}: {exc}\n"
-              "Salin pesan ini dan kirim ke Claude.")
+        print(f"Unexpected error: {type(exc).__name__}: {exc}\n"
+              "Copy this message and send it to Claude.")
         return 1
 
 

@@ -9,7 +9,7 @@ from .models import ResultRow
 
 EMAS_THRESHOLD = 200 / 3  # sepertiga teratas
 POTENSIAL_THRESHOLD = 60.0
-LEVEL_LABELS = {1: "Rendah", 2: "Sedang", 3: "Tinggi"}
+LEVEL_LABELS = {1: "Low", 2: "Medium", 3: "High"}
 
 
 @dataclass(frozen=True)
@@ -20,7 +20,7 @@ class ScoredKeyword:
     p_conversion: float | None
     p_low_competition: float | None
     score: float | None
-    label: str  # "Emas" | "Potensial" | "Lewati" | "Data kurang"
+    label: str  # "Gold" | "Potential" | "Skip" | "Not enough data"
     searches_per_listing: float | None
 
 
@@ -49,10 +49,10 @@ def label_for(p_volume: float | None, p_conversion: float | None,
               p_low_competition: float | None, score: float) -> str:
     present = [p for p in (p_volume, p_conversion, p_low_competition) if p is not None]
     if present and all(p >= EMAS_THRESHOLD for p in present):
-        return "Emas"
+        return "Gold"
     if score >= POTENSIAL_THRESHOLD:
-        return "Potensial"
-    return "Lewati"
+        return "Potential"
+    return "Skip"
 
 
 def _searches_per_listing(row: ResultRow) -> float | None:
@@ -96,6 +96,6 @@ def score_all(rows: Sequence[ResultRow], cfg: Config) -> list[ScoredKeyword]:
 
     eligible_ids = {id(r) for r in eligible}
     rest = sorted((r for r in rows if id(r) not in eligible_ids), key=lambda r: r.keyword)
-    scored.extend(ScoredKeyword(r, False, None, None, None, None, "Data kurang", _searches_per_listing(r))
+    scored.extend(ScoredKeyword(r, False, None, None, None, None, "Not enough data", _searches_per_listing(r))
                   for r in rest)
     return scored

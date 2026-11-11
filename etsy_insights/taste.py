@@ -48,7 +48,7 @@ class TasteProfile:
     bestseller_share: float
     star_seller_share: float
     unique_shops: int
-    difficulty: str  # "Mudah" | "Sedang" | "Sulit" | "Tidak diketahui"
+    difficulty: str  # "Easy" | "Medium" | "Hard" | "Unknown"
     examples: tuple[ListingCard, ...]
 
 
@@ -81,12 +81,12 @@ def top_terms(titles: Sequence[str], keyword: str, limit: int = 10) -> list[tupl
 
 def difficulty(median_reviews: int | None, bestseller_share: float, star_seller_share: float) -> str:
     if median_reviews is None:
-        return "Tidak diketahui"
+        return "Unknown"
     if median_reviews >= 2000 or (bestseller_share >= 0.8 and median_reviews >= 1000):
-        return "Sulit"
+        return "Hard"
     if median_reviews < 300 and bestseller_share < 0.5:
-        return "Mudah"
-    return "Sedang"
+        return "Easy"
+    return "Medium"
 
 
 def _reviews(value: Any) -> int | None:

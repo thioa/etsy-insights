@@ -146,22 +146,22 @@ class EtsyInsightsPage:
             page = self._page = self._context.new_page()
             page.goto(self._dashboard_url, wait_until="domcontentloaded")
             if is_login_url(page.url):
-                raise NotLoggedIn("Chrome 'Etsy Riset' belum login ke Etsy.")
+                raise NotLoggedIn("The 'Etsy Riset' Chrome is not signed in to Etsy.")
             if self._blocked_now():
-                self._log("Etsy menampilkan tanda bahaya di dashboard; tidak melanjutkan.")
+                self._log("Etsy showed a warning on the dashboard; not continuing.")
                 return
             page.wait_for_timeout(self._rng.uniform(*self._settle) * 1000)
             nav = page.locator(NAV_SELECTOR).first
             try:
                 nav.wait_for(state="visible", timeout=10_000)
             except PlaywrightTimeout:
-                self._log("Menu Marketplace Insights tidak ditemukan, membuka langsung.")
+                self._log("Marketplace Insights menu not found, opening it directly.")
                 page.goto(INSIGHTS_URL, wait_until="domcontentloaded")
             else:
                 with page.expect_navigation(wait_until="domcontentloaded", timeout=30_000):
                     nav.click()
             if is_login_url(page.url):
-                raise NotLoggedIn("Chrome 'Etsy Riset' belum login ke Etsy.")
+                raise NotLoggedIn("The 'Etsy Riset' Chrome is not signed in to Etsy.")
 
     def _find_search_box(self):
         page = self._page
@@ -172,7 +172,7 @@ class EtsyInsightsPage:
                 if box.count() and box.is_visible():
                     return box
             if time.monotonic() > deadline:
-                raise PageLoadTimeout("Kotak pencarian tidak ditemukan (tampilan Etsy mungkin berubah).")
+                raise PageLoadTimeout("Search box not found (Etsy's page may have changed).")
             page.wait_for_timeout(200)
 
     def search(self, keyword: str) -> RawResult:
@@ -198,7 +198,7 @@ class EtsyInsightsPage:
                 if self._http_statuses or is_login_url(page.url) or blocked_quota(self._captured[mark:], keyword):
                     break  # tanda bahaya / kuota Etsy: biarkan sesi memeriksa dan berhenti
                 if time.monotonic() > deadline:
-                    raise PageLoadTimeout(f"Data untuk '{keyword}' tidak datang dalam {self._results_timeout:.0f} detik.")
+                    raise PageLoadTimeout(f"No data for '{keyword}' within {self._results_timeout:.0f} seconds.")
                 page.wait_for_timeout(_POLL_MS)
             else:
                 deadline = time.monotonic() + self._related_timeout

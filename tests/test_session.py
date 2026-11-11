@@ -124,7 +124,7 @@ def test_long_break_schedule():
 def test_format_summary():
     clock, store, page = setup("a", "b", "c", outcomes={"c": "captcha"})
     text = format_summary(run_session(make_deps(store, page, clock)))
-    assert "Keyword dicek: 3" in text and "Sisa kuota hari ini: 12" in text and "Masa pendinginan sampai" in text
+    assert "Keywords checked: 3" in text and "Searches left today: 12" in text and "Cooldown until" in text
 
 
 def test_unexpected_error_returns_keyword_and_closes_session():
@@ -236,3 +236,9 @@ def test_etsy_quota_without_stats_returns_keyword_and_blocks_day():
     assert s.stop_reason is StopReason.ETSY_QUOTA
     assert (store.get("a").status, store.get("a").fail_count) == ("pending", 0)
     assert run_session(make_deps(store, FakePage(clock), clock)).stop_reason is StopReason.ETSY_QUOTA
+
+
+def test_format_summary_test_run():
+    clock, store, page = setup("a", "b", "c", "d")
+    s = run_session(make_deps(store, page, clock), max_keywords=3)
+    assert s.test_run and format_summary(s).startswith("Session finished: Test run finished (3 searches).")

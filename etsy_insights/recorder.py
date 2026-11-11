@@ -27,6 +27,7 @@ MAX_BODY_CHARS = 2_000_000
 FORMAT = "etsy-insights-kenali/1"
 INSIGHTS_URL = "https://www.etsy.com/your/shops/me/marketplace-insights"
 _TRUNCATED = "...[TERPOTONG]"
+_DONE_WORDS = ("done", "selesai")
 
 _SENS = "|".join(re.escape(k) for k in SENSITIVE_KEYS)
 # Semua pola dibatasi panjangnya supaya tetap linear pada teks panjang (base64, state besar).
@@ -143,7 +144,7 @@ def wait_for_line(context, stdin) -> str:
         if ready:
             line = stdin.readline()
             if line == "":  # stdin ditutup
-                return "selesai"
+                return "done"
             return line.strip()
 
 
@@ -153,31 +154,31 @@ def _is_insights_tab(url: str) -> bool:
 
 def _drive_kenali(context, recording: Recording, clock: Callable[[], datetime], stdin, print_fn) -> None:
     page = context.new_page()
-    print_fn("Membuka Marketplace Insights di Chrome 'Etsy Riset'...")
+    print_fn("Opening Marketplace Insights in the 'Etsy Riset' Chrome...")
     page.goto(INSIGHTS_URL, wait_until="domcontentloaded")
     while "signin" in page.url:
-        print_fn("Anda belum login. Silakan login ke Etsy di jendela Chrome itu, "
-                 "lalu tekan Enter di sini (atau ketik 'selesai' untuk batal).")
-        if wait_for_line(context, stdin).lower() == "selesai":
+        print_fn("You are not signed in. Sign in to Etsy in that Chrome window, "
+                 "then press Enter here (or type 'done' to cancel).")
+        if wait_for_line(context, stdin).lower() in _DONE_WORDS:
             return
         if "marketplace-insights" not in page.url:
             page.goto(INSIGHTS_URL, wait_until="domcontentloaded")
 
-    print_fn("\nLangkah:\n"
-             "  1. Di Chrome, ketik satu keyword di kotak pencarian Marketplace Insights,\n"
-             "     lalu tunggu sampai hasilnya muncul.\n"
-             "  2. Kembali ke jendela Terminal ini dan tekan Enter untuk merekam.\n"
-             "  3. Ulangi untuk 2-3 keyword. Setelah itu ketik 'selesai' lalu Enter.\n"
-             "  (Hanya tab Marketplace Insights yang direkam.)\n")
+    print_fn("\nSteps:\n"
+             "  1. In Chrome, type one keyword in the Marketplace Insights search box\n"
+             "     and wait until the results appear.\n"
+             "  2. Come back to this Terminal window and press Enter to record.\n"
+             "  3. Repeat for 2-3 keywords. Then type 'done' and press Enter.\n"
+             "  (Only the Marketplace Insights tab is recorded.)\n")
     while True:
         line = wait_for_line(context, stdin)
-        if line.lower() == "selesai":
+        if line.lower() in _DONE_WORDS:
             return
         for tab in context.pages:
             if _is_insights_tab(tab.url):
                 recording.add_snapshot(tab.url, tab.content(), tab.screenshot(full_page=True), clock())
-        print_fn(f"Terekam: {len(recording.snapshots)} snapshot, {len(recording.responses)} respons data. "
-                 "Cari keyword berikutnya, atau ketik 'selesai'.")
+        print_fn(f"Recorded: {len(recording.snapshots)} snapshots, {len(recording.responses)} data responses. "
+                 "Search the next keyword, or type 'done'.")
 
 
 def run_kenali(context, out_dir: Path, clock: Callable[[], datetime], stdin=sys.stdin, print_fn=print) -> Path:
@@ -196,12 +197,12 @@ def run_kenali(context, out_dir: Path, clock: Callable[[], datetime], stdin=sys.
     try:
         _drive_kenali(context, recording, clock, stdin, print_fn)
     except KeyboardInterrupt:
-        print_fn("\nDihentikan. Menyimpan rekaman yang sudah ada...")
+        print_fn("\nStopped. Saving what was recorded so far...")
     except PlaywrightError as exc:
-        print_fn(f"\nChrome tertutup atau tidak merespons ({exc}). Menyimpan rekaman yang sudah ada...")
+        print_fn(f"\nChrome closed or not responding ({exc}). Saving what was recorded so far...")
 
     path = recording.save(out_dir)
-    print_fn(f"\nRekaman disimpan di:\n  {path}\n"
-             "Kirim file ini ke Claude (beserta screenshot halaman Insights Anda).\n"
-             "Chrome 'Etsy Riset' boleh dibiarkan terbuka.")
+    print_fn(f"\nRecording saved to:\n  {path}\n"
+             "Send this file to Claude (with a screenshot of your Insights page).\n"
+             "You can leave the 'Etsy Riset' Chrome open.")
     return path

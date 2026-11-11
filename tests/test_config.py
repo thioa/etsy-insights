@@ -58,7 +58,7 @@ def test_all_zero_weights_fall_back_to_default(tmp_path):
 
 
 def test_invalid_toml_raises_config_error_with_line(tmp_path):
-    with pytest.raises(ConfigError, match=r"config\.toml.*baris 1"):
+    with pytest.raises(ConfigError, match=r"config\.toml.*line 1"):
         load_config(write(tmp_path, "kuota_harian = = 5\n"))
 
 

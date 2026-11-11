@@ -61,11 +61,11 @@ def ensure_chrome(port: int, profile_dir: Path = PROFILE_DIR, chrome_path: Path 
     if info and "Chrome" in str(info.get("Browser", "")):
         return endpoint
     if in_use(port):
-        raise PortBusy(f"Port {port} sedang dipakai program lain. Ubah port_debug di config.toml "
-                       "(misalnya 9223), lalu coba lagi.")
+        raise PortBusy(f"Port {port} is used by another program. Change port_debug in config.toml "
+                       "(for example 9223), then try again.")
     if not Path(chrome_path).exists():
-        raise ChromeNotFound(f"Google Chrome tidak ditemukan di {chrome_path}. "
-                             "Pasang Chrome dari https://www.google.com/chrome/ lalu coba lagi.")
+        raise ChromeNotFound(f"Google Chrome was not found at {chrome_path}. "
+                             "Install Chrome from https://www.google.com/chrome/ and try again.")
     Path(profile_dir).mkdir(parents=True, exist_ok=True)
     launch(chrome_args(chrome_path, port, profile_dir, extra_args),
            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
@@ -74,8 +74,8 @@ def ensure_chrome(port: int, profile_dir: Path = PROFILE_DIR, chrome_path: Path 
         if info and "Chrome" in str(info.get("Browser", "")):
             return endpoint
         sleep(_POLL_SECONDS)
-    raise ChromeStartTimeout(f"Chrome tidak merespons dalam {wait_seconds:.0f} detik. Tutup semua jendela "
-                             "Chrome 'Etsy Riset' (atau restart Mac), lalu coba lagi.")
+    raise ChromeStartTimeout(f"Chrome did not respond within {wait_seconds:.0f} seconds. Close all "
+                             "'Etsy Riset' Chrome windows (or restart the Mac), then try again.")
 
 
 @contextmanager

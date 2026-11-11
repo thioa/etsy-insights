@@ -1,48 +1,47 @@
-# Pengaturan Etsy Insights. Hapus sebuah baris untuk memakai nilai default.
-# Angka yang melewati batas keras otomatis dikoreksi (dan diberi peringatan).
+# Etsy Insights settings. Delete a line to use the default value.
+# Values outside the safety limits are corrected automatically (with a warning).
 
-# Jumlah pencarian per hari (tanggal Mac). Setiap pencarian memanen ±130-180 keyword terkait.
-# Batas keras: maks 30.
+# Searches per day (Mac's date). Each search harvests about 130-180 related keywords. Safety limit: max 30.
 kuota_harian = 15
 
-# Lama maksimal satu sesi, termasuk jeda dan istirahat. Batas keras: maks 60.
+# How long one session may run, including pauses and breaks (minutes). Safety limit: max 60.
 durasi_sesi_menit = 45
 
-# Jeda acak antar-keyword dalam detik [min, maks]. Batas keras: min tidak di bawah 15.
+# Random pause between searches in seconds [min, max]. Safety limit: min not below 15.
 jeda_antar_keyword_detik = [20, 60]
 
-# Setelah sekian keyword [min, maks], ambil istirahat panjang.
+# After this many searches [min, max], take a longer break.
 istirahat_setiap = [8, 12]
 
-# Lama istirahat panjang dalam detik [min, maks].
+# Length of the longer break in seconds [min, max].
 istirahat_detik = [120, 300]
 
-# Jeda antar-huruf saat mengetik dalam milidetik [min, maks]. Batas keras: min tidak di bawah 40.
+# Pause between typed letters in milliseconds [min, max]. Safety limit: min not below 40.
 kecepatan_ketik_ms = [60, 180]
 
-# Lama "membaca" hasil dalam detik [min, maks]. Batas keras: min tidak di bawah 3.
+# How long to "read" the results in seconds [min, max]. Safety limit: min not below 3.
 waktu_baca_detik = [5, 15]
 
-# Maksimal keyword terkait yang disimpan per pencarian.
+# Maximum related keywords saved per search.
 keyword_terkait_maks = 200
 
-# Seberapa jauh menelusuri keyword terkait dari keyword Anda. Batas keras: maks 3.
+# How far to follow related keywords from your own keywords. Safety limit: max 3.
 kedalaman_maks = 2
 
-# Keyword yang sudah dicek baru dicek ulang setelah sekian hari. Batas keras: min 7.
+# A searched keyword is searched again after this many days. Safety limit: min 7.
 cek_ulang_setelah_hari = 30
 
-# Lama berhenti setelah CAPTCHA/verifikasi/403/429, dalam jam. Batas keras: min 12.
+# Pause after a captcha/verification/403/429, in hours. Safety limit: min 12.
 pendinginan_jam = 24
 
-# Keyword dengan volume pencarian di bawah angka ini tidak masuk ranking.
+# Keywords with fewer searches per month than this are not ranked.
 volume_minimum = 100
 
-# Port koneksi ke Chrome "Etsy Riset". Ubah hanya jika port ini dipakai program lain.
+# Port for the 'Etsy Riset' Chrome connection. Change only if another program uses it.
 port_debug = 9222
 
-# Bobot skor peluang. Otomatis dinormalisasi sehingga totalnya 1.
+# Score weights. They are normalized automatically so they add up to 1.
 [bobot]
-volume = 0.40
+volume = 0.4
 conversion = 0.35
 kompetisi = 0.25

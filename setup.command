@@ -2,7 +2,7 @@
 # Pemasangan sekali: membuat lingkungan Python dan memasang library yang dibutuhkan.
 cd "$(dirname "$0")" || exit 1
 
-tutup() { read -r -p "Tekan Enter untuk menutup..."; exit "$1"; }
+tutup() { read -r -p "Press Enter to close..."; exit "$1"; }
 
 PY=""
 for c in python3.13 python3.12 python3.11 python3; do
@@ -13,24 +13,24 @@ for c in python3.13 python3.12 python3.11 python3; do
 done
 
 if [ -z "$PY" ]; then
-  echo "Python 3.11 atau lebih baru belum terpasang di Mac ini."
-  echo "Unduh dari https://www.python.org/downloads/macos/ , pasang, lalu jalankan setup.command lagi."
+  echo "Python 3.11 or newer is not installed on this Mac."
+  echo "Download it from https://www.python.org/downloads/macos/ , install it, then run setup.command again."
   tutup 1
 fi
 
-echo "Memakai $("$PY" --version)"
-echo "Membuat lingkungan Python (.venv) dan memasang library... (1-2 menit)"
+echo "Using $("$PY" --version)"
+echo "Creating the Python environment (.venv) and installing libraries... (1-2 minutes)"
 if ! "$PY" -m venv .venv || ! .venv/bin/pip install -q -r requirements.txt; then
-  echo "Pemasangan gagal. Periksa koneksi internet, lalu jalankan setup.command lagi."
+  echo "Installation failed. Check your internet connection, then run setup.command again."
   tutup 1
 fi
 
 if [ ! -x "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]; then
-  echo "Peringatan: Google Chrome tidak ditemukan di folder Applications."
-  echo "Pasang dari https://www.google.com/chrome/ sebelum menjalankan kenali.command."
+  echo "Warning: Google Chrome was not found in the Applications folder."
+  echo "Install it from https://www.google.com/chrome/ before running kenali.command."
 fi
 
 mkdir -p data hasil logs rekaman
 echo ""
-echo "Selesai. Langkah berikutnya: klik dua kali kenali.command."
+echo "Done. Next step: run mulai.command --uji (test run)."
 tutup 0

@@ -32,18 +32,18 @@ class StopReason(str, Enum):
 
 
 REASON_TEXT = {
-    StopReason.QUOTA: "Kuota untuk sesi/hari ini sudah tercapai.",
-    StopReason.DURATION: "Batas durasi sesi sudah tercapai.",
-    StopReason.DANGER: "Etsy menampilkan tanda bahaya (CAPTCHA/verifikasi/login/403/429). Sesi dihentikan demi keamanan akun.",
-    StopReason.FAILURES: "3 kegagalan berturut-turut. Kemungkinan tampilan Etsy berubah: jalankan kenali.command lagi.",
-    StopReason.INTERRUPTED: "Sesi dihentikan oleh Anda.",
-    StopReason.BROWSER_CLOSED: "Chrome ditutup saat sesi berjalan.",
-    StopReason.QUEUE_EMPTY: "Antrean keyword sudah habis. Tambahkan keyword di keywords.txt.",
-    StopReason.NOT_LOGGED_IN: "Chrome 'Etsy Riset' belum login ke Etsy. Silakan login manual dulu.",
-    StopReason.COOLDOWN: "Masih dalam masa pendinginan setelah tanda bahaya sebelumnya.",
-    StopReason.NO_QUOTA: "Kuota hari ini sudah habis. Coba lagi besok.",
-    StopReason.ETSY_QUOTA: "Etsy menandai kuota Marketplace Insights hampir/sudah habis. Coba lagi besok.",
-    StopReason.PAGE_UNAVAILABLE: "Halaman Etsy tidak bisa dibuka (internet lambat?). Coba lagi nanti.",
+    StopReason.QUOTA: "Daily limit reached.",
+    StopReason.DURATION: "Session time limit reached.",
+    StopReason.DANGER: "Etsy showed a warning (captcha, verification, sign-in or 403/429). Paused for 24 hours to protect your account.",
+    StopReason.FAILURES: "3 failures in a row. Etsy's page may have changed — run Recording mode and send the file to Claude.",
+    StopReason.INTERRUPTED: "Stopped by you.",
+    StopReason.BROWSER_CLOSED: "Chrome was closed.",
+    StopReason.QUEUE_EMPTY: "Nothing left to search. Add keywords in My keywords.",
+    StopReason.NOT_LOGGED_IN: "Not signed in to Etsy in the 'Etsy Riset' Chrome window. Sign in there, then start again.",
+    StopReason.COOLDOWN: "Cooldown is active.",
+    StopReason.NO_QUOTA: "Today's searches are used up. Try again tomorrow.",
+    StopReason.ETSY_QUOTA: "Etsy says the Marketplace Insights quota is (almost) used up. Try again tomorrow.",
+    StopReason.PAGE_UNAVAILABLE: "Etsy's page didn't load (slow internet?). Try again later.",
 }
 
 
@@ -72,6 +72,7 @@ class SessionSummary:
     quota_left: int
     cooldown_until: datetime | None
     danger: DangerSignal | None
+    test_run: bool = False
 
 
 @dataclass
@@ -85,6 +86,7 @@ class _State:
     session_id: int = 0
     tried: set[int] = field(default_factory=set)
     reason: StopReason | None = None
+    test_run: bool = False
     cooldown_until: datetime | None = None
     danger: DangerSignal | None = None
 
@@ -95,14 +97,14 @@ def _summary(deps: SessionDeps, state: _State) -> SessionSummary:
     queue_left = len(upcoming(deps.store, deps.cfg, limit=10**9))
     return SessionSummary(state.reason, state.checked, state.succeeded, state.no_data, state.failed,
                           state.new_keywords, queue_left, quota_left,
-                          state.cooldown_until, state.danger)
+                          state.cooldown_until, state.danger, state.test_run)
 
 
 def _stop_for_danger(deps: SessionDeps, state: _State, danger: DangerSignal) -> None:
     state.reason = StopReason.DANGER
     state.danger = danger
     state.cooldown_until = cooldown_end(deps.clock(), deps.cfg)
-    deps.log(f"Tanda bahaya: {danger.kind} ({danger.detail}). Berhenti.")
+    deps.log(f"Warning sign: {danger.kind} ({danger.detail}). Stopping.")
 
 
 def _check_page(deps: SessionDeps, state: _State) -> bool:
@@ -116,7 +118,7 @@ def _check_page(deps: SessionDeps, state: _State) -> bool:
         state.reason = StopReason.BROWSER_CLOSED
         return True
     except Exception as exc:
-        danger = DangerSignal("verifikasi", f"Halaman tidak bisa diperiksa: {exc}")
+        danger = DangerSignal("verifikasi", f"Page could not be checked: {exc}")
     if danger is None:
         return False
     _stop_for_danger(deps, state, danger)
@@ -152,7 +154,7 @@ def _loop(deps: SessionDeps, state: _State, limit: int, start: datetime, prev_en
         if state.checked == 0 and prev_end is not None:
             wait = pacer.gap_seconds() - (deps.clock() - prev_end).total_seconds()
             if wait > 0:
-                deps.log(f"Menunggu {wait:.0f} detik sejak sesi sebelumnya.")
+                deps.log(f"Waiting {wait:.0f} seconds since the last session.")
                 deps.sleep(wait)
                 if deps.clock() - start >= max_duration:
                     state.reason = StopReason.DURATION
@@ -160,7 +162,7 @@ def _loop(deps: SessionDeps, state: _State, limit: int, start: datetime, prev_en
         if state.checked > 0:
             if since_break >= next_break:
                 pause = pacer.break_seconds()
-                deps.log(f"Istirahat {pause:.0f} detik.")
+                deps.log(f"Break {pause:.0f} seconds.")
                 deps.sleep(pause)
                 since_break = 0
                 next_break = pacer.break_every()
@@ -187,7 +189,7 @@ def _loop(deps: SessionDeps, state: _State, limit: int, start: datetime, prev_en
             state.current_id = None
             state.failed += 1
             streak += 1
-            deps.log(f"  halaman tidak termuat: {item.keyword}")
+            deps.log(f"  page did not load: {item.keyword}")
         except BrowserClosed:
             store.return_to_queue(item.id)
             state.current_id = None
@@ -202,14 +204,14 @@ def _loop(deps: SessionDeps, state: _State, limit: int, start: datetime, prev_en
                 store.return_to_queue(item.id)
                 state.current_id = None
                 state.reason = StopReason.ETSY_QUOTA
-                deps.log(f"  kuota Etsy habis: sisa {exc.quota.remaining} dari {exc.quota.total}")
+                deps.log(f"  Etsy quota used up: {exc.quota.remaining} of {exc.quota.total} left")
                 return
             except Exception as exc:  # ParseError, atau parser crash karena data Etsy berubah
                 store.record_failure(item.id)
                 state.current_id = None
                 state.failed += 1
                 streak += 1
-                deps.log(f"  data tidak terbaca: {exc}")
+                deps.log(f"  could not read data: {exc}")
             else:
                 now = deps.clock()
                 store.save_result(item.id, parsed.main, raw, now, deps.parser_version)
@@ -222,11 +224,11 @@ def _loop(deps: SessionDeps, state: _State, limit: int, start: datetime, prev_en
                 harvested = store.save_harvest(item.id, parsed.related, cfg.keyword_terkait_maks,
                                                cfg.kedalaman_maks, now)
                 state.new_keywords += harvested
-                deps.log(f"  {parsed.main.search_volume} pencarian, {len(parsed.related)} keyword terkait "
-                         f"({harvested} baru)")
+                deps.log(f"  {parsed.main.search_volume} searches, {len(parsed.related)} related keywords "
+                         f"({harvested} new)")
                 if parsed.quota is not None and parsed.quota.exhausted:
                     state.reason = StopReason.ETSY_QUOTA
-                    deps.log(f"  kuota Etsy: sisa {parsed.quota.remaining} dari {parsed.quota.total}")
+                    deps.log(f"  Etsy quota: {parsed.quota.remaining} of {parsed.quota.total} left")
                     return
                 try:
                     page.dwell(pacer.dwell_seconds(), pacer.should_scroll())
@@ -242,11 +244,11 @@ def _loop(deps: SessionDeps, state: _State, limit: int, start: datetime, prev_en
 def run_session(deps: SessionDeps, max_keywords: int | None = None,
                 ignore_cooldown: bool = False) -> SessionSummary:
     store, cfg = deps.store, deps.cfg
-    state = _State()
+    state = _State(test_run=max_keywords is not None)
     now = deps.clock()
     recovered = store.recover_in_progress()
     if recovered:
-        deps.log(f"{recovered} keyword dari sesi yang terputus dikembalikan ke antrean.")
+        deps.log(f"{recovered} keywords from an interrupted session went back to the queue.")
 
     if not ignore_cooldown:
         cooldown = store.active_cooldown_until(now)
@@ -286,21 +288,24 @@ def run_session(deps: SessionDeps, max_keywords: int | None = None,
     if state.current_id is not None:
         store.return_to_queue(state.current_id)
     store.end_session(state.session_id, deps.clock(), state.reason.value, state.cooldown_until)
-    deps.log(f"Berhenti: {REASON_TEXT[state.reason]}")
+    deps.log(f"Stopped: {REASON_TEXT[state.reason]}")
     return _summary(deps, state)
 
 
 def format_summary(summary: SessionSummary) -> str:
+    reason = REASON_TEXT[summary.stop_reason]
+    if summary.test_run and summary.stop_reason is StopReason.QUOTA:
+        reason = f"Test run finished ({summary.checked} searches)."
     lines = [
-        f"Sesi selesai: {REASON_TEXT[summary.stop_reason]}",
-        f"Keyword dicek: {summary.checked} (berhasil {summary.succeeded}, tanpa data {summary.no_data}, "
-        f"gagal {summary.failed})",
-        f"Keyword baru ditemukan: {summary.new_keywords}",
-        f"Sisa antrean: {summary.queue_left}",
-        f"Sisa kuota hari ini: {summary.quota_left}",
+        f"Session finished: {reason}",
+        f"Keywords checked: {summary.checked} (ok {summary.succeeded}, no data {summary.no_data}, "
+        f"failed {summary.failed})",
+        f"New keywords found: {summary.new_keywords}",
+        f"Queue left: {summary.queue_left}",
+        f"Searches left today: {summary.quota_left}",
     ]
     if summary.danger is not None:
-        lines.append(f"Tanda bahaya: {summary.danger.kind} ({summary.danger.detail})")
+        lines.append(f"Warning: {summary.danger.kind} ({summary.danger.detail})")
     if summary.cooldown_until is not None:
-        lines.append(f"Masa pendinginan sampai: {summary.cooldown_until.astimezone():%Y-%m-%d %H:%M}")
+        lines.append(f"Cooldown until: {summary.cooldown_until.astimezone():%Y-%m-%d %H:%M}")
     return "\n".join(lines)

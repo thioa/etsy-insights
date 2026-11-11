@@ -24,19 +24,19 @@ def project(tmp_path, keywords="boho wall art\nmacrame\n", config=""):
 def test_cli_status(tmp_path, capsys):
     assert main(["status"], base_dir=project(tmp_path), now=lambda: T0) == 0
     out = capsys.readouterr().out
-    assert "Antrean: 2 menunggu" in out and "Hari ini: 0/15 keyword dicek" in out
+    assert "Queue: 2 queued" in out and "Today: 0/15 searches" in out
 
 
 def test_cli_export(tmp_path, capsys):
     assert main(["export"], base_dir=project(tmp_path), now=lambda: T0) == 0
     path = tmp_path / "hasil" / "peluang-2026-11-11.xlsx"
-    assert path.exists() and load_workbook(path)["Antrean"].max_row == 4
+    assert path.exists() and load_workbook(path)["Queue"].max_row == 4
 
 
 def test_cli_bad_config_returns_1(tmp_path, capsys):
     assert main(["status"], base_dir=project(tmp_path, config="kuota_harian = = 1\n"), now=lambda: T0) == 1
     out = capsys.readouterr().out
-    assert "baris 1" in out and "Traceback" not in out
+    assert "line 1" in out and "Traceback" not in out
 
 
 def test_command_scripts_are_valid_and_executable():
@@ -66,7 +66,7 @@ def test_cli_unexpected_error_has_no_traceback(tmp_path, capsys, monkeypatch):
     monkeypatch.setattr(cli, "_status", boom)
     assert main(["status"], base_dir=project(tmp_path), now=lambda: T0) == 1
     out = capsys.readouterr().out
-    assert "kesalahan tak terduga" in out and "aneh" in out
+    assert "Unexpected error" in out and "aneh" in out
 
 
 def patch_page(monkeypatch, page):
@@ -83,7 +83,7 @@ def test_cli_run_uji(tmp_path, capsys, monkeypatch):
     patch_page(monkeypatch, page)
     assert main(["run", "--uji"], base_dir=project(tmp_path, keywords="a\nb\nc\nd\n"), now=lambda: T0) == 0
     out = capsys.readouterr().out
-    assert "Keyword dicek: 3" in out and page.searched == ["a", "b", "c"]
+    assert "Keywords checked: 3" in out and page.searched == ["a", "b", "c"]
     assert len(list((tmp_path / "logs").glob("sesi-*.log"))) == 1
 
 
@@ -95,7 +95,7 @@ def test_cli_run_refuses_when_locked(tmp_path, capsys, monkeypatch):
     with open(base / "data" / "sesi.lock", "w") as held:
         fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
         assert main(["run"], base_dir=base, now=lambda: T0) == 1
-    assert "Sesi lain sedang berjalan" in capsys.readouterr().out and page.opened == 0
+    assert "Another session is running" in capsys.readouterr().out and page.opened == 0
 
 
 def test_lock_released_after_error(tmp_path, monkeypatch):
@@ -111,7 +111,7 @@ def test_lock_released_after_error(tmp_path, monkeypatch):
         assert ok
 
 
-def test_cli_ignore_cooldown_requires_ya(tmp_path, capsys, monkeypatch):
+def test_cli_ignore_cooldown_requires_yes(tmp_path, capsys, monkeypatch):
     from etsy_insights.store import Store
     base = project(tmp_path)
     s = Store(base / "data" / "etsy.db")
@@ -120,9 +120,9 @@ def test_cli_ignore_cooldown_requires_ya(tmp_path, capsys, monkeypatch):
     s.close()
     page = FakePage(FakeClock(T0))
     patch_page(monkeypatch, page)
-    assert main(["run", "--abaikan-pendinginan"], base_dir=base, now=lambda: T0, input_fn=lambda p: "tidak") == 1
+    assert main(["run", "--abaikan-pendinginan"], base_dir=base, now=lambda: T0, input_fn=lambda p: "no") == 1
     assert page.opened == 0
-    assert main(["run", "--abaikan-pendinginan"], base_dir=base, now=lambda: T0, input_fn=lambda p: "YA") == 0
+    assert main(["run", "--abaikan-pendinginan"], base_dir=base, now=lambda: T0, input_fn=lambda p: "YES") == 0
     assert page.opened == 1
 
 
@@ -144,7 +144,7 @@ def test_cli_export_includes_selera(tmp_path, capsys):
                   load_raw("sweatshirt"), T0, "t")
     s.close()
     assert main(["export"], base_dir=base, now=lambda: T0) == 0
-    sel = load_workbook(tmp_path / "hasil" / "peluang-2026-11-11.xlsx")["Selera"]
+    sel = load_workbook(tmp_path / "hasil" / "peluang-2026-11-11.xlsx")["Buyer taste"]
     assert sel.cell(3, 1).value == "sweatshirt"
 
 
@@ -156,4 +156,4 @@ def test_cli_status_error_reason_is_readable(tmp_path, capsys):
     s.end_session(sid, T0, "error", None)
     s.close()
     assert main(["status"], base_dir=base, now=lambda: T0) == 0
-    assert "kesalahan tak terduga" in capsys.readouterr().out
+    assert "unexpected error" in capsys.readouterr().out

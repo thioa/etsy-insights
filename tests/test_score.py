@@ -17,7 +17,7 @@ def test_score_example_from_spec():
     assert [s.row.keyword for s in out] == ["a", "c", "b", "d"]
     a, c, b, d = out
     assert a.score == pytest.approx(80) and c.score == pytest.approx(40) and b.score == pytest.approx(30)
-    assert (a.label, c.label, b.label, d.label) == ("Potensial", "Lewati", "Lewati", "Data kurang")
+    assert (a.label, c.label, b.label, d.label) == ("Potential", "Skip", "Skip", "Not enough data")
     assert a.searches_per_listing == pytest.approx(10.0) and d.score is None and not d.eligible
 
 
@@ -25,13 +25,13 @@ def test_emas_when_top_third_everywhere():
     rows = [make_row("a", 1000, 3, 100), make_row("b", 500, 2, 1000),
             make_row("c", 2000, 1, 5000), make_row("e", 4000, 4, 10)]
     e = score_all(rows, Config())[0]
-    assert e.row.keyword == "e" and e.label == "Emas" and e.score == pytest.approx(100)
+    assert e.row.keyword == "e" and e.label == "Gold" and e.score == pytest.approx(100)
 
 
 def test_label_boundaries():
-    assert label_for(200 / 3, 200 / 3, 200 / 3, 66.7) == "Emas"
-    assert label_for(66.6, 100, 100, 90) == "Potensial"
-    assert label_for(10, 10, 10, 60) == "Potensial" and label_for(10, 10, 10, 59.99) == "Lewati"
+    assert label_for(200 / 3, 200 / 3, 200 / 3, 66.7) == "Gold"
+    assert label_for(66.6, 100, 100, 90) == "Potential"
+    assert label_for(10, 10, 10, 60) == "Potential" and label_for(10, 10, 10, 59.99) == "Skip"
 
 
 def test_competition_levels():
@@ -51,7 +51,7 @@ def test_missing_metric_reweights():
 
 def test_no_data_rows_are_data_kurang():
     [s] = score_all([make_row("n", None, None, None, has_data=False)], Config())
-    assert s.label == "Data kurang" and not s.eligible
+    assert s.label == "Not enough data" and not s.eligible
 
 
 def test_conversion_uses_level_not_rate():

@@ -95,7 +95,7 @@ def parse_search(raw: RawResult) -> ParsedSearch:
         quota = blocked_quota(raw.responses, raw.keyword)
         if quota is not None:
             raise EtsyQuotaReached(quota)
-        raise ParseError(f"Data utama untuk '{raw.keyword}' tidak ditemukan.")
+        raise ParseError(f"Main data for '{raw.keyword}' not found.")
     body = results[-1].body
     stats = body["stats"]
     daily = (body.get("dailyStats") or {}).get("stats") if isinstance(body.get("dailyStats"), dict) else None

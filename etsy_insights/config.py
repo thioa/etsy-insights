@@ -57,15 +57,15 @@ def _is_number(value: Any) -> bool:
 
 def _parse_scalar(key: str, value: Any, default: int, warnings: list[str]) -> int:
     if not _is_number(value) or value < 0 or (key in _INT_KEYS and value != int(value)):
-        warnings.append(f"{key}: nilai '{value}' tidak valid (harus angka bulat ≥ 0), memakai default {default}.")
+        warnings.append(f"{key}: value '{value}' is not valid (must be a whole number of 0 or more), using default {default}.")
         return default
     lo, hi = HARD_LIMITS.get(key, (None, None))
     result = int(value)
     if hi is not None and result > hi:
-        warnings.append(f"{key}: {result} melewati batas keras, memakai {int(hi)}.")
+        warnings.append(f"{key}: {result} is above the safety limit, using {int(hi)}.")
         result = int(hi)
     if lo is not None and result < lo:
-        warnings.append(f"{key}: {result} di bawah batas keras, memakai {int(lo)}.")
+        warnings.append(f"{key}: {result} is below the safety limit, using {int(lo)}.")
         result = int(lo)
     return result
 
@@ -73,14 +73,14 @@ def _parse_scalar(key: str, value: Any, default: int, warnings: list[str]) -> in
 def _parse_range(key: str, value: Any, default: tuple, warnings: list[str]) -> tuple:
     if (not isinstance(value, list) or len(value) != 2
             or not all(_is_number(v) and v >= 0 for v in value)):
-        warnings.append(f"{key}: harus berupa [min, maks] berisi angka ≥ 0, memakai default {list(default)}.")
+        warnings.append(f"{key}: must be [min, max] with numbers of 0 or more, using default {list(default)}.")
         return default
     lo, hi = sorted(value)
     if key in _INT_RANGE_KEYS:
         lo, hi = int(lo), int(hi)
     hard_lo, _ = HARD_LIMITS.get(key, (None, None))
     if hard_lo is not None and lo < hard_lo:
-        warnings.append(f"{key}: batas bawah {lo} di bawah batas keras, memakai {hard_lo}.")
+        warnings.append(f"{key}: minimum {lo} is below the safety limit, using {hard_lo}.")
         lo = hard_lo
     hi = max(hi, lo)
     return (lo, hi)
@@ -88,20 +88,20 @@ def _parse_range(key: str, value: Any, default: tuple, warnings: list[str]) -> t
 
 def _parse_weights(value: Any, default: tuple, warnings: list[str]) -> tuple:
     if not isinstance(value, dict):
-        warnings.append("bobot: harus berupa tabel [bobot], memakai default.")
+        warnings.append("bobot: must be a [bobot] table, using defaults.")
         return default
     for unknown in set(value) - set(_WEIGHT_KEYS):
-        warnings.append(f"bobot.{unknown}: kunci tidak dikenal, diabaikan.")
+        warnings.append(f"bobot.{unknown}: unknown key, ignored.")
     raw = []
     for name, dflt in zip(_WEIGHT_KEYS, default):
         w = value.get(name, dflt)
         if not _is_number(w) or w < 0:
-            warnings.append(f"bobot.{name}: nilai '{w}' tidak valid, memakai default {dflt}.")
+            warnings.append(f"bobot.{name}: value '{w}' is not valid, using default {dflt}.")
             w = dflt
         raw.append(float(w))
     total = sum(raw)
     if total <= 0:
-        warnings.append("bobot: semua bobot nol, memakai default 0.40/0.35/0.25.")
+        warnings.append("bobot: all weights are zero, using defaults 0.40/0.35/0.25.")
         return default
     return tuple(w / total for w in raw)
 
@@ -114,14 +114,14 @@ def load_config(path: Path) -> tuple[Config, list[str]]:
     try:
         text = path.read_text(encoding="utf-8-sig")
     except UnicodeDecodeError as exc:
-        raise ConfigError("config.toml bukan teks UTF-8. Buka dengan TextEdit, lalu simpan ulang "
-                          "dengan encoding UTF-8 (Format > Make Plain Text).") from exc
+        raise ConfigError("config.toml is not UTF-8 text. Open it in TextEdit and save it as plain text "
+                          "(UTF-8).") from exc
     try:
         data = tomllib.loads(text)
     except tomllib.TOMLDecodeError as exc:
         match = re.search(r"line (\d+)", str(exc))
         line = match.group(1) if match else "?"
-        raise ConfigError(f"config.toml tidak valid di baris {line}: {exc}") from exc
+        raise ConfigError(f"config.toml is not valid at line {line}: {exc}") from exc
 
     defaults = Config()
     known = {f.name for f in fields(Config)}
@@ -129,7 +129,7 @@ def load_config(path: Path) -> tuple[Config, list[str]]:
     changes: dict[str, Any] = {}
     for key, value in data.items():
         if key not in known:
-            warnings.append(f"{key}: kunci tidak dikenal, diabaikan.")
+            warnings.append(f"{key}: unknown key, ignored.")
             continue
         default = getattr(defaults, key)
         if key == "bobot":
