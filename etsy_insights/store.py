@@ -101,6 +101,11 @@ def _dt(text: str | None) -> datetime | None:
     return datetime.fromisoformat(text) if text else None
 
 
+def _json_tuple(text: str | None) -> tuple:
+    # Hasil panen menyimpan "[]"; melewati json.loads untuk puluhan ribu baris itu membuat pembacaan jauh lebih cepat.
+    return tuple(json.loads(text)) if text and text != "[]" else ()
+
+
 class Store:
     def __init__(self, path: str | Path) -> None:
         if str(path) != ":memory:":
@@ -317,8 +322,8 @@ class Store:
         metrics = KeywordMetrics(
             has_data=bool(row["has_data"]), search_volume=row["search_volume"],
             conversion_rate=row["conversion_rate"], competition_value=row["competition_value"],
-            competition_kind=row["competition_kind"], trend=tuple(json.loads(row["trend_json"] or "[]")),
-            related=tuple(json.loads(row["related_json"] or "[]")),
+            competition_kind=row["competition_kind"], trend=_json_tuple(row["trend_json"]),
+            related=_json_tuple(row["related_json"]),
             conversion_level=row["conversion_level"], wow_pct=row["wow_pct"])
         return ResultRow(keyword_id=row["keyword_id"], keyword=row["keyword"], source=row["source"],
                          depth=row["depth"], parent_keyword=row["parent_keyword"], status=row["status"],
