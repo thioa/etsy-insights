@@ -88,7 +88,7 @@ def handling_days(shipping: dict) -> int | None:
     return value if _int(value) else None
 
 
-def _check_shipping(path: str, shipping: dict) -> None:
+def check_shipping(path: str, shipping: dict) -> None:
     for profile in _profiles(shipping):
         first = profile.get("first_item") if isinstance(profile, dict) else None
         if (not isinstance(profile, dict) or not isinstance(profile.get("countries"), list)
@@ -134,7 +134,7 @@ def _type_details(client: PrintifyClient, key: tuple[int, int], title: str, prov
     if not is_own and provider_title is None:  # provider tidak ada lagi di katalog
         return SyncedType(*key, title, None, "picked", None, None, None, None, False)
     shipping = client.shipping(blueprint_id, provider_id)
-    _check_shipping(f"/v1/catalog/blueprints/{blueprint_id}/print_providers/{provider_id}/shipping.json", shipping)
+    check_shipping(f"/v1/catalog/blueprints/{blueprint_id}/print_providers/{provider_id}/shipping.json", shipping)
     if not is_own:
         return SyncedType(*key, title, provider_title, "picked", None, None, us_shipping_cents(shipping, None),
                           handling_days(shipping), True)

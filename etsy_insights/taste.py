@@ -7,7 +7,7 @@ from __future__ import annotations
 import re
 import statistics
 from collections import Counter
-from collections.abc import Sequence
+from collections.abc import Collection, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -135,9 +135,11 @@ def build_profile(raw: RawResult) -> TasteProfile | None:
         examples=tuple(cards[:EXAMPLE_COUNT]))
 
 
-def build_profiles(store: Store) -> dict[str, TasteProfile]:
+def build_profiles(store: Store, only: Collection[str] | None = None) -> dict[str, TasteProfile]:
+    """Profil selera per keyword; `only` membatasi ke keyword tertentu (lebih cepat)."""
     profiles = {}
-    for raw in store.latest_search_raws().values():
+    ids = None if only is None else list(store.keyword_ids(only).values())
+    for raw in store.latest_search_raws(ids).values():
         profile = build_profile(raw)
         if profile is not None:
             profiles[raw.keyword] = profile

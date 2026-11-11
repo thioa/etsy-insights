@@ -80,3 +80,16 @@ def test_titles_are_escaped(home):
     assert "<script>alert" not in page(home, "/catalog?q=script").get_data(as_text=True)  # judul hanya untuk pencarian
     html = page(home, "/catalog/mug").get_data(as_text=True)
     assert "<script>alert" not in html and "&lt;script&gt;alert(1)&lt;/script&gt; Mug" in html
+
+
+def test_category_page_reuses_the_catalog_summary(home, monkeypatch):
+    import etsy_insights.catalog as catalog
+    seed_ready_keyword(home)
+    seed_printify(home, mug_cost=100, mug_shipping=0)
+    calls = []
+    real = catalog.score_all
+    monkeypatch.setattr(catalog, "score_all", lambda rows, cfg: calls.append(1) or real(rows, cfg))
+    c = client(create_app(home, token=TOKEN, runner=FakeRunner()))
+    c.get("/catalog")
+    html = c.get("/catalog/mug").get_data(as_text=True)
+    assert len(calls) == 1 and 'href="/keyword/custom%20mug"' in html

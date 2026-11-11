@@ -10,7 +10,7 @@ from .config import Config
 from .keywords import add_keywords
 from .printify_api import PrintifyClient
 from .printify_store import Blueprint, PrintifyStore, ShippingInfo
-from .printify_sync import handling_days, us_shipping_cents
+from .printify_sync import check_shipping, handling_days, us_shipping_cents
 from .product_fit import fits_for_store
 from .product_words import CATEGORY_NAMES, ENTRIES, category_for, category_slug, normalize_words
 from .score import ScoredKeyword, score_all
@@ -20,6 +20,7 @@ from .taste import build_profiles
 OTHER = "other"
 SEARCHED = ("done", "no_data")
 WAITING = ("pending", "in_progress")
+TOP_KEYWORDS = 10
 
 
 @dataclass(frozen=True)
@@ -51,6 +52,7 @@ class CategorySummary:
     models: int
     in_my_products: bool
     research: ResearchState
+    top: tuple[ScoredKeyword, ...] = ()  # 10 keyword terbaik (untuk halaman kategori)
 
 
 def categories_from(blueprints: Sequence[Blueprint]) -> dict[str, CategoryInfo]:
@@ -116,7 +118,8 @@ _CACHE: dict[str, tuple[tuple, dict[str, CategorySummary]]] = {}
 def summarize(store: Store, cfg: Config, categories: Mapping[str, CategoryInfo]) -> dict[str, CategorySummary]:
     """Ringkasan per kategori. Disimpan sampai keyword, hasil, data Printify, atau pengaturan berubah."""
     printify = PrintifyStore(store)
-    key = (store.change_stamp(), printify.change_stamp(), cfg, tuple(sorted(categories)))
+    key = (store.change_stamp(), tuple(printify.types()), tuple(sorted(printify.links().items())), cfg,
+           tuple(sorted(categories.items())))
     cached = _CACHE.get(store.path)
     if cached is not None and cached[0] == key:
         return cached[1]
@@ -132,15 +135,18 @@ def _summarize(store: Store, cfg: Config, categories: Mapping[str, CategoryInfo]
     types = [t for t in printify.types() if t.available]
     mine = {category_for(t.title) for t in types}
     costed = {category_for(t.title) for t in types if t.cost_min_cents is not None}
-    fits = {}
-    if costed:  # hanya keyword yang pernah dicari langsung punya harga, jadi hanya itu yang bisa Ready to sell
-        profiles = build_profiles(store)
-        fits = fits_for_store(store, cfg, [s for s in scored if s.row.keyword in profiles], profiles)
     index = _CategoryIndex(m for m in categories if m != OTHER)
     members: dict[str, list[ScoredKeyword]] = {main: [] for main in categories}
     for item in scored:
         for main in index.categories(item.row.keyword):
             members[main].append(item)
+    # Ready to sell butuh label Gold/Potential dan harga pembeli: hanya keyword itu yang harganya dibaca.
+    needed = {s.row.keyword for main in costed if main in members for s in members[main]
+              if s.eligible and s.label in ("Gold", "Potential")}
+    fits = {}
+    if needed:
+        profiles = build_profiles(store, only=needed)
+        fits = fits_for_store(store, cfg, [s for s in scored if s.row.keyword in profiles], profiles)
 
     summaries = {}
     for main, info in categories.items():
@@ -157,7 +163,8 @@ def _summarize(store: Store, cfg: Config, categories: Mapping[str, CategoryInfo]
             gold=sum(s.label == "Gold" for s in eligible), potential=sum(s.label == "Potential" for s in eligible),
             best=(best.row.keyword, best.score, best.label) if best else None,
             ready=sum(fits[s.row.keyword].ready for s in items if s.row.keyword in fits) if main in costed else None,
-            models=len(info.blueprints), in_my_products=main in mine, research=research_state(statuses, main))
+            models=len(info.blueprints), in_my_products=main in mine, research=research_state(statuses, main),
+            top=tuple(sorted(eligible, key=lambda s: (-s.score, s.row.keyword))[:TOP_KEYWORDS]))
     return summaries
 
 
@@ -175,13 +182,6 @@ def sort_summaries(summaries: Iterable[CategorySummary], sort: str) -> list[Cate
     items = list(summaries)
     return (sorted((s for s in items if s.info.main != OTHER), key=key)
             + [s for s in items if s.info.main == OTHER])
-
-
-def top_keywords(store: Store, cfg: Config, main: str, limit: int = 10) -> list[ScoredKeyword]:
-    index = _CategoryIndex([main])
-    matching = [s for s in score_all(store.latest_results(), cfg)
-                if s.eligible and main in index.categories(s.row.keyword)]
-    return sorted(matching, key=lambda s: (-s.score, s.row.keyword))[:limit]
 
 
 def provider_list(printify: PrintifyStore, client: Callable[[], PrintifyClient], blueprint_id: int,
@@ -203,6 +203,7 @@ def shipping_for(printify: PrintifyStore, client: Callable[[], PrintifyClient], 
     if cached is not None:
         return cached
     shipping = client().shipping(blueprint_id, provider_id)
+    check_shipping(f"/v1/catalog/blueprints/{blueprint_id}/print_providers/{provider_id}/shipping.json", shipping)
     info = ShippingInfo(us_shipping_cents(shipping, None), handling_days(shipping))
     printify.save_shipping(blueprint_id, provider_id, info, now)
     return info

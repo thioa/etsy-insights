@@ -82,6 +82,7 @@ CATEGORY_NAMES: dict[str, str] = {
 }
 
 _SEPARATORS = re.compile(r"[-_/&]")
+_BRACKETS = re.compile(r"\([^()]*\)|\[[^\[\]]*\]")
 _NOT_WORD = re.compile(r"[^\w\s]|_")
 
 
@@ -140,7 +141,7 @@ def words_for_title(title: str) -> list[str]:
     Kata benda utama = kecocokan yang berakhir paling belakang di judul; kalau sama, frasa terpanjang.
     "Hooded Sweatshirt" → hoodie (bukan sweatshirt), "Cotton Canvas Tote Bag" → tote bag (bukan canvas).
     """
-    tokens = normalize_words(title)
+    tokens = normalize_words(_BRACKETS.sub(" ", title))  # "(Two-sided print)" bukan jenis produknya
     best: tuple[tuple[int, int], tuple[str, ...]] | None = None
     for main, synonyms in DICTIONARY:
         entry = (main, *synonyms)

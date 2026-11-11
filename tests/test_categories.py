@@ -77,3 +77,11 @@ def test_slugs_round_trip():
     for main in CATEGORY_NAMES:
         assert category_from_slug(category_slug(main)) == main
     assert category_slug("wall clock") == "wall-clock" and category_from_slug("nope") is None
+
+
+def test_text_in_brackets_does_not_decide_the_category():
+    from etsy_insights.product_words import words_for_title
+    assert category_for("Velveteen Minky Blanket (Two-sided print)") == "blanket"
+    assert "print" not in words_for_title("Velveteen Minky Blanket (Two-sided print)")
+    assert category_for("Ceramic Mug 15oz (Black)") == "mug"
+    assert category_for("Unclosed (bracket Mug") == "mug"

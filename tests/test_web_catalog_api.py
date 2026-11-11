@@ -76,3 +76,13 @@ def test_failures_are_not_cached(home, fake):
     assert r.status_code == 400 and r.get_json()["error"].startswith("Could not reach Printify")
     r = c.get("/api/catalog/shipping?blueprint_id=6&provider_id=99", headers=H)
     assert r.status_code == 200 and r.get_json()["shipping_us_cents"] == 475
+
+
+def test_malformed_shipping_is_not_cached(home, fake):
+    c = connected(home, fake)
+    path = "/v1/catalog/blueprints/6/print_providers/99/shipping.json"
+    fake.queue(path, (200, {"unexpected": "shape"}, None))
+    r = c.get("/api/catalog/shipping?blueprint_id=6&provider_id=99", headers=H)
+    assert r.status_code == 400 and r.get_json()["error"].startswith("Printify sent data in an unexpected format")
+    r = c.get("/api/catalog/shipping?blueprint_id=6&provider_id=99", headers=H)
+    assert r.status_code == 200 and r.get_json()["shipping_us_cents"] == 475

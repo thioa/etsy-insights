@@ -348,12 +348,28 @@ class Store:
                          tuple(CapturedResponse(r["url"], r["status"], r["body"]) for r in data["responses"]),
                          data.get("html", ""))
 
-    def latest_search_raws(self) -> dict[int, RawResult]:
+    def keyword_ids(self, keywords: Iterable[str]) -> dict[str, int]:
+        wanted = list(dict.fromkeys(normalize_keyword(k) for k in keywords))
+        ids: dict[str, int] = {}
+        for start in range(0, len(wanted), 500):
+            chunk = wanted[start:start + 500]
+            ids.update(self._db.execute(f"SELECT keyword, id FROM keywords WHERE keyword IN "
+                                        f"({','.join('?' * len(chunk))})", chunk).fetchall())
+        return ids
+
+    def latest_search_raws(self, keyword_ids: Collection[int] | None = None) -> dict[int, RawResult]:
         """keyword_id -> data mentah dari pencarian terbaru (dipakai untuk profil selera)."""
-        rows = self._db.execute(
-            "SELECT r.keyword_id, r.raw_json FROM results r WHERE r.kind = 'search' AND r.raw_json IS NOT NULL "
-            "AND r.id = (SELECT r2.id FROM results r2 WHERE r2.keyword_id = r.keyword_id AND r2.kind = 'search' "
-            "AND r2.raw_json IS NOT NULL ORDER BY r2.checked_at DESC, r2.id DESC LIMIT 1)").fetchall()
+        query = ("SELECT r.keyword_id, r.raw_json FROM results r WHERE r.kind = 'search' AND r.raw_json IS NOT NULL "
+                 "AND r.id = (SELECT r2.id FROM results r2 WHERE r2.keyword_id = r.keyword_id AND r2.kind = 'search' "
+                 "AND r2.raw_json IS NOT NULL ORDER BY r2.checked_at DESC, r2.id DESC LIMIT 1)")
+        if keyword_ids is None:
+            rows = self._db.execute(query).fetchall()
+        else:
+            ids, rows = list(keyword_ids), []
+            for start in range(0, len(ids), 500):
+                chunk = ids[start:start + 500]
+                rows += self._db.execute(query + f" AND r.keyword_id IN ({','.join('?' * len(chunk))})",
+                                         chunk).fetchall()
         raws = {}
         for keyword_id, text in rows:
             data = json.loads(text)

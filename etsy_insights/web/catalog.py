@@ -3,8 +3,7 @@ from __future__ import annotations
 
 from flask import Blueprint, jsonify, request
 
-from ..catalog import (categories_from, research, research_state, shipping_for, sort_summaries, summarize,
-                       top_keywords)
+from ..catalog import categories_from, research, research_state, shipping_for, sort_summaries, summarize
 from ..margin import money
 from ..models import CONVERSION_LEVEL_TEXT
 from ..printify_api import PrintifyError
@@ -111,8 +110,8 @@ def category_page(slug: str):
         return _page("unknown_category", active="catalog"), 404
     store, cfg = get_store(), get_config()
     summary = summaries[main]
-    top = top_keywords(store, cfg, main)
-    profiles = build_profiles(store)
+    top = list(summary.top)
+    profiles = build_profiles(store, only=[item.row.keyword for item in top])
     fits = fits_for_store(store, cfg, top, profiles)
     minimum = minimum_cents(cfg)
     rows = []

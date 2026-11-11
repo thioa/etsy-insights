@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from etsy_insights.catalog import (ResearchState, categories_from, research, research_seeds, research_state,
-                                   sort_summaries, summarize, top_keywords)
+                                   sort_summaries, summarize)
 from etsy_insights.config import Config
 from etsy_insights.models import RelatedKeyword
 from etsy_insights.printify_store import Blueprint, PrintifyStore
@@ -93,8 +93,8 @@ def test_sort_orders(tmp_path):
 
 def test_top_keywords(tmp_path):
     home, store, sums = fixture_summaries(tmp_path)
-    top = top_keywords(store, Config(), "sweatshirt", limit=3)
-    assert 0 < len(top) <= 3 and [s.score for s in top] == sorted((s.score for s in top), reverse=True)
+    top = sums["sweatshirt"].top
+    assert 0 < len(top) <= 10 and [s.score for s in top] == sorted((s.score for s in top), reverse=True)
     assert all(matches(s.row.keyword, ENTRIES["sweatshirt"]) for s in top)
 
 
@@ -113,3 +113,35 @@ def test_summaries_are_reused_until_data_changes(tmp_path, monkeypatch):
     PrintifyStore(store).update_type(PrintifyStore(store).types()[0].id, words=["mug"])
     catalog.summarize(store, Config(), categories)           # data Printify berubah → dihitung ulang
     assert len(calls) == 2
+
+
+def test_cache_refreshes_when_catalog_changes(tmp_path):
+    import dataclasses
+
+    from etsy_insights.printify_store import SyncResult
+    home, store, _ = fixture_summaries(tmp_path)
+    printify = PrintifyStore(store)
+    now = datetime.now().astimezone()
+
+    def sync_mug(image, brand):
+        catalog = [dataclasses.replace(b, image_url=image, brand=brand) if b.id == 68 else b
+                   for b in printify.blueprints()]
+        printify.apply_sync(SyncResult(111, "My Etsy Shop", tuple(catalog), (), tuple()), now)
+        return summarize(store, Config(), categories_from(printify.blueprints()))["mug"]
+    first = sync_mug("https://images.printify.com/mug1.png", "Old brand")
+    after = sync_mug("https://images.printify.com/mug2.png", "New brand")  # panjang alamat sama
+    assert first.info.photo.endswith("mug1.png")
+    assert after.info.photo == "https://images.printify.com/mug2.png" and after.info.blueprints[0].brand == "New brand"
+
+
+def test_prices_are_parsed_only_where_they_matter(tmp_path, monkeypatch):
+    import etsy_insights.catalog as catalog
+    home, store, _ = fixture_summaries(tmp_path)
+    asked = []
+    real = catalog.build_profiles
+    monkeypatch.setattr(catalog, "build_profiles", lambda st, only=None: asked.append(only) or real(st, only))
+    catalog._CACHE.clear()
+    sums = summarize(store, Config(), categories_from(PrintifyStore(store).blueprints()))
+    assert sums["mug"].ready == 1
+    (only,) = asked
+    assert "custom mug" in only and "sweatshirt" not in only  # sweatshirt is Skip: never Ready to sell
