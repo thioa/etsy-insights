@@ -210,6 +210,18 @@ class Store:
             "ORDER BY r2.checked_at DESC, r2.id DESC LIMIT 1) ORDER BY k.keyword", [max_depth, *exclude]).fetchall()
         return [self._result_row(r) for r in rows]
 
+    def remove_user_keyword(self, keyword_id: int) -> None:
+        """Kembalikan keyword ke hasil panen (kalau punya data panen); kalau tidak punya hasil, hapus."""
+        has_panen = self._db.execute(
+            "SELECT 1 FROM results WHERE keyword_id = ? AND kind = 'panen' LIMIT 1", (keyword_id,)).fetchone()
+        if has_panen:
+            self._db.execute(
+                "UPDATE keywords SET source = 'related', depth = 1, status = 'harvested' WHERE id = ?", (keyword_id,))
+            return
+        has_results = self._db.execute("SELECT 1 FROM results WHERE keyword_id = ? LIMIT 1", (keyword_id,)).fetchone()
+        if not has_results:
+            self._db.execute("DELETE FROM keywords WHERE id = ?", (keyword_id,))
+
     def status_counts(self) -> dict[str, int]:
         rows = self._db.execute("SELECT status, COUNT(*) FROM keywords GROUP BY status").fetchall()
         return {status: count for status, count in rows if count > 0}
