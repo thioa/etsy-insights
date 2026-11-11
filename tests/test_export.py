@@ -2,11 +2,13 @@ import pytest
 from openpyxl import load_workbook
 
 from etsy_insights.config import Config
-from etsy_insights.export import ANTREAN_HEADERS, PELUANG_HEADERS, SEMUA_HEADERS, export_excel
+from etsy_insights.export import ANTREAN_HEADERS, PELUANG_HEADERS, SELERA_HEADERS, SEMUA_HEADERS, export_excel
 from etsy_insights.planner import upcoming
 from etsy_insights.score import score_all
 from etsy_insights.store import Store
+from etsy_insights.taste import build_profile
 from tests.helpers import T0, make_metrics, make_raw, make_related, make_row
+from tests.test_parser import load_raw
 
 ROWS = [make_row("a", 1000, 3, 100, wow=12.0, rate=0.00022), make_row("b", 500, 2, 1000),
         make_row("c", 2000, 1, 5000, source="related", parent="a", row_kind="panen"),
@@ -54,3 +56,19 @@ def test_export_queue_sheet(tmp_path):
     ws = load_workbook(export_excel([], [], upcoming(s, Config()), tmp_path, T0.date()))["Antrean"]
     assert [c.value for c in ws[3]] == [1, "b", "daftar Anda", 0, None]
     assert [c.value for c in ws[4]] == [2, "x", "hasil panen", 1, "a"]
+
+
+def test_export_selera_sheet(tmp_path):
+    rows = [make_row("sweatshirt", 46395, 0, 1863632), make_row("mug", 900, 2, 500)]
+    profiles = {"sweatshirt": build_profile(load_raw("sweatshirt"))}
+    wb = load_workbook(export_excel(score_all(rows, Config()), rows, [], tmp_path, T0.date(), profiles=profiles))
+    assert wb.sheetnames == ["Peluang", "Selera", "Semua data", "Antrean"]
+    sel = wb["Selera"]
+    assert [c.value for c in sel[2]] == SELERA_HEADERS and sel.max_row == 3
+    row = {h: sel.cell(3, i + 1) for i, h in enumerate(SELERA_HEADERS)}
+    assert row["Keyword"].value == "sweatshirt" and row["Harga dibayar pembeli"].value == "US$15.30 – US$18.70"
+    assert row["Kesulitan masuk"].value == "Sulit"
+    assert row["Contoh 1"].hyperlink.target.startswith("https://www.etsy.com/listing/")
+    pel = wb["Peluang"]
+    by_kw = {pel.cell(r, 1).value: [c.value for c in pel[r]] for r in range(3, pel.max_row + 1)}
+    assert by_kw["sweatshirt"][-2:] == ["US$15.30 – US$18.70", "Sulit"] and by_kw["mug"][-2:] == [None, None]

@@ -77,6 +77,16 @@ File `hasil/peluang-YYYY-MM-DD.xlsx` berisi:
 
 - **Peluang**: keyword diurutkan menurut skor (volume 40%, konversi 35%, pesaing sedikit 25%),
   dengan label **Emas** (sepertiga teratas di ketiganya), **Potensial** (skor ≥ 60), atau **Lewati**.
+- **Selera**: untuk setiap keyword yang sudah dicari, dibaca dari ±20 listing teratas di Insights:
+  - **tema populer**: kata atau frasa yang sering muncul di judul, misalnya "christmas (7), vintage (6)";
+  - **harga yang benar-benar dibayar pembeli** dan rentang harga listing teratas;
+  - **kesulitan masuk**:
+    - **Sulit** kalau pemain teratas rata-rata punya ribuan ulasan atau hampir semuanya Bestseller;
+    - **Mudah** kalau ulasannya masih sedikit;
+    - **Sedang** di antaranya;
+  - **5 contoh listing teratas** (klik untuk melihat gambarnya).
+
+  Kolom *Harga pasar* dan *Kesulitan masuk* juga muncul di sheet Peluang.
 - **Semua data**: semua angka mentah, baik hasil cari maupun hasil panen.
 - **Antrean**: keyword berikutnya yang akan dicari.
 

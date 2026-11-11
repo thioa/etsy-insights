@@ -183,3 +183,13 @@ def test_sync_promotes_harvested_to_user():
     assert s.sync_user_keywords(["b"], T0) == 1
     b = s.get("b")
     assert (b.source, b.depth, b.parent_keyword, b.status) == ("user", 0, None, "pending")
+
+
+def test_latest_search_raws_roundtrip():
+    from tests.test_parser import load_raw
+    s = new_store("sweatshirt")
+    kid = s.get("sweatshirt").id
+    raw = load_raw("sweatshirt")
+    s.save_result(kid, make_metrics(), raw, T0, "t")
+    back = s.latest_search_raws()[kid]
+    assert back.keyword == "sweatshirt" and back.responses == raw.responses

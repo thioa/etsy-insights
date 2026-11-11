@@ -131,3 +131,18 @@ def test_sigterm_becomes_keyboard_interrupt():
         with cli.interrupt_on_signals():
             os.kill(os.getpid(), signal.SIGTERM)
     assert signal.getsignal(signal.SIGTERM) is signal.SIG_DFL
+
+
+def test_cli_export_includes_selera(tmp_path, capsys):
+    from etsy_insights.store import Store
+    from tests.helpers import make_metrics
+    from tests.test_parser import load_raw
+    base = project(tmp_path, keywords="sweatshirt\n")
+    s = Store(base / "data" / "etsy.db")
+    s.sync_user_keywords(["sweatshirt"], T0)
+    s.save_result(s.get("sweatshirt").id, make_metrics(volume=46395, level=0, comp=1863632),
+                  load_raw("sweatshirt"), T0, "t")
+    s.close()
+    assert main(["export"], base_dir=base, now=lambda: T0) == 0
+    sel = load_workbook(tmp_path / "hasil" / "peluang-2026-11-11.xlsx")["Selera"]
+    assert sel.cell(3, 1).value == "sweatshirt"

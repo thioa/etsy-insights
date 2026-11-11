@@ -9,7 +9,7 @@ from collections.abc import Collection, Iterable, Sequence
 from datetime import date, datetime, timedelta, timezone, tzinfo
 from pathlib import Path
 
-from .models import KeywordMetrics, QueueItem, RawResult, RelatedKeyword, ResultRow
+from .models import CapturedResponse, KeywordMetrics, QueueItem, RawResult, RelatedKeyword, ResultRow
 
 MAX_FAILURES = 3
 
@@ -279,6 +279,21 @@ class Store:
             self._RESULT_SELECT + " WHERE r.id = (SELECT r2.id FROM results r2 WHERE r2.keyword_id = r.keyword_id "
             "ORDER BY r2.checked_at DESC, r2.id DESC LIMIT 1) ORDER BY k.keyword").fetchall()
         return [self._result_row(r) for r in rows]
+
+    def latest_search_raws(self) -> dict[int, RawResult]:
+        """keyword_id -> data mentah dari pencarian terbaru (dipakai untuk profil selera)."""
+        rows = self._db.execute(
+            "SELECT r.keyword_id, r.raw_json FROM results r WHERE r.kind = 'search' AND r.raw_json IS NOT NULL "
+            "AND r.id = (SELECT r2.id FROM results r2 WHERE r2.keyword_id = r.keyword_id AND r2.kind = 'search' "
+            "AND r2.raw_json IS NOT NULL ORDER BY r2.checked_at DESC, r2.id DESC LIMIT 1)").fetchall()
+        raws = {}
+        for keyword_id, text in rows:
+            data = json.loads(text)
+            raws[keyword_id] = RawResult(
+                data["keyword"], data["page_url"],
+                tuple(CapturedResponse(r["url"], r["status"], r["body"]) for r in data["responses"]),
+                data.get("html", ""))
+        return raws
 
     def all_results(self) -> list[ResultRow]:
         rows = self._db.execute(self._RESULT_SELECT + " ORDER BY r.checked_at DESC, r.id DESC").fetchall()

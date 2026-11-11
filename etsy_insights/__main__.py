@@ -25,6 +25,7 @@ from .recorder import run_kenali
 from .score import score_all
 from .session import REASON_TEXT, SessionDeps, StopReason, format_summary, run_session
 from .store import Store, read_keywords_file
+from .taste import build_profiles
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 UJI_SEARCHES = 3
@@ -103,7 +104,7 @@ def _status(base: Path, cfg: Config, now: datetime) -> int:
 def _export(base: Path, cfg: Config, now: datetime) -> int:
     store = _open_store(base, now)
     path = export_excel(score_all(store.latest_results(), cfg), store.all_results(), upcoming(store, cfg),
-                        base / "hasil", now.date())
+                        base / "hasil", now.date(), profiles=build_profiles(store))
     store.close()
     print(f"File Excel: {path}")
     return 0
