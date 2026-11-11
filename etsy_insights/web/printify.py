@@ -6,12 +6,13 @@ from datetime import datetime
 
 from flask import Blueprint, current_app, jsonify, request
 
+from ..catalog import provider_list, shipping_for
 from ..keywords import add_keywords
 from ..margin import money, parse_usd_cents
 from ..printify_api import PrintifyError
 from ..printify_store import PrintifyStore
 from ..printify_suggestions import suggest
-from ..printify_sync import NotConnected, SyncBusy, handling_days, us_shipping_cents
+from ..printify_sync import NotConnected, SyncBusy
 from ..printify_token import clean_token, delete_token, load_token, looks_like_token, save_token, token_hint
 from ..product_fit import match_counts
 from ..store import normalize_keyword
@@ -52,6 +53,11 @@ def _local(text: str | None) -> str | None:
 def _shops(shops: list) -> list[dict]:
     return [{"id": s.get("id"), "title": s.get("title"), "sales_channel": s.get("sales_channel")}
             for s in shops if isinstance(s, dict)]
+
+
+def app_token_ok() -> bool:
+    """GET yang memanggil Printify wajib membawa kode aplikasi (header X-App-Token)."""
+    return secrets.compare_digest(request.headers.get("X-App-Token", ""), current_app.config["APP_TOKEN"])
 
 
 def _client():
@@ -156,19 +162,18 @@ def catalog():
 @bp.get("/api/printify/providers")
 def providers():
     # Endpoint ini memakai token Printify Anda, jadi situs lain tidak boleh memanggilnya (wajib kode aplikasi).
-    supplied = request.headers.get("X-App-Token", "")
-    if not secrets.compare_digest(supplied, current_app.config["APP_TOKEN"]):
+    if not app_token_ok():
         return _error("Forbidden", 403)
     blueprint_id = _int(request.args.get("blueprint_id"))
     if blueprint_id is None:
         return _error("Choose a product.")
     try:
-        items = _client().providers(blueprint_id)
+        items = provider_list(PrintifyStore(get_store()), _client, blueprint_id, ctx().now())
     except NotConnected as exc:
         return _error(exc.message, 409)
     except PrintifyError as exc:
         return _error(exc.message)
-    return jsonify(providers=[{"id": p.get("id"), "title": p.get("title")} for p in items if isinstance(p, dict)])
+    return jsonify(providers=[{"id": pid, "title": title} for pid, title in items])
 
 
 @bp.post("/api/printify/types/add")
@@ -187,17 +192,16 @@ def add_type():
     if blueprint is None:
         return _error("Unknown product.", 404)
     try:
-        client = _client()
-        names = {p.get("id"): p.get("title") for p in client.providers(blueprint_id) if isinstance(p, dict)}
+        names = dict(provider_list(printify, _client, blueprint_id, ctx().now()))
         if provider_id not in names:
             return _error("Unknown print provider.", 404)
-        shipping = client.shipping(blueprint_id, provider_id)
+        shipping = shipping_for(printify, _client, blueprint_id, provider_id, ctx().now())
     except NotConnected as exc:
         return _error(exc.message, 409)
     except PrintifyError as exc:
         return _error(exc.message)
     added = printify.add_picked(blueprint_id, provider_id, blueprint.title, names[provider_id], cost,
-                                us_shipping_cents(shipping, None), handling_days(shipping), ctx().now())
+                                shipping.shipping_us_cents, shipping.handling_days, ctx().now())
     return jsonify(ok=True, type_id=added.id)
 
 

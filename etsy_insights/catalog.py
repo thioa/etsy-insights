@@ -1,14 +1,16 @@
 """Katalog Printify per kategori: ringkasan peluang Etsy dan Research (spec Tahap 5 §5–§7)."""
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
 from .config import Config
 from .keywords import add_keywords
-from .printify_store import Blueprint, PrintifyStore
+from .printify_api import PrintifyClient
+from .printify_store import Blueprint, PrintifyStore, ShippingInfo
+from .printify_sync import handling_days, us_shipping_cents
 from .product_fit import fits_for_store
 from .product_words import CATEGORY_NAMES, ENTRIES, category_for, category_slug, normalize_words
 from .score import ScoredKeyword, score_all
@@ -180,3 +182,27 @@ def top_keywords(store: Store, cfg: Config, main: str, limit: int = 10) -> list[
     matching = [s for s in score_all(store.latest_results(), cfg)
                 if s.eligible and main in index.categories(s.row.keyword)]
     return sorted(matching, key=lambda s: (-s.score, s.row.keyword))[:limit]
+
+
+def provider_list(printify: PrintifyStore, client: Callable[[], PrintifyClient], blueprint_id: int,
+                  now: datetime) -> list[tuple[int, str]]:
+    """Print provider untuk sebuah model: dari cache (30 hari), atau dari Printify lalu disimpan."""
+    cached = printify.cached_providers(blueprint_id, now)
+    if cached is not None:
+        return cached
+    providers = [(item["id"], str(item.get("title") or "")) for item in client().providers(blueprint_id)
+                 if isinstance(item, dict) and isinstance(item.get("id"), int)]
+    printify.save_providers(blueprint_id, providers, now)
+    return providers
+
+
+def shipping_for(printify: PrintifyStore, client: Callable[[], PrintifyClient], blueprint_id: int,
+                 provider_id: int, now: datetime) -> ShippingInfo:
+    """Ongkir ke AS dan waktu produksi: dari cache (30 hari), atau dari Printify lalu disimpan."""
+    cached = printify.cached_shipping(blueprint_id, provider_id, now)
+    if cached is not None:
+        return cached
+    shipping = client().shipping(blueprint_id, provider_id)
+    info = ShippingInfo(us_shipping_cents(shipping, None), handling_days(shipping))
+    printify.save_shipping(blueprint_id, provider_id, info, now)
+    return info

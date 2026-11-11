@@ -36,10 +36,11 @@ def create_app(home: Path, *, token: str, runner, port: int = 8765,
         printify_job=SyncJob(Path(home), client_factory, now=clock, **job_options))
     security.install(app, port)
 
-    from . import api, printify, views
+    from . import api, catalog, printify, views
     app.register_blueprint(api.bp)
     app.register_blueprint(views.bp)
     app.register_blueprint(printify.bp)
+    app.register_blueprint(catalog.bp)
 
     @app.teardown_appcontext
     def close_store(exc):
