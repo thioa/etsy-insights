@@ -237,6 +237,10 @@ class Store:
         ).fetchone())
         return results + keywords
 
+    def keyword_texts(self) -> set[str]:
+        """Semua keyword di database (status apa pun)."""
+        return {row[0] for row in self._db.execute("SELECT keyword FROM keywords")}
+
     def status_counts(self) -> dict[str, int]:
         rows = self._db.execute("SELECT status, COUNT(*) FROM keywords GROUP BY status").fetchall()
         return {status: count for status, count in rows if count > 0}

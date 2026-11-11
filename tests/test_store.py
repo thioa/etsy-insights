@@ -218,3 +218,9 @@ def test_harvested_from_sorted_by_volume():
     s = new_store("a")
     s.save_harvest(s.get("a").id, [make_related("x", 10), make_related("y", 500)], 200, 2, T0)
     assert [r.keyword for r in s.harvested_from(s.get("a").id)] == ["y", "x"]
+
+
+def test_keyword_texts():
+    s = new_store("mug", "tote bag")
+    s.save_harvest(s.get("mug").id, [make_related("coffee mug")], 200, 2, T0)
+    assert s.keyword_texts() == {"mug", "tote bag", "coffee mug"}

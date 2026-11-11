@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Sequence
+from functools import lru_cache
 
 # (kata utama, sinonim) — urutan sama dengan tabel spec §7.
 DICTIONARY: tuple[tuple[str, tuple[str, ...]], ...] = (
@@ -33,7 +34,6 @@ DICTIONARY: tuple[tuple[str, tuple[str, ...]], ...] = (
 
 _SEPARATORS = re.compile(r"[-_/&]")
 _NOT_WORD = re.compile(r"[^\w\s]|_")
-_CONSONANT_Y = re.compile(r"([^aeiou\W\d_])y$")
 
 
 def _base_form(word: str) -> str:
@@ -43,9 +43,12 @@ def _base_form(word: str) -> str:
         word = word[:-2]
     elif word.endswith("s") and not word.endswith("ss") and len(word) > 1:
         word = word[:-1]
-    return _CONSONANT_Y.sub(r"\1ie", word)  # baby → babie, hoody → hoodie
+    if len(word) > 1 and word[-1] == "y" and word[-2].isalpha() and word[-2] not in "aeiou":
+        word = word[:-1] + "ie"  # baby → babie, hoody → hoodie
+    return word
 
 
+@lru_cache(maxsize=65536)
 def normalize_words(text: str) -> tuple[str, ...]:
     cleaned = _NOT_WORD.sub(" ", _SEPARATORS.sub(" ", text.lower()))
     return tuple(_base_form(word) for word in cleaned.split())
@@ -53,7 +56,9 @@ def normalize_words(text: str) -> tuple[str, ...]:
 
 def _contains(tokens: Sequence[str], phrase: Sequence[str]) -> bool:
     size = len(phrase)
-    return size > 0 and any(tuple(tokens[i:i + size]) == tuple(phrase) for i in range(len(tokens) - size + 1))
+    if size == 0 or phrase[0] not in tokens:
+        return False
+    return any(tuple(tokens[i:i + size]) == tuple(phrase) for i in range(len(tokens) - size + 1))
 
 
 def matches_tokens(tokens: Sequence[str], words: Sequence[str]) -> bool:

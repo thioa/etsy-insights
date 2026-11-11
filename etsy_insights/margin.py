@@ -1,10 +1,10 @@
 """Perkiraan margin per penjualan dalam sen USD (spec Tahap 4 §8). Semua angka bilangan bulat."""
 from __future__ import annotations
 
-import math
 import re
 from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
+from functools import lru_cache
 
 STATUS_TEXT = {"no_match": "No match", "no_price": "Search to see price",
                "cost_unknown": "Cost unknown", "no_shipping": "No US shipping"}
@@ -53,14 +53,21 @@ def paid_price_cents(low: str | None, high: str | None) -> int | None:
     return int(_half_up(Decimal(sum(values)) / len(values)))
 
 
+@lru_cache(maxsize=64)
+def _basis_points(percent: float) -> int:
+    """9.5 % → 950. Hitungan fee memakai bilangan bulat (cepat dan tanpa galat desimal)."""
+    return int(_half_up(Decimal(str(percent)) * 100))
+
+
 def fee_cents(price_cents: int, fees: Fees) -> int:
-    return int(_half_up(Decimal(price_cents) * Decimal(str(fees.percent)) / 100)) + fees.fixed_cents
+    bp = _basis_points(fees.percent)
+    return (2 * price_cents * bp + 10000) // 20000 + fees.fixed_cents  # ROUND_HALF_UP untuk harga ≥ 0
 
 
 def price_needed_cents(cost_cents: int, shipping_cents: int, fees: Fees, target_cents: int) -> int:
     """Harga jual terendah (sen) agar margin ≥ target."""
-    needed = Decimal(cost_cents + shipping_cents + fees.fixed_cents + target_cents)
-    return math.ceil(needed / (1 - Decimal(str(fees.percent)) / 100))
+    needed = cost_cents + shipping_cents + fees.fixed_cents + target_cents
+    return -(-needed * 10000 // (10000 - _basis_points(fees.percent)))  # ceil
 
 
 def compute(price_cents: int | None, cost_cents: int | None, shipping_cents: int | None,
