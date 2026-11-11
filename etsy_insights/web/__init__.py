@@ -10,6 +10,7 @@ from types import SimpleNamespace
 
 from flask import Flask, g
 
+from ..advisor import AdvisorJob, default_ai
 from ..config import Config, load_config
 from ..printify_api import PrintifyClient
 from ..printify_sync import SyncJob
@@ -24,23 +25,30 @@ def _default_quit() -> None:
 def create_app(home: Path, *, token: str, runner, port: int = 8765,
                now: Callable[[], datetime] | None = None, on_quit: Callable[[], None] | None = None,
                printify_client: Callable[[str], PrintifyClient] | None = None,
-               printify_spawn: Callable[[Callable[[], None]], None] | None = None) -> Flask:
+               printify_spawn: Callable[[Callable[[], None]], None] | None = None,
+               advisor_client: Callable | None = None,
+               advisor_spawn: Callable[[Callable[[], None]], None] | None = None) -> Flask:
     app = Flask(__name__)
     app.config.update(APP_TOKEN=token, APP_HOME=Path(home), APP_PORT=port)
     clock = now or (lambda: datetime.now().astimezone())
     client_factory = printify_client or PrintifyClient
     job_options = {"spawn": printify_spawn} if printify_spawn is not None else {}
+    advisor_factory = advisor_client or default_ai
+    advisor_options = {"spawn": advisor_spawn} if advisor_spawn is not None else {}
     app.extensions["etsy"] = SimpleNamespace(
         runner=runner, now=clock, on_quit=on_quit or _default_quit, cache={},
         printify_client=client_factory,
-        printify_job=SyncJob(Path(home), client_factory, now=clock, **job_options))
+        printify_job=SyncJob(Path(home), client_factory, now=clock, **job_options),
+        advisor_client=advisor_factory,
+        advisor_job=AdvisorJob(Path(home), advisor_factory, now=clock, **advisor_options))
     security.install(app, port)
 
-    from . import api, catalog, printify, views
+    from . import advisor, api, catalog, printify, views
     app.register_blueprint(api.bp)
     app.register_blueprint(views.bp)
     app.register_blueprint(printify.bp)
     app.register_blueprint(catalog.bp)
+    app.register_blueprint(advisor.bp)
 
     @app.teardown_appcontext
     def close_store(exc):

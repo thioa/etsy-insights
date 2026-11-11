@@ -134,3 +134,11 @@ def seed_ready_keyword(home: Path, keyword: str = "custom mug") -> str:
         return keyword
     finally:
         store.close()
+
+
+def advisor_app(home: Path, ai_factory, *, spawn=lambda f: f(), port: int = 8765):
+    """App dengan AI Advisor palsu (tanpa jaringan). `spawn=None` memakai thread sungguhan."""
+    from etsy_insights.web import create_app
+    app = create_app(home, token=TOKEN, runner=FakeRunner(), port=port, advisor_client=ai_factory,
+                     advisor_spawn=spawn)
+    return app, client(app)
