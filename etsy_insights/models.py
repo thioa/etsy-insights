@@ -69,7 +69,7 @@ class RawResult:
 
 @dataclass(frozen=True)
 class DangerSignal:
-    kind: Literal["captcha", "verifikasi", "login", "http_403", "http_429"]
+    kind: Literal["captcha", "verification", "login", "http_403", "http_429"]
     detail: str
 
 

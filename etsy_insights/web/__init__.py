@@ -24,7 +24,8 @@ def create_app(home: Path, *, token: str, runner, port: int = 8765,
     app = Flask(__name__)
     app.config.update(APP_TOKEN=token, APP_HOME=Path(home), APP_PORT=port)
     app.extensions["etsy"] = SimpleNamespace(
-        runner=runner, now=now or (lambda: datetime.now().astimezone()), on_quit=on_quit or _default_quit)
+        runner=runner, now=now or (lambda: datetime.now().astimezone()), on_quit=on_quit or _default_quit,
+        cache={})
     security.install(app, port)
 
     from . import api, views

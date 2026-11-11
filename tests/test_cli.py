@@ -29,7 +29,7 @@ def test_cli_status(tmp_path, capsys):
 
 def test_cli_export(tmp_path, capsys):
     assert main(["export"], base_dir=project(tmp_path), now=lambda: T0) == 0
-    path = tmp_path / "hasil" / "peluang-2026-11-11.xlsx"
+    path = tmp_path / "hasil" / "opportunities-2026-11-11.xlsx"
     assert path.exists() and load_workbook(path)["Queue"].max_row == 4
 
 
@@ -144,7 +144,7 @@ def test_cli_export_includes_selera(tmp_path, capsys):
                   load_raw("sweatshirt"), T0, "t")
     s.close()
     assert main(["export"], base_dir=base, now=lambda: T0) == 0
-    sel = load_workbook(tmp_path / "hasil" / "peluang-2026-11-11.xlsx")["Buyer taste"]
+    sel = load_workbook(tmp_path / "hasil" / "opportunities-2026-11-11.xlsx")["Buyer taste"]
     assert sel.cell(3, 1).value == "sweatshirt"
 
 

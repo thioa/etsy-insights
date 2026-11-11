@@ -111,7 +111,7 @@ def export_excel(scored: Sequence[ScoredKeyword], history: Sequence[ResultRow],
     profiles = profiles or {}
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    path = out_dir / f"peluang-{today.isoformat()}.xlsx"
+    path = out_dir / f"opportunities-{today.isoformat()}.xlsx"
 
     wb = Workbook()
     peluang = wb.active

@@ -46,14 +46,19 @@
     <aside class="split__side">
       <section class="panel" aria-label="Last session">
         <h2>Last session</h2>
+        <div class="start-error" data-start-error {{ 'hidden' if not status.runner.error_code }}>
+          <p><strong>The session could not start or stopped with an error.</strong></p>
+          <pre class="start-error__out" data-start-error-lines>{{ status.runner.error_tail | join('\n') }}</pre>
+        </div>
         <div data-last>
         {% if status.last_session %}
-          <p><strong>{{ status.last_session.checked }}</strong> searches · {{ status.last_session.started_at[:16].replace('T', ' ') }}</p>
+          <p><strong>{{ status.last_session.checked }}</strong> searches · {{ status.last_session.started_text }}</p>
           <p class="muted">{{ status.last_session.reason_text }}</p>
         {% else %}
           <p class="muted">No sessions yet. Add keywords in My keywords, then start a test run.</p>
         {% endif %}
         </div>
+        <p><a class="small" href="/log">Open log</a></p>
       </section>
       <a class="btn btn--primary btn--block" href="/opportunities">See opportunities</a>
     </aside>

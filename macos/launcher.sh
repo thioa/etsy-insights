@@ -6,10 +6,23 @@ ask() {  # ask "message" "Button" -> 0 when the button was clicked
   /usr/bin/osascript -e "display dialog \"$1\" with title \"Etsy Insights\" buttons {\"Cancel\", \"$2\"} default button \"$2\" with icon caution" >/dev/null 2>&1
 }
 
+usable() {  # usable PYTHON -> 0 when it exists and may be run
+  local path
+  path="$(command -v "$1" 2>/dev/null)" || return 1
+  # Without Apple's developer tools, /usr/bin/python3 only shows an "install the tools?" popup.
+  if [ "$path" = "/usr/bin/python3" ]; then
+    /usr/bin/xcode-select -p >/dev/null 2>&1 || return 1
+  fi
+  return 0
+}
+
+# python.org first, then Homebrew, then anything else on PATH. ETSY_INSIGHTS_PYTHONS overrides (tests).
+CANDIDATES="${ETSY_INSIGHTS_PYTHONS-$(echo /Library/Frameworks/Python.framework/Versions/3.1[1-9]/bin/python3) /opt/homebrew/bin/python3 /usr/local/bin/python3 python3}"
 PY=""
-for c in /Library/Frameworks/Python.framework/Versions/3.1[1-9]/bin/python3 /opt/homebrew/bin/python3 /usr/local/bin/python3 python3; do
-  if command -v "$c" >/dev/null 2>&1 && "$c" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)' 2>/dev/null; then
+for c in $CANDIDATES; do
+  if usable "$c" && "$c" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)' 2>/dev/null; then
     PY="$c"
+    break
   fi
 done
 

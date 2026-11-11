@@ -21,8 +21,14 @@ Tampilan aplikasinya berbahasa Inggris; README ini berbahasa Indonesia.
 5. **Saat pertama dibuka**, aplikasi akan:
    - **menyiapkan dirinya sendiri** (sekali, 1–2 menit; muncul notifikasi "Setting up Etsy Insights…");
    - **menawarkan impor data lama.** Klik **Choose folder…**, lalu pilih folder `etsy-insights`
-     lama Anda (misalnya `Downloads/etsy-insights`). Database, `keywords.txt`, dan rekaman akan
-     disalin. `config.toml` lama sengaja tidak disalin, karena kuota defaultnya sudah berubah.
+     lama Anda (misalnya `Downloads/etsy-insights`), yaitu folder yang berisi folder `data`.
+     - Yang disalin: database, `keywords.txt`, dan rekaman. `config.toml` lama sengaja tidak
+       disalin, karena kuota defaultnya sudah berubah.
+     - Kalau folder yang dipilih salah, aplikasi akan bilang dan bertanya lagi.
+     - Kalau macOS meminta izin membuka folder Downloads, klik **Allow**.
+   - **Setelah impor, jangan pakai folder lama lagi.** `mulai.command` dan file `.command` lain di
+     folder lama punya batas harian dan cooldown sendiri. Kalau dipakai bersamaan dengan aplikasi,
+     jumlah pencarian Anda bisa dobel, dan itu bisa membuat Etsy curiga. Folder lama boleh dihapus.
 6. **Browser terbuka** ke `http://127.0.0.1:8765/`. Itulah aplikasinya.
 
 ## 2. Pemakaian sehari-hari
@@ -33,6 +39,8 @@ Tampilan aplikasinya berbahasa Inggris; README ini berbahasa Indonesia.
   - **Test run (3 searches)** untuk uji coba, **Start session** untuk sesi harian (default 15 pencarian).
   - Progres, keyword yang sedang dicari, dan catatan langkahnya diperbarui otomatis.
   - **Stop** menghentikan sesi dengan rapi.
+  - Kalau sesi gagal dimulai (misalnya Chrome tidak ditemukan), pesannya muncul di kartu
+    *Last session*. **Open log** menampilkan catatan lengkapnya.
   - Selama sesi berjalan, jendela Chrome "Etsy Riset" jangan diklik dan jangan di-minimize.
 - **Opportunities:**
   - Tabel peluang dengan filter label (*Gold / Potential / Skip*), *Entry difficulty*, konversi,
@@ -63,12 +71,15 @@ itu **tidak disarankan**.
 ## 4. Letak data
 
 - **Data aplikasi:** `~/Library/Application Support/Etsy Insights/` (database, `keywords.txt`,
-  `config.toml`, log, rekaman). Saat memperbarui aplikasi, cukup ganti file .app-nya; data tetap aman.
-- **File Excel:** *Documents → Etsy Insights*.
+  `config.toml`, log, rekaman).
+- **Memperbarui aplikasi:** klik **Quit Etsy Insights** di Settings dulu, lalu ganti file .app-nya.
+  Data tetap aman.
+- **File Excel:** *Documents → Etsy Insights* (`opportunities-TANGGAL.xlsx`).
 
 ## 5. Cadangan lewat Terminal
 
-Semua perintah lama tetap ada, dan memakai data yang sama dengan aplikasi:
+Perintah Terminal tetap ada lewat aplikasinya. Perintah ini memakai data yang sama dengan aplikasi
+(bukan data di folder lama):
 
 ```bash
 "/Applications/Etsy Insights.app/Contents/MacOS/etsy-insights" --cli run --uji

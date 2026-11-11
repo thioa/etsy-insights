@@ -83,5 +83,65 @@ def test_download_excel(setup, tmp_path):
     home, runner, quits, c = setup
     r = c.get("/download/excel")
     assert r.status_code == 200 and "attachment" in r.headers["Content-Disposition"]
-    files = list((tmp_path / "Documents" / "Etsy Insights").glob("peluang-*.xlsx"))
+    files = list((tmp_path / "Documents" / "Etsy Insights").glob("opportunities-*.xlsx"))
     assert len(files) == 1 and load_workbook(files[0]).sheetnames[0] == "Opportunities"
+
+
+def test_frame_and_referrer_headers(setup):
+    home, runner, quits, c = setup
+    for path in ("/", "/settings", "/api/status"):
+        resp = c.get(path)
+        assert resp.headers["X-Frame-Options"] == "DENY"
+        assert "frame-ancestors 'none'" in resp.headers["Content-Security-Policy"]
+        assert resp.headers["Referrer-Policy"] == "no-referrer"
+
+
+def test_status_reuses_queue_ranking_until_data_changes(setup, monkeypatch):
+    import etsy_insights.planner as planner
+    from etsy_insights.config import Config
+    home, runner, quits, c = setup
+    store = Store(home / "data" / "etsy.db")
+    expected = len(planner.upcoming(store, Config(), limit=10**9))
+    store.close()
+    calls = []
+    real = planner.score_all
+    monkeypatch.setattr(planner, "score_all", lambda rows, cfg: calls.append(1) or real(rows, cfg))
+    assert c.get("/api/status").get_json()["queue"] == expected
+    c.get("/api/status")
+    c.get("/")
+    assert len(calls) == 1
+    assert c.post("/api/keywords/add", json={"text": "brand new keyword"}, headers=H).status_code == 200
+    assert c.get("/api/status").get_json()["queue"] == expected + 1
+
+
+def test_status_shows_local_time(setup, monkeypatch):
+    import time
+    from datetime import timezone
+    home, runner, quits, c = setup
+    monkeypatch.setenv("TZ", "Asia/Jakarta")
+    time.tzset()
+    try:
+        store = Store(home / "data" / "etsy.db")
+        sid = store.start_session(datetime(2026, 11, 11, 5, 29, tzinfo=timezone.utc))
+        store.end_session(sid, datetime(2026, 11, 11, 5, 40, tzinfo=timezone.utc), "no_quota", None)
+        store.close()
+        last = c.get("/api/status").get_json()["last_session"]
+        assert last["started_text"] == "2026-11-11 12:29"
+        assert "2026-11-11 12:29" in c.get("/").get_data(as_text=True)
+    finally:
+        monkeypatch.undo()
+        time.tzset()
+
+
+def test_status_reports_start_error(tmp_path, monkeypatch):
+    from etsy_insights.runner import RunnerStatus
+    monkeypatch.setenv("HOME", str(tmp_path))
+    home = seeded_home(tmp_path / "home")
+    runner = FakeRunner()
+    runner.status = lambda tail=20: RunnerStatus(False, None, None, 0, None, (), False, error_code=1,
+                                                 error_tail=("Google Chrome was not found.",))
+    c = client(create_app(home, token=TOKEN, runner=runner))
+    st = c.get("/api/status").get_json()
+    assert st["runner"]["error_code"] == 1 and st["runner"]["error_tail"] == ["Google Chrome was not found."]
+    html = c.get("/").get_data(as_text=True)
+    assert "Google Chrome was not found." in html and 'href="/log"' in html and "Open log" in html

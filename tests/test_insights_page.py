@@ -6,7 +6,7 @@ def test_detect_danger_cases():
     assert detect_danger("https://www.etsy.com/signin?from=x", [], "", []).kind == "login"
     assert detect_danger("https://www.etsy.com/your/shops/me/marketplace-insights",
                          ["https://geo.captcha-delivery.com/captcha/?a=1"], "", []).kind == "captcha"
-    assert detect_danger("https://www.etsy.com/x", [], "Please verify you are a human", []).kind == "verifikasi"
+    assert detect_danger("https://www.etsy.com/x", [], "Please verify you are a human", []).kind == "verification"
     assert detect_danger("https://www.etsy.com/x", [], "", [200, 429]).kind == "http_429"
     assert detect_danger("https://www.etsy.com/x", [], "", [403]).kind == "http_403"
     assert detect_danger("https://www.etsy.com/your/shops/me/marketplace-insights", [], "Searches 43k", [200]) is None
@@ -61,3 +61,8 @@ def test_check_danger_survives_navigation():
     assert _driver_on("https://www.etsy.com/signin?from=x").check_danger().kind == "login"
     driver = _driver_on("https://www.etsy.com/your/shops/me/marketplace-insights")
     assert driver.check_danger() is None and driver._page.waits >= 2
+
+
+def test_danger_details_are_english():
+    assert detect_danger("https://www.etsy.com/x", [], "", [429]).detail == "Etsy answered 429 (too many requests)"
+    assert detect_danger("https://www.etsy.com/x", [], "", [403]).detail == "Etsy answered 403 (access denied)"

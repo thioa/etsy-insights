@@ -46,3 +46,22 @@ def test_keywords_and_settings_pages(c):
     assert "Add keywords" in html and "Searched" in html and "No data" in html
     s = c.get("/settings").get_data(as_text=True)
     assert "Daily searches" in s and "1–30" in s and "Quit Etsy Insights" in s
+
+
+def test_log_page_shows_latest_output(tmp_path):
+    home = seeded_home(tmp_path)
+    logs = home / "logs"
+    logs.mkdir()
+    old = logs / "sesi-20261110-100000.log"
+    old.write_text("10:00:00 [1/15] mug\n", encoding="utf-8")
+    new = logs / "session-20261111-100000.out"
+    new.write_text("Google Chrome was not found. <install it>\n", encoding="utf-8")
+    import os
+    os.utime(old, (1, 1))
+    c = client(create_app(home, token=TOKEN, runner=FakeRunner()))
+    html = c.get("/log").get_data(as_text=True)
+    assert "Google Chrome was not found. &lt;install it&gt;" in html and "session-20261111-100000.out" in html
+
+
+def test_log_page_without_logs(c):
+    assert "No session log yet." in c.get("/log").get_data(as_text=True)

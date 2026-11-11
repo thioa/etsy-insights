@@ -14,6 +14,7 @@ import socket
 import subprocess
 import sys
 import time
+import traceback
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -79,6 +80,21 @@ def ensure_venv(home: Path, python: str, requirements: Path, *, run=subprocess.r
                                  f"and open it again. Details: {log}")
     stamp.write_text(digest, encoding="utf-8")
     return target
+
+
+IMPORTED_MESSAGE = (
+    "Imported your keywords and results from {src}.\n\n"
+    "From now on, use only the Etsy Insights app. Do not run mulai.command or the other .command files in "
+    "the old folder: they keep their own daily limit and cooldown, so using both could make Etsy suspicious. "
+    "You can delete the old folder.")
+NO_DATA_MESSAGE = ("No Etsy Insights data was found in {src}. Choose the etsy-insights folder that contains "
+                   "the \"data\" folder (for example Downloads/etsy-insights).")
+
+
+def is_old_folder(src: Path, home: Path) -> bool:
+    """True when `src` holds data from the Terminal version (and is not the app's own folder)."""
+    src = Path(src)
+    return (src / "data" / "etsy.db").is_file() and src.resolve() != Path(home).resolve()
 
 
 def needs_import(home: Path) -> bool:
@@ -159,15 +175,42 @@ class MacDialogs:
         _osascript(f'display dialog "{_quote(message)}" with title "{APP_NAME}" buttons {{"OK"}} '
                    f'default button "OK" with icon caution')
 
+    def info(self, message: str) -> None:
+        _osascript(f'display dialog "{_quote(message)}" with title "{APP_NAME}" buttons {{"OK"}} '
+                   f'default button "OK" with icon note')
+
     def ask_import(self) -> Path | None:
-        answer = _osascript(
-            f'display dialog "Import data from an older etsy-insights folder? (keywords, results, recordings)" '
-            f'with title "{APP_NAME}" buttons {{"Skip", "Choose folder…"}} default button "Choose folder…"')
-        if answer.returncode != 0 or "Choose folder" not in answer.stdout:
-            return None
-        chosen = _osascript('POSIX path of (choose folder with prompt "Choose your old etsy-insights folder")')
-        path = chosen.stdout.strip()
-        return Path(path) if chosen.returncode == 0 and path else None
+        while True:  # cancelling the folder picker goes back to the question
+            answer = _osascript(
+                f'display dialog "Import data from an older etsy-insights folder? (keywords, results, recordings)" '
+                f'with title "{APP_NAME}" buttons {{"Skip", "Choose folder…"}} default button "Choose folder…"')
+            if answer.returncode != 0 or "Choose folder" not in answer.stdout:
+                return None
+            chosen = _osascript('POSIX path of (choose folder with prompt "Choose your old etsy-insights folder")')
+            path = chosen.stdout.strip()
+            if chosen.returncode == 0 and path:
+                return Path(path)
+
+
+def _offer_import(home: Path, dialogs) -> None:
+    """Ask for the old folder until data is imported or the user skips."""
+    while True:
+        source = dialogs.ask_import()
+        if not source:
+            break
+        source = Path(source)
+        if not is_old_folder(source, home):
+            dialogs.error(NO_DATA_MESSAGE.format(src=source))
+            continue
+        try:
+            import_old_data(source, home)
+        except (OSError, shutil.Error) as exc:
+            dialogs.error(f"Etsy Insights could not copy {source}: {exc}. If macOS asked for permission, "
+                          f"allow it and choose the folder again.")
+            continue
+        dialogs.info(IMPORTED_MESSAGE.format(src=source))
+        break
+    (home / ".import-asked").write_text("yes", encoding="utf-8")
 
 
 def _open_in_browser(url: str) -> None:
@@ -212,10 +255,7 @@ def main(argv: list[str], *, dialogs=None, open_url=None, ping=ping, popen=subpr
         dialogs.error(str(exc))
         return 1
     if needs_import(home):
-        source = dialogs.ask_import()
-        if source:
-            import_old_data(Path(source), home)
-        (home / ".import-asked").write_text("yes", encoding="utf-8")
+        _offer_import(home, dialogs)
     start_server(target, app_dir, home, port, popen=popen)
     if not wait_for_server(port, ping=ping):
         dialogs.error(f"Etsy Insights could not start. Details: {home / 'server.log'}")
@@ -224,5 +264,24 @@ def main(argv: list[str], *, dialogs=None, open_url=None, ping=ping, popen=subpr
     return 0
 
 
+def launch(argv: list[str], **kwargs) -> int:
+    """main() with a readable message instead of silence when something unexpected goes wrong."""
+    try:
+        return main(argv, **kwargs)
+    except Exception as exc:  # noqa: BLE001 - last resort: the user must see something
+        log = app_home() / "launcher-error.log"
+        try:
+            log.parent.mkdir(parents=True, exist_ok=True)
+            log.write_text(traceback.format_exc(), encoding="utf-8")
+        except OSError:
+            pass
+        message = f"Etsy Insights could not open: {type(exc).__name__}: {exc}\nDetails: {log}"
+        if argv[:1] == ["--cli"]:
+            print(message)
+        else:
+            (kwargs.get("dialogs") or MacDialogs()).error(message)
+        return 1
+
+
 if __name__ == "__main__":
-    raise SystemExit(main(sys.argv[1:]))
+    raise SystemExit(launch(sys.argv[1:]))

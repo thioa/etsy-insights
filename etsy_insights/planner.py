@@ -40,3 +40,12 @@ def select_next(store: Store, cfg: Config, now: datetime,
 def upcoming(store: Store, cfg: Config, limit: int = 50) -> list[QueueItem]:
     pending = store.pending_queue()[:limit]
     return pending + _ranked_harvested(store, cfg, store.harvest_candidates(cfg.kedalaman_maks), limit - len(pending))
+
+
+def harvest_queue_size(store: Store, cfg: Config) -> int:
+    """Number of harvested keywords `upcoming` would list (without loading each one)."""
+    candidates = store.harvest_candidates(cfg.kedalaman_maks)
+    if not candidates:
+        return 0
+    wanted = {row.keyword_id for row in candidates}
+    return sum(1 for s in score_all(store.latest_results(), cfg) if s.eligible and s.row.keyword_id in wanted)

@@ -52,11 +52,11 @@ def detect_danger(url: str, frame_urls: Sequence[str], body_text: str,
     text = body_text.lower()
     for phrase in VERIFY_TEXTS:
         if phrase in text:
-            return DangerSignal("verifikasi", phrase)
+            return DangerSignal("verification", phrase)
     if 429 in http_statuses:
-        return DangerSignal("http_429", "Etsy membalas 429 (terlalu banyak permintaan)")
+        return DangerSignal("http_429", "Etsy answered 429 (too many requests)")
     if 403 in http_statuses:
-        return DangerSignal("http_403", "Etsy membalas 403 (akses ditolak)")
+        return DangerSignal("http_403", "Etsy answered 403 (access denied)")
     return None
 
 

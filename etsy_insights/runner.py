@@ -26,6 +26,8 @@ class RunnerStatus:
     limit: int | None
     log_tail: tuple[str, ...]
     stopping: bool
+    error_code: int | None = None  # exit code of the app's last session when it failed (not stopped by you)
+    error_tail: tuple[str, ...] = ()  # its last output lines (Chrome not found, unexpected error, ...)
 
 
 class RunnerBusy(Exception):
@@ -143,6 +145,13 @@ class SessionRunner:
             running, source, log = False, None, self._log or self._latest_log()
         lines = _tail(log, max(tail, 200))
         keyword, done, limit = parse_progress(lines)
+        error_code, error_tail = None, ()
+        if not running and self._process is not None and self._stop_deadline is None:
+            code = self._process.poll()
+            if code not in (None, 0):
+                error_code = code
+                error_tail = tuple(_tail(self._log.with_suffix(".out") if self._log else None, 5))
         return RunnerStatus(running=running, source=source, current_keyword=keyword if running else None,
                             done=done, limit=limit, log_tail=tuple(lines[-tail:]),
-                            stopping=running and source == "app" and self._stop_deadline is not None)
+                            stopping=running and source == "app" and self._stop_deadline is not None,
+                            error_code=error_code, error_tail=error_tail)

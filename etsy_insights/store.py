@@ -222,6 +222,15 @@ class Store:
         if not has_results:
             self._db.execute("DELETE FROM keywords WHERE id = ?", (keyword_id,))
 
+    def change_stamp(self) -> tuple:
+        """Cheap fingerprint that changes whenever keywords or results change (used to cache queue ranking)."""
+        results = tuple(self._db.execute("SELECT COUNT(*), MAX(id), MAX(checked_at) FROM results").fetchone())
+        keywords = tuple(self._db.execute(
+            "SELECT COUNT(*), TOTAL(id * instr('pending|in_progress|done|no_data|harvested|failed|', status || '|')), "
+            "TOTAL(id * depth), TOTAL(id * (source = 'user')), TOTAL(id * (parent_id IS NULL)) FROM keywords"
+        ).fetchone())
+        return results + keywords
+
     def status_counts(self) -> dict[str, int]:
         rows = self._db.execute("SELECT status, COUNT(*) FROM keywords GROUP BY status").fetchall()
         return {status: count for status, count in rows if count > 0}

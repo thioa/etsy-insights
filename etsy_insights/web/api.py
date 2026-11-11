@@ -9,7 +9,7 @@ from ..export import export_excel
 from ..keywords import add_keywords, prioritize, remove_keyword
 from ..pacer import remaining_quota
 from ..paths import excel_dir
-from ..planner import upcoming
+from ..planner import harvest_queue_size, upcoming
 from ..runner import RunnerBusy
 from ..score import score_all
 from ..session import REASON_TEXT, StopReason, precheck, reason_text
@@ -42,21 +42,35 @@ def account_state(store, now) -> dict:
     return {"state": "safe", "until": None, "message": "Safe — no cooldown"}
 
 
+def _harvest_queue_size(store, cfg) -> int:
+    """harvest_queue_size, recomputed only after the database or settings changed (status is polled)."""
+    cache = ctx().cache
+    key = (store.change_stamp(), cfg)
+    if cache.get("harvest_key") != key:
+        cache["harvest_size"] = harvest_queue_size(store, cfg)
+        cache["harvest_key"] = key
+    return cache["harvest_size"]
+
+
 def status_payload() -> dict:
     store, cfg, now = get_store(), get_config(), ctx().now()
     runner = ctx().runner.status()
     counts = store.status_counts()
     checked = store.checked_on(now.date(), now.tzinfo)
-    reason, until = precheck(store, cfg, now)
+    pending = counts.get("pending", 0)
+    harvest = _harvest_queue_size(store, cfg)
+    reason, until = precheck(store, cfg, now, has_next=lambda: pending > 0 or harvest > 0 or store.next_recheck(
+        now, cfg.cek_ulang_setelah_hari) is not None)
     last = store.last_session()
     return {
-        "runner": asdict(runner) | {"log_tail": list(runner.log_tail)},
+        "runner": asdict(runner) | {"log_tail": list(runner.log_tail), "error_tail": list(runner.error_tail)},
         "today": {"searches": checked, "limit": cfg.kuota_harian, "left": remaining_quota(cfg, checked)},
         "collected": sum(counts.get(k, 0) for k in ("done", "no_data", "harvested")),
-        "queue": len(upcoming(store, cfg, limit=10**9)),
+        "queue": pending + harvest,
         "account": account_state(store, now),
         "last_session": None if last is None else {
-            "started_at": last["started_at"].isoformat(), "checked": last["checked_count"],
+            "started_at": last["started_at"].isoformat(),
+            "started_text": f"{last['started_at'].astimezone():%Y-%m-%d %H:%M}", "checked": last["checked_count"],
             "reason_code": last["stop_reason"], "reason_text": reason_text(last["stop_reason"])},
         "can_start": not runner.running and reason is None,
         "blocker": None if reason is None else _blocker_text(reason, until),

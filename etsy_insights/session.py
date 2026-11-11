@@ -118,7 +118,7 @@ def _check_page(deps: SessionDeps, state: _State) -> bool:
         state.reason = StopReason.BROWSER_CLOSED
         return True
     except Exception as exc:
-        danger = DangerSignal("verifikasi", f"Page could not be checked: {exc}")
+        danger = DangerSignal("verification", f"Page could not be checked: {exc}")
     if danger is None:
         return False
     _stop_for_danger(deps, state, danger)
@@ -242,8 +242,12 @@ def _loop(deps: SessionDeps, state: _State, limit: int, start: datetime, prev_en
 
 
 def precheck(store: Store, cfg: Config, now: datetime, max_keywords: int | None = None,
-             ignore_cooldown: bool = False) -> tuple[StopReason | None, datetime | None]:
-    """Alasan sesi tidak bisa dimulai, dicek SEBELUM Chrome dibuka. (None, None) = boleh mulai."""
+             ignore_cooldown: bool = False,
+             has_next: Callable[[], bool] | None = None) -> tuple[StopReason | None, datetime | None]:
+    """Alasan sesi tidak bisa dimulai, dicek SEBELUM Chrome dibuka. (None, None) = boleh mulai.
+
+    `has_next` may replace the (slow) "is anything left to search" check with a cached equivalent.
+    """
     if not ignore_cooldown:
         cooldown = store.active_cooldown_until(now)
         if cooldown is not None:
@@ -252,7 +256,7 @@ def precheck(store: Store, cfg: Config, now: datetime, max_keywords: int | None 
         return StopReason.NO_QUOTA, None
     if StopReason.ETSY_QUOTA.value in store.stop_reasons_on(now.date(), now.tzinfo):
         return StopReason.ETSY_QUOTA, None
-    if select_next(store, cfg, now) is None:
+    if not (has_next() if has_next else select_next(store, cfg, now) is not None):
         return StopReason.QUEUE_EMPTY, None
     return None, None
 

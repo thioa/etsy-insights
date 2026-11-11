@@ -35,3 +35,11 @@ def install(app: Flask, port: int) -> None:
         if not secrets.compare_digest(str(supplied), app.config["APP_TOKEN"]):
             return _forbidden()
         return None
+
+    @app.after_request
+    def harden(response):
+        # No other site may show the app in a frame (clickjacking), and Etsy never sees this local address.
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("Content-Security-Policy", "frame-ancestors 'none'")
+        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        return response

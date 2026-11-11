@@ -79,3 +79,21 @@ def test_default_command_and_env(tmp_path):
     assert "--uji" in args and "--abaikan-pendinginan" in args and "--yes" in args
     assert args[-2:] == ["--log-file", str(log)]
     assert kw["env"]["ETSY_INSIGHTS_HOME"] == str(tmp_path) and kw["start_new_session"] is True
+
+
+def test_start_failure_is_reported(tmp_path):
+    crash = [sys.executable, "-c", "print('Google Chrome was not found.'); raise SystemExit(1)"]
+    r = SessionRunner(tmp_path, command=crash)
+    r.start()
+    assert wait_for(lambda: not r.status().running)
+    st = r.status()
+    assert st.error_code == 1 and "Google Chrome was not found." in st.error_tail
+
+
+def test_stopped_session_is_not_an_error(tmp_path):
+    r = SessionRunner(tmp_path, command=FAKE + ["--ignore-term"], stop_timeout=0.3)
+    r.start()
+    assert wait_for(lambda: r.status().done == 2)
+    r.stop()
+    assert wait_for(lambda: not r.status().running, timeout=5)
+    assert r.status().error_code is None

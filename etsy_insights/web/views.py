@@ -188,3 +188,22 @@ def keywords_page():
 @bp.get("/settings")
 def settings_page():
     return _page("settings", active="settings", form=settings_form(get_config()))
+
+
+LOG_LINES = 500
+
+
+def latest_log(logs_dir) -> tuple[str | None, list[str]]:
+    """(file name, last lines) of the newest session log or session output."""
+    files = [p for pattern in ("*.log", "*.out") for p in logs_dir.glob(pattern)] if logs_dir.is_dir() else []
+    if not files:
+        return None, []
+    newest = max(files, key=lambda p: p.stat().st_mtime)
+    lines = newest.read_text(encoding="utf-8", errors="replace").splitlines()
+    return newest.name, lines[-LOG_LINES:]
+
+
+@bp.get("/log")
+def log_page():
+    file_name, lines = latest_log(home() / "logs")
+    return _page("log", active="session", file_name=file_name, lines=lines)

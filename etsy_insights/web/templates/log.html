@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Session log · Etsy Insights{% endblock %}
+{% block content %}
+<div class="page-head"><div>
+  <h1>Session log</h1>
+  <p class="muted">{% if file_name %}{{ file_name }} · last {{ lines | length }} lines{% else %}No session log yet.{% endif %}</p>
+</div></div>
+{% if file_name %}<pre class="log-file">{{ lines | join('\n') }}</pre>{% endif %}
+<p><a class="btn" href="/">Back to Session</a></p>
+{% endblock %}

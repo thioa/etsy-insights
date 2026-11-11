@@ -105,3 +105,6 @@ textarea { width: 100%; margin: 8px 0; }
 .badges { display: flex; flex-wrap: wrap; gap: 6px; }
 .quit { max-width: 640px; margin: 80px auto; text-align: center; }
 @media (max-width: 640px) { h1 { font-size: 24px; } .page { padding: 20px 16px 40px; } }
+.start-error { border-left: 3px solid var(--danger); padding: 2px 0 2px 12px; margin-bottom: 12px; }
+.start-error__out, .log-file { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; white-space: pre-wrap; word-break: break-word; margin: 0; }
+.log-file { background: var(--surface); border: 1px solid #E4E4DE; border-radius: 8px; padding: 16px; max-height: 70vh; overflow: auto; }

@@ -140,13 +140,16 @@
       });
       log.scrollTop = log.scrollHeight;
     }
+    var startError = root.querySelector("[data-start-error]");
+    startError.hidden = !r.error_code;
+    root.querySelector("[data-start-error-lines]").textContent = (r.error_tail || []).join("\n");
     var last = root.querySelector("[data-last]");
     if (s.last_session) {
       last.innerHTML = "";
       var p1 = document.createElement("p");
       p1.innerHTML = "<strong></strong> searches · ";
       p1.firstChild.textContent = s.last_session.checked;
-      p1.appendChild(document.createTextNode(s.last_session.started_at.slice(0, 16).replace("T", " ")));
+      p1.appendChild(document.createTextNode(s.last_session.started_text));
       var p2 = document.createElement("p");
       p2.className = "muted";
       p2.textContent = s.last_session.reason_text;
@@ -156,8 +159,8 @@
   }
 
   function refresh() {
-    if (!root) return;
-    fetch("/api/status").then(function (res) { return res.json(); }).then(function (s) {
+    if (!root) return Promise.resolve();
+    return fetch("/api/status").then(function (res) { return res.json(); }).then(function (s) {
       failures = 0;
       document.querySelector("[data-offline]").hidden = true;
       render(s);
@@ -167,5 +170,7 @@
     });
   }
 
-  if (root) setInterval(refresh, 2000);
+  // The next poll starts 2 s after the previous answer, so slow answers never pile up.
+  function poll() { refresh().then(function () { setTimeout(poll, 2000); }); }
+  if (root) setTimeout(poll, 2000);
 })();
