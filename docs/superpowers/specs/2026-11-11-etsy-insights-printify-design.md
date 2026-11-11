@@ -212,10 +212,16 @@ Sync yang gagal hanya menulis `last_sync_error`.
 ## 7. Pencocokan keyword ↔ jenis produk
 
 **Normalisasi:** huruf kecil. `-`, `_`, `/`, dan `&` menjadi spasi. Tanda baca lain dibuang.
-Dipecah menjadi kata. Setiap kata dibuat bentuk tunggal sederhana: `ies` → `y` dan `es` → `` untuk
-kata berakhiran `ses`/`xes`/`ches`/`shes`. Akhiran `s` dibuang kecuali untuk `ss`. Normalisasi yang
-sama dipakai untuk keyword dan product words, jadi hasil yang aneh (misalnya `canvas` → `canva`)
-tetap cocok di kedua sisi. Tampilan selalu memakai teks aslinya.
+Dipecah menjadi kata. Setiap kata dibuat bentuk dasar sederhana, dalam dua langkah:
+
+1. **Jamak:** `ies` → `ie`. Akhiran `es` dibuang untuk kata berakhiran `ses`/`xes`/`ches`/`shes`.
+   Selain itu, akhiran `s` dibuang kecuali untuk `ss`.
+2. **Akhiran y:** konsonan + `y` di akhir kata menjadi konsonan + `ie`.
+
+Contoh: *hoodies*, *hoodie*, dan *hoody* → `hoodie`; *babies* dan *baby* → `babie`; *glasses* →
+`glass`; *tees* → `tee`; *toys* → `toy`. Normalisasi yang sama dipakai untuk keyword dan product
+words, jadi bentuk yang aneh (misalnya `canvas` → `canva`) tetap cocok di kedua sisi. Tampilan
+selalu memakai teks aslinya.
 
 **Kamus bawaan** (`product_words.DICTIONARY`). Setiap entri punya kata utama dan sinonim, misalnya:
 
