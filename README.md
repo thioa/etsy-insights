@@ -1,117 +1,86 @@
 # Etsy Insights: Pencari Peluang Keyword
 
-Alat ini mencari keyword Etsy dengan **volume pencarian besar**, **konversi tinggi**,
-dan **pesaing sedikit**. Datanya dibaca dari halaman Marketplace Insights di Shop Manager Anda
-sendiri, lewat Chrome asli di Mac Anda. Semua data tersimpan di Mac Anda.
+Etsy Insights mencari keyword Etsy dengan **volume pencarian besar**, **konversi tinggi**, dan
+**pesaing sedikit**, lalu menunjukkan **selera pembeli** untuk setiap keyword.
 
-Setiap pencarian menyimpan data keyword itu **dan memanen 130–180 keyword terkait** beserta
-volume, jumlah pesaing, dan level konversinya. Karena itu cukup 15 pencarian per hari.
+Datanya dibaca dari halaman Marketplace Insights di Shop Manager Anda sendiri, lewat Chrome asli
+di Mac Anda, dengan jeda yang pelan dan aman. Semua data tersimpan di Mac Anda.
+
+Tampilan aplikasinya berbahasa Inggris; README ini berbahasa Indonesia.
 
 ## 1. Pemasangan (sekali saja)
 
-1. Unzip, lalu pindahkan folder `etsy-insights` ke tempat yang mudah ditemukan.
-   **Kalau sudah punya folder versi lama:** salin dulu `keywords.txt`, `config.toml`, folder `data/`,
-   dan folder `rekaman/` dari folder lama ke folder baru. Setelah itu folder lama boleh dihapus.
-   Jangan menimpa folder lama dengan isi zip, karena `keywords.txt` dan `config.toml` Anda akan
-   kembali ke isi bawaan.
-2. Buka **Terminal**, lalu masuk ke folder itu, misalnya:
-   ```bash
-   cd ~/Downloads/etsy-insights
-   ```
-3. Pasang:
-   ```bash
-   bash setup.command
-   ```
+1. **Pasang Python 3.11 atau lebih baru**, kalau belum ada. Unduh dari
+   https://www.python.org/downloads/macos/ (installer *macOS 64-bit universal2*).
+2. **Pastikan Google Chrome** ada di folder Applications.
+3. **Unzip `Etsy-Insights.zip`**, lalu seret **Etsy Insights.app** ke folder **Applications**.
+   Kalau mau, seret juga ke Dock.
+4. **Pembukaan pertama:** klik kanan **Etsy Insights** → **Open** → **Open**. Ini perlu karena
+   aplikasinya tidak ditandatangani Apple. Di macOS terbaru, kalau tetap ditolak:
+   *System Settings → Privacy & Security → Open Anyway*.
+5. **Saat pertama dibuka**, aplikasi akan:
+   - **menyiapkan dirinya sendiri** (sekali, 1–2 menit; muncul notifikasi "Setting up Etsy Insights…");
+   - **menawarkan impor data lama.** Klik **Choose folder…**, lalu pilih folder `etsy-insights`
+     lama Anda (misalnya `Downloads/etsy-insights`). Database, `keywords.txt`, dan rekaman akan
+     disalin. `config.toml` lama sengaja tidak disalin, karena kuota defaultnya sudah berubah.
+6. **Browser terbuka** ke `http://127.0.0.1:8765/`. Itulah aplikasinya.
 
-## 2. Daftar keyword Anda
+## 2. Pemakaian sehari-hari
 
-Isi `keywords.txt`, satu keyword per baris. Contoh:
+- **Buka Etsy Insights** dari Applications atau Dock. Kalau aplikasinya sudah menyala, yang terbuka
+  hanya tab baru.
+- **Session:**
+  - **Test run (3 searches)** untuk uji coba, **Start session** untuk sesi harian (default 15 pencarian).
+  - Progres, keyword yang sedang dicari, dan catatan langkahnya diperbarui otomatis.
+  - **Stop** menghentikan sesi dengan rapi.
+  - Selama sesi berjalan, jendela Chrome "Etsy Riset" jangan diklik dan jangan di-minimize.
+- **Opportunities:**
+  - Tabel peluang dengan filter label (*Gold / Potential / Skip*), *Entry difficulty*, konversi,
+    volume, dan pencarian teks.
+  - Klik sebuah keyword untuk melihat grafik 30 hari, *Buyer taste* (tema populer, harga yang
+    dibayar pembeli, kesulitan masuk), dan 5 listing teratas beserta fotonya.
+  - **Prioritize** membuat keyword hasil panen dicari pertama di sesi berikutnya.
+  - **Download Excel** mengunduh file Excel (juga disimpan di *Documents → Etsy Insights*).
+- **My keywords:** tambah keyword (satu per baris), atau hapus keyword yang masih *Queued*.
+- **Settings:** kuota harian (1–30), jeda, durasi sesi, dan bobot skor. Tombol
+  **Quit Etsy Insights** ada di halaman ini.
 
-```
-personalized cutting board
-custom pet portrait
-```
-
-Keyword dari daftar ini selalu dicari lebih dulu. Setelah daftar habis, alat ini otomatis
-mencari keyword hasil panen yang skornya paling tinggi.
-
-## 3. Uji coba pertama (3 pencarian)
-
-```bash
-bash mulai.command --uji
-```
-
-Chrome "Etsy Riset" terbuka sendiri. Biarkan saja dan jangan dipakai selama sesi berjalan.
-Terminal menampilkan setiap langkah dan diakhiri ringkasan. Kirim ringkasan itu ke Claude
-kalau ada yang aneh.
-
-## 4. Sesi harian
-
-```bash
-bash mulai.command
-```
-
-- Default **15 pencarian per hari**, dengan jeda acak 20–60 detik dan sesekali istirahat
-  2–5 menit. Durasinya kira-kira 15–25 menit.
-- Jalankan saat Anda sedang di depan Mac. Untuk berhenti di tengah jalan, tekan **Ctrl+C**.
-  Data yang sudah terkumpul tetap tersimpan.
-- Log setiap sesi tersimpan di folder `logs/`.
-
-**Alasan sesi berhenti:**
+## 3. Kalau sesi berhenti
 
 | Pesan | Artinya | Yang perlu dilakukan |
 |---|---|---|
-| Kuota tercapai | 15 pencarian hari ini sudah habis | Lanjut besok |
-| Tanda bahaya (CAPTCHA/verifikasi/login/403/429) | Etsy curiga atau meminta verifikasi | Selesaikan verifikasi di Chrome. Alat ini berhenti **24 jam** (masa pendinginan). |
-| Kuota Etsy | Etsy menandai kuota Insights hampir habis | Lanjut besok |
-| 3 kegagalan berturut-turut | Tampilan Etsy mungkin berubah | Jalankan `bash kenali.command` lagi dan kirim rekamannya ke Claude |
-| Belum login | Chrome "Etsy Riset" keluar dari akun | Login manual di Chrome itu, lalu jalankan lagi |
+| *Daily limit reached* | Kuota hari ini habis | Lanjut besok |
+| *Test run finished (3 searches)* | Uji coba selesai | Lihat hasilnya di Opportunities |
+| *Etsy showed a warning … Paused for 24 hours* | CAPTCHA, verifikasi, login, atau 403/429 | Selesaikan verifikasi di Chrome "Etsy Riset". Tunggu cooldown 24 jam. |
+| *Etsy says the Marketplace Insights quota is (almost) used up* | Kuota Insights dari Etsy | Lanjut besok |
+| *3 failures in a row* | Tampilan Etsy mungkin berubah | Kabari Claude |
+| *Not signed in to Etsy …* | Chrome "Etsy Riset" keluar dari akun | Login di Chrome itu, lalu mulai lagi |
+| *Nothing left to search* | Antrean kosong | Tambah keyword di My keywords |
 
-Masa pendinginan **bisa** dilewati dengan `bash mulai.command --abaikan-pendinginan`
-(Anda harus mengetik `YA`), tetapi itu **tidak disarankan**.
+Cooldown **bisa** dilewati lewat tautan *Ignore cooldown* (Anda harus mengetik `YES`), tetapi
+itu **tidak disarankan**.
 
-## 5. Hasil Excel
+## 4. Letak data
 
-```bash
-bash export.command
-```
+- **Data aplikasi:** `~/Library/Application Support/Etsy Insights/` (database, `keywords.txt`,
+  `config.toml`, log, rekaman). Saat memperbarui aplikasi, cukup ganti file .app-nya; data tetap aman.
+- **File Excel:** *Documents → Etsy Insights*.
 
-File `hasil/peluang-YYYY-MM-DD.xlsx` berisi:
+## 5. Cadangan lewat Terminal
 
-- **Peluang**: keyword diurutkan menurut skor (volume 40%, konversi 35%, pesaing sedikit 25%),
-  dengan label **Emas** (sepertiga teratas di ketiganya), **Potensial** (skor ≥ 60), atau **Lewati**.
-- **Selera**: untuk setiap keyword yang sudah dicari, dibaca dari ±20 listing teratas di Insights:
-  - **tema populer**: kata atau frasa yang sering muncul di judul, misalnya "christmas (7), vintage (6)";
-  - **harga yang benar-benar dibayar pembeli** dan rentang harga listing teratas;
-  - **kesulitan masuk**:
-    - **Sulit** kalau pemain teratas rata-rata punya ribuan ulasan atau hampir semuanya Bestseller;
-    - **Mudah** kalau ulasannya masih sedikit;
-    - **Sedang** di antaranya;
-  - **5 contoh listing teratas** (klik untuk melihat gambarnya).
-
-  Kolom *Harga pasar* dan *Kesulitan masuk* juga muncul di sheet Peluang.
-- **Semua data**: semua angka mentah, baik hasil cari maupun hasil panen.
-- **Antrean**: keyword berikutnya yang akan dicari.
-
-## 6. Mode kenal-halaman (kalau diminta)
+Semua perintah lama tetap ada, dan memakai data yang sama dengan aplikasi:
 
 ```bash
-bash kenali.command
+"/Applications/Etsy Insights.app/Contents/MacOS/etsy-insights" --cli run --uji
 ```
 
-Mode ini merekam data halaman saat Anda mencari keyword secara manual. Hanya tab Marketplace
-Insights yang direkam. Nilai sensitif (token, cookie, email, dan sejenisnya) disensor otomatis,
-tetapi **screenshot berisi apa pun yang tampil di layar**. Kirim file `rekaman/kenali-*.json`
-ke Claude.
+Perintah lain: `--cli run`, `--cli status`, `--cli export`, `--cli kenali` (mode rekam).
 
-## 7. Pengaturan
-
-`config.toml` berisi kuota, jeda, bobot skor, dan pengaturan lain. Angka yang melewati batas
-keras (misalnya kuota di atas 30 per hari) otomatis dikoreksi.
-
-## 8. Risiko yang perlu Anda ketahui
+## 6. Risiko yang perlu Anda ketahui
 
 - **Ketentuan Etsy melarang akses otomatis.** Desain alat ini menekan risikonya: pelan, volume kecil,
   Chrome asli dari IP Anda sendiri, dan langsung berhenti saat ada tanda bahaya. Tetapi risikonya
   tidak bisa dihilangkan sepenuhnya, dan akun seller Anda yang menanggungnya.
 - Etsy bisa mengubah halamannya kapan saja. Kalau itu terjadi, alat ini berhenti dengan aman.
+- Aplikasi web hanya bisa dibuka dari Mac ini (`127.0.0.1`), dan setiap tombol dilindungi kode
+  rahasia, sehingga situs lain di browser Anda tidak bisa memicu sesi.
