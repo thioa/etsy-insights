@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from urllib.parse import urlsplit
 
 import anthropic
+import httpx2
 
 from .advisor_brief import AnalysisInput, TrendInput
 from .advisor_store import Source, Usage
@@ -239,8 +240,18 @@ def _usage(message) -> Usage:
     return Usage(input_tokens, output_tokens, searches, cost_cents(message.model, input_tokens, output_tokens, searches))
 
 
+def _served_blocks(messages: Sequence) -> list:
+    """Blok jawaban dari model yang akhirnya melayani: semua blok setelah blok `fallback` terakhir.
+
+    Kalau model pertama menolak di tengah jawaban, teksnya yang setengah jadi tetap ada sebelum blok `fallback`.
+    """
+    blocks = [block for message in messages for block in message.content]
+    cut = max((i for i, block in enumerate(blocks) if block.type == "fallback"), default=-1)
+    return blocks[cut + 1:]
+
+
 def _text(messages: Sequence) -> str:
-    return "".join(block.text for message in messages for block in message.content if block.type == "text").strip()
+    return "".join(block.text for block in _served_blocks(messages) if block.type == "text").strip()
 
 
 def _web_url(url: object) -> bool:
@@ -251,9 +262,10 @@ def _web_url(url: object) -> bool:
 
 
 def _sources(messages: Sequence) -> tuple[Source, ...]:
-    cited = [(c.url, c.title) for m in messages for b in m.content if b.type == "text"
+    blocks = _served_blocks(messages)
+    cited = [(c.url, c.title) for b in blocks if b.type == "text"
              for c in (getattr(b, "citations", None) or []) if getattr(c, "type", None) == "web_search_result_location"]
-    found = cited or [(r.url, r.title) for m in messages for b in m.content if b.type == "web_search_tool_result"
+    found = cited or [(r.url, r.title) for b in blocks if b.type == "web_search_tool_result"
                       and isinstance(b.content, list)
                       for r in b.content if getattr(r, "type", None) == "web_search_result"]
     unique: dict[str, str] = {}
@@ -266,7 +278,7 @@ def _sources(messages: Sequence) -> tuple[Source, ...]:
 def _check_stop(message, usage: Usage) -> None:
     if message.stop_reason == "refusal":
         raise ClaudeRefused(usage=usage)
-    if message.stop_reason == "max_tokens":
+    if message.stop_reason in ("max_tokens", None):  # None: streaming berhenti sebelum jawaban selesai
         raise ClaudeCutOff(usage=usage)
 
 
@@ -312,6 +324,12 @@ class AdvisorAI:
                 return stream.get_final_message()
         except anthropic.APIError as exc:
             raise _map_error(exc, usage) from None
+        except httpx2.HTTPError as exc:  # koneksi putus atau macet setelah streaming dimulai (tidak dibungkus SDK)
+            certificate = _certificate_cause(exc)
+            if certificate is not None:
+                raise ClaudeCertificateProblem(_redact(certificate.verify_message or str(certificate))) from None
+            log.warning("Anthropic: stream interrupted: %s", type(exc).__name__)
+            raise ClaudeUnreachable(usage=usage) from None
 
     def check_trends(self, inp: TrendInput) -> TrendResult:
         prompt = {"role": "user", "content": _trend_prompt(inp)}

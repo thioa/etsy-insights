@@ -112,3 +112,26 @@ def test_unexpected_exception(tmp_path, caplog):
         report = _report(home, _job(home, FakeAI(analysis=RuntimeError(f"boom {KEY}"))).start())
     assert report.status == "error" and report.error == "Something went wrong. See the log for details."
     assert "boom" in caplog.text and KEY not in caplog.text
+
+
+def test_step1_stream_drop_continues(tmp_path):
+    import json
+    from etsy_insights.advisor_ai import AdvisorAI
+    from tests.advisor_helpers import ANSWER
+    from tests.anthropic_fake import FakeAnthropic, Truncated, message_events, stream, text_block
+    home = advisor_home(tmp_path)
+    with FakeAnthropic() as fake:
+        fake.queue("POST", "/v1/messages", Truncated(message_events([text_block("- partial")])[:4]),
+                   stream([text_block(json.dumps(ANSWER))]))
+        job = AdvisorJob(home, lambda key: AdvisorAI(key, base_url=fake.url, trust_env=False, max_retries=0),
+                         now=lambda: NOW, spawn=lambda f: f())
+        report = _report(home, job.start())
+    assert report.status == "done" and report.trend_failed is True
+    assert [i["keyword"] for i in report.result["keyword_ideas"]] == ["cat dad mug", "teacher necklace"]
+
+
+def test_report_records_served_model(tmp_path):
+    from dataclasses import replace
+    home = advisor_home(tmp_path)
+    ai = FakeAI(analysis=replace(ANALYSIS, model="claude-opus-4-8"))
+    assert _report(home, _job(home, ai).start()).model == "claude-opus-4-8"

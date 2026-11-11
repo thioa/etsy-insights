@@ -103,8 +103,12 @@ class AdvisorStore:
              usage.input_tokens, usage.output_tokens, usage.web_searches, usage.cost_cents, report_id))
 
     def finish_report(self, report_id: int, now: datetime, *, trend_note: str | None, trend_failed: bool,
-                      sources: Sequence[Source], result: dict, stats: dict, usage: Usage) -> None:
+                      sources: Sequence[Source], result: dict, stats: dict, usage: Usage,
+                      model: str | None = None) -> None:
+        """`model`: model yang benar-benar menulis analisis (bisa model fallback)."""
         self._close(report_id, now, "done", None, trend_note, trend_failed, sources, result, stats, usage)
+        if model:
+            self._db.execute("UPDATE advisor_reports SET model = ? WHERE id = ?", (model, report_id))
 
     def fail_report(self, report_id: int, now: datetime, error: str, usage: Usage, *, trend_note: str | None = None,
                     trend_failed: bool = False, sources: Sequence[Source] = ()) -> None:

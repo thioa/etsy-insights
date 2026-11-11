@@ -11,7 +11,8 @@ from etsy_insights.advisor_ai import (
 from etsy_insights.advisor_brief import AnalysisInput, TrendInput
 from etsy_insights.advisor_store import Source, Usage
 from tests.anthropic_fake import (
-    DROP, FakeAnthropic, Json, Sse, error_body, error_event, message_events, search_blocks, stream, text_block)
+    DROP, FakeAnthropic, Json, Sse, Truncated, error_body, error_event, fallback_block, message_events, search_blocks,
+    stream, text_block)
 
 KEY = "sk-ant-test-key-123456"
 TREND_INPUT = TrendInput(date(2026, 11, 11), ("Mugs", "Tumblers"), ("custom mug", "dog mom sweatshirt"))
@@ -179,3 +180,28 @@ def test_cost_cents():
     assert cost_cents("claude-x", 1_000_000, 100_000, 2) == 752
     assert cost_cents(MODEL, 1, 0, 0) == 1
     assert cost_cents(MODEL, 0, 0, 0) == 0
+
+
+def test_stream_cut_mid_way(fake):
+    fake.queue("POST", MESSAGES, Truncated(message_events([text_block("- partial note")])[:4]))
+    with pytest.raises(ClaudeUnreachable):
+        _ai(fake).check_trends(TREND_INPUT)
+
+
+def test_stream_without_stop_is_cut_off(fake):
+    fake.queue("POST", MESSAGES, Sse(message_events([text_block("- partial note")])[:-2]))
+    with pytest.raises(ClaudeCutOff):
+        _ai(fake).check_trends(TREND_INPUT)
+
+
+def test_fallback_answer_uses_text_after_fallback(fake):
+    fake.queue("POST", MESSAGES,
+               stream([text_block('{"summary": "I was'), fallback_block(), text_block(json.dumps(ANSWER))],
+                      model="claude-opus-4-8"),
+               stream([text_block("- Declined model's words."), fallback_block(),
+                       text_block("- Valentine's Day soon.")], model="claude-opus-4-8"))
+    ai = _ai(fake)
+    result = ai.analyze(ANALYSIS_INPUT, None)
+    assert result.data == ANSWER and result.model == "claude-opus-4-8"
+    assert result.usage.cost_cents == cost_cents("claude-opus-4-8", 1000, 500, 0)
+    assert ai.check_trends(TREND_INPUT).note == "- Valentine's Day soon."

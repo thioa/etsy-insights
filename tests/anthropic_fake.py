@@ -25,6 +25,12 @@ class Json:
     body: dict = field(default_factory=dict)
 
 
+@dataclass
+class Truncated:
+    """Streaming yang putus di tengah: Content-Length lebih besar dari yang dikirim, lalu koneksi ditutup."""
+    events: list[dict]
+
+
 DROP = object()  # koneksi ditutup tanpa jawaban
 
 
@@ -47,6 +53,12 @@ def text_block(text: str, citations=()) -> dict:
 
 
 _ids = iter(range(1, 1_000_000))
+
+
+def fallback_block(from_model: str = MODEL, to_model: str = "claude-opus-4-8") -> dict:
+    """Batas saat model pertama menolak dan model fallback melanjutkan jawaban."""
+    return {"type": "fallback", "from": {"model": from_model}, "to": {"model": to_model},
+            "trigger": {"type": "refusal", "category": None}}
 
 
 def search_blocks(query: str, results) -> list[dict]:
@@ -125,9 +137,18 @@ class FakeAnthropic:
                 if response is DROP:
                     self.close_connection = True
                     return
-                if isinstance(response, Sse):
+                if isinstance(response, (Sse, Truncated)):
                     payload = b"".join(f"event: {e['type']}\ndata: {json.dumps(e)}\n\n".encode()
                                        for e in response.events)
+                    if isinstance(response, Truncated):
+                        self.send_response(200)
+                        self.send_header("Content-Type", "text/event-stream")
+                        self.send_header("Content-Length", str(len(payload) + 1000))
+                        self.end_headers()
+                        self.wfile.write(payload)
+                        self.wfile.flush()
+                        self.close_connection = True
+                        return
                     self._send(200, payload, "text/event-stream")
                 else:
                     self._send(response.status, json.dumps(response.body).encode(), "application/json")

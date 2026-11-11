@@ -163,7 +163,7 @@ class AdvisorJob:
                     log.info("Advisor dropped from Claude's answer: %s", validated.dropped)
                 advisor.finish_report(report_id, self._now(), trend_note=trend.note if trend else None,
                                       trend_failed=trend_failed, sources=trend.sources if trend else (),
-                                      result=validated.result, stats=stats, usage=usage)
+                                      result=validated.result, stats=stats, usage=usage, model=analysis.model)
                 self._set(state="done", stage=None, error=None)
             except ClaudeError as exc:
                 usage += exc.usage
