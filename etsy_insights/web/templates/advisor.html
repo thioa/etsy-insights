@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Advisor · Etsy Insights{% endblock %}
+{% block content %}
+<div class="page-head"><div>
+  {% if single %}<a class="back" href="/advisor">← Advisor</a>{% endif %}
+  <h1>{{ 'Advisor report' if single else 'Advisor' }}</h1>
+  <p class="muted">Claude suggests products, themes and keywords from your research data and the Printify catalog.
+    Nothing is added to your queue without your click.</p>
+</div></div>
+
+{% if not single %}
+<section class="panel" aria-label="Claude connection" data-advisor data-state="{{ status.state }}">
+  {% if not connected %}
+  <h2>Connect Claude</h2>
+  <ol class="steps">
+    <li>Open <strong>console.anthropic.com</strong>, go to <strong>Settings → API Keys</strong> and create a key.</li>
+    <li>Add credit under <strong>Billing</strong>. You pay only for what you use.</li>
+    <li>Paste the key below. It is stored only on this Mac.</li>
+  </ol>
+  <form class="form" data-advisor-key-form>
+    <div class="field"><label for="advisor-key">Paste your Anthropic API key</label>
+      <input id="advisor-key" name="key" type="password" autocomplete="off" spellcheck="false"></div>
+    <p class="error" data-error></p>
+    <button class="btn btn--primary" type="submit">Save and test</button>
+  </form>
+  {% else %}
+  <div class="panel__head">
+    <h2>Get advice</h2>
+    <p class="muted small">Connected · key ends {{ hint }}
+      <button type="button" class="btn btn--small" data-api="/api/advisor/disconnect">Disconnect</button></p>
+  </div>
+  <p class="muted small">Uses Claude Opus 5.5 and up to 5 web searches. Est. US$0.40–0.80 per run.<br>
+    This month: {{ runs }} run{{ '' if runs == 1 else 's' }}, {{ spent }}</p>
+  <div class="actions">
+    <button type="button" class="btn btn--primary" data-advisor-run{{ ' disabled' if not can_run }}>Get advice</button>
+  </div>
+  {% if not has_catalog %}<p class="notice">Sync Printify first. <a href="/printify">Open Printify</a></p>{% endif %}
+  {% if limit_message %}<p class="notice">{{ limit_message }}</p>{% endif %}
+  {% if few_data and has_catalog %}<p class="muted small">You have little research data yet, so most advice will be ideas rather than data.</p>{% endif %}
+  {% endif %}
+  <p class="notice" data-advisor-status{% if status.state != 'running' %} hidden{% endif %}>{{ stage_text }}</p>
+  <p class="error" data-advisor-error></p>
+</section>
+{% endif %}
+
+{% if view %}
+<section class="panel" aria-label="Report" data-report-id="{{ view.id }}">
+  <div class="panel__head">
+    <h2>Report · {{ view.when }}</h2>
+    {% if view.status != 'done' %}<span class="badge badge--skip">{{ view.status_text }}</span>{% endif %}
+  </div>
+  <p class="muted small">Est. cost {{ view.cost }}{% if view.keywords is not none %} · Analyzed {{ view.keywords }} keywords and {{ view.categories }} categories{% endif %}</p>
+  {% if view.trend_failed %}<p class="notice">Trend check failed; advice uses your data only.</p>{% endif %}
+  {% if view.error %}<p class="error">{{ view.error }}</p>{% endif %}
+  {% if view.status == 'interrupted' %}<p class="notice">Interrupted: Etsy Insights was closed while this analysis was running.</p>{% endif %}
+
+  {% if view.status == 'done' %}
+  <h3>Summary</h3>
+  <p>{{ view.summary }}</p>
+
+  <h3>Recommendations</h3>
+  {% if view.recommendations %}
+  <div class="advice-list">
+  {% for r in view.recommendations %}
+  <article class="advice-card">
+    <div class="advice-card__head">
+      {% if r.category.photo %}<img class="advice-card__photo" src="{{ r.category.photo }}" alt="" loading="lazy">{% endif %}
+      <div>
+        <p class="small muted">{% if r.category.slug %}<a href="/catalog/{{ r.category.slug }}">{{ r.category.name }}</a>{% else %}{{ r.category.name }}{% endif %}
+          · <span class="badge {{ 'badge--ready' if r.backed else 'badge--queue' }}">{{ 'Backed by data' if r.backed else 'Idea' }}</span></p>
+        <h4>{{ r.title }}</h4>
+        {% if r.theme %}<p class="muted small">Theme: {{ r.theme }}</p>{% endif %}
+      </div>
+    </div>
+    <p>{{ r.why }}</p>
+    {% if r.action %}<p><strong>Next:</strong> {{ r.action }}</p>{% endif %}
+    {% if r.evidence %}
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th scope="col">Keyword</th><th scope="col" class="num">Searches/month</th><th scope="col">Conversion</th>
+        <th scope="col" class="num">Competing listings</th><th scope="col">Label</th><th scope="col" class="num">Trend</th><th scope="col" class="num">Margin</th></tr></thead>
+      <tbody>{% for e in r.evidence %}<tr>
+        {% if e.found %}
+        <td><a class="kw" href="/keyword/{{ e.keyword | urlencode }}">{{ e.keyword }}</a>{% if e.ready %} <span class="badge badge--ready">Ready to sell</span>{% endif %}</td>
+        <td class="num">{{ e.volume }}</td>
+        <td><span class="conv conv--{{ e.conversion_class }}">{{ e.conversion }}</span></td>
+        <td class="num">{{ e.competition }}</td>
+        <td><span class="badge badge--{{ e.label | lower }}">{{ e.label }}</span></td>
+        <td class="num">{{ e.trend }}</td>
+        <td class="num"><span class="margin margin--{{ e.margin_class }}">{{ e.margin_text }}</span></td>
+        {% else %}
+        <td>{{ e.keyword }}</td><td class="num">—</td><td>—</td><td class="num">—</td><td>—</td><td class="num">—</td><td class="num">—</td>
+        {% endif %}
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    {% endif %}
+    {% if r.sources %}<p class="small muted">Sources: {% for s in r.sources %}<a href="{{ s.url }}" target="_blank" rel="noopener noreferrer">{{ s.title }}</a>{{ ', ' if not loop.last }}{% endfor %}</p>{% endif %}
+  </article>
+  {% endfor %}
+  </div>
+  {% else %}<p class="muted">No recommendations in this report.</p>{% endif %}
+
+  <h3>Keyword ideas</h3>
+  {% if view.ideas %}
+  <div class="actions">
+    <button type="button" class="btn btn--primary btn--small" data-add-selected>Add selected to queue</button>
+    <p class="muted small">Each idea uses 1 of your {{ daily_searches }} daily searches. In queue now: {{ in_queue }}</p>
+  </div>
+  <p class="error" data-ideas-error></p>
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th scope="col"><span class="sr-only">Select</span></th><th scope="col">Keyword</th><th scope="col">Category</th>
+      <th scope="col">Type</th><th scope="col">Why</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+    <tbody>{% for i in view.ideas %}<tr data-idea="{{ i.keyword }}">
+      <td>{% if i.status == 'new' %}<input type="checkbox" data-idea-check aria-label="Select {{ i.keyword }}">{% endif %}</td>
+      <td><strong>{{ i.keyword }}</strong></td>
+      <td>{{ i.category }}</td>
+      <td>{{ i.kind }}</td>
+      <td class="small">{{ i.reason }}</td>
+      <td data-idea-status>{{ i.status_text }}</td>
+      <td>{% if i.status == 'new' %}<button type="button" class="btn btn--small" data-add-idea>Add</button>{% endif %}</td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="muted">No new keyword ideas in this report.</p>{% endif %}
+
+  <details class="trend-notes">
+    <summary>What's trending</summary>
+    {% if view.trend_note %}<p class="note">{{ view.trend_note }}</p>{% else %}<p class="muted">No trend notes for this report.</p>{% endif %}
+    {% if view.sources %}<ul class="small">{% for s in view.sources %}<li>{{ s.id }}: <a href="{{ s.url }}" target="_blank" rel="noopener noreferrer">{{ s.title }}</a></li>{% endfor %}</ul>{% endif %}
+  </details>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if history %}
+<section class="panel" aria-label="Earlier reports">
+  <h2>Earlier reports</h2>
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th scope="col">Date</th><th scope="col">Status</th><th scope="col" class="num">Est. cost</th><th scope="col" class="num">Keyword ideas</th></tr></thead>
+    <tbody>{% for h in history %}<tr>
+      <td><a href="/advisor/{{ h.id }}">{{ h.when }}</a></td><td>{{ h.status_text }}</td>
+      <td class="num">{{ h.cost }}</td><td class="num">{{ h.ideas }}</td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+{% endif %}
+{% endblock %}

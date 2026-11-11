@@ -337,6 +337,110 @@
     });
   }
 
+  // Advisor: save the Anthropic API key (stored only on this Mac; it never comes back to the page)
+  var keyForm = document.querySelector("form[data-advisor-key-form]");
+  if (keyForm) {
+    keyForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      var submit = keyForm.querySelector('button[type="submit"]');
+      submit.disabled = true;
+      submit.textContent = "Working…";
+      post("/api/advisor/key", { key: keyForm.querySelector('input[name="key"]').value }).then(function (r) {
+        if (r.ok) {
+          if (r.data.warning) alert(r.data.warning);
+          location.reload();
+        } else {
+          submit.disabled = false;
+          submit.textContent = "Save and test";
+          showErrors(keyForm, r.data);
+        }
+      });
+    });
+  }
+
+  // Advisor: run an analysis and follow its progress
+  var advisor = document.querySelector("[data-advisor]");
+  if (advisor) {
+    var runButton = advisor.querySelector("[data-advisor-run]");
+    var statusLine = advisor.querySelector("[data-advisor-status]");
+    var advisorError = advisor.querySelector("[data-advisor-error]");
+    var stages = { checking_trends: "Step 1 of 2 – Checking trends on the web…",
+                   analyzing: "Step 2 of 2 – Analyzing your data…" };
+    var followAdvice = function () {
+      getJSON("/api/advisor/status").then(function (r) {
+        var s = r.data || {};
+        if (r.ok && s.state === "running") {
+          statusLine.hidden = false;
+          statusLine.textContent = (stages[s.stage] || "Starting…") + " (" + (s.elapsed_seconds || 0) + " s)";
+          setTimeout(followAdvice, 2000);
+        } else if (r.ok && s.report_id) {
+          location.href = "/advisor/" + s.report_id;
+        } else if (r.ok) {
+          location.reload();
+        } else {
+          setTimeout(followAdvice, 2000);
+        }
+      }).catch(function () { setTimeout(followAdvice, 2000); });
+    };
+    if (runButton) {
+      runButton.addEventListener("click", function () {
+        runButton.disabled = true;
+        advisorError.textContent = "";
+        post("/api/advisor/run", {}).then(function (r) {
+          if (r.ok) {
+            statusLine.hidden = false;
+            statusLine.textContent = "Starting…";
+            setTimeout(followAdvice, 2000);
+          } else {
+            runButton.disabled = false;
+            advisorError.textContent = r.data.error || "Something went wrong.";
+          }
+        });
+      });
+    }
+    if (advisor.getAttribute("data-state") === "running") setTimeout(followAdvice, 2000);
+  }
+
+  // Advisor: add keyword ideas to the research queue (only after a click)
+  var report = document.querySelector("[data-report-id]");
+  if (report) {
+    var statusText = { "new": "New", in_queue: "In queue", researched: "Researched" };
+    var ideasError = report.querySelector("[data-ideas-error]");
+    var addIdeas = function (keywords, button) {
+      if (!keywords.length) { ideasError.textContent = "Choose at least one keyword."; return; }
+      ideasError.textContent = "";
+      if (button) button.disabled = true;
+      post("/api/advisor/add", { report_id: Number(report.getAttribute("data-report-id")), keywords: keywords })
+        .then(function (r) {
+          if (button) button.disabled = false;
+          if (!r.ok) { ideasError.textContent = r.data.error || "Something went wrong."; return; }
+          report.querySelectorAll("[data-idea]").forEach(function (row) {
+            var status = r.data.statuses[row.getAttribute("data-idea")];
+            if (!status) return;
+            row.querySelector("[data-idea-status]").textContent = statusText[status] || status;
+            if (status !== "new") {
+              row.querySelectorAll("[data-idea-check], [data-add-idea]").forEach(function (el) { el.remove(); });
+            }
+          });
+        });
+    };
+    report.querySelectorAll("[data-add-idea]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        addIdeas([button.closest("[data-idea]").getAttribute("data-idea")], button);
+      });
+    });
+    var addSelected = report.querySelector("[data-add-selected]");
+    if (addSelected) {
+      addSelected.addEventListener("click", function () {
+        var keywords = [];
+        report.querySelectorAll("[data-idea-check]:checked").forEach(function (box) {
+          keywords.push(box.closest("[data-idea]").getAttribute("data-idea"));
+        });
+        addIdeas(keywords, addSelected);
+      });
+    }
+  }
+
   // The next poll starts 2 s after the previous answer, so slow answers never pile up.
   function poll() { refresh().then(function () { setTimeout(poll, 2000); }); }
   if (root) setTimeout(poll, 2000);

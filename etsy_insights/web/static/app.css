@@ -148,3 +148,15 @@ form.inline .error { flex-basis: 100%; text-align: right; }
 .back { display: inline-block; margin-bottom: 6px; font-size: 14px; }
 [hidden] { display: none !important; }
 .category-card__photo { text-decoration: none; }
+
+/* Advisor */
+.advice-list { display: grid; gap: 16px; margin: 12px 0 20px; }
+.advice-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+.advice-card p { margin: 8px 0; }
+.advice-card__head { display: flex; gap: 14px; align-items: flex-start; }
+.advice-card__head h4 { margin: 2px 0 0; font-size: 17px; }
+.advice-card__head p { margin: 0; }
+.advice-card__photo { width: 72px; height: 72px; object-fit: cover; border-radius: 10px; background: #F1F1EC; flex: none; }
+.trend-notes { margin-top: 16px; }
+.trend-notes summary { cursor: pointer; font-weight: 600; }
+.note { white-space: pre-wrap; }
