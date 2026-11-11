@@ -10,6 +10,7 @@ from datetime import date, datetime, timedelta, timezone, tzinfo
 from pathlib import Path
 
 from .models import CapturedResponse, KeywordMetrics, QueueItem, RawResult, RelatedKeyword, ResultRow
+from .printify_store import PRINTIFY_SCHEMA
 
 MAX_FAILURES = 3
 
@@ -109,6 +110,7 @@ class Store:
             # WAL: server web bisa membaca sementara proses sesi menulis.
             self._db.execute("PRAGMA journal_mode=WAL")
         self._db.executescript(_SCHEMA)
+        self._db.executescript(PRINTIFY_SCHEMA)
         self._migrate()
 
     def _migrate(self) -> None:
@@ -122,6 +124,10 @@ class Store:
 
     def close(self) -> None:
         self._db.close()
+
+    @property
+    def connection(self) -> sqlite3.Connection:
+        return self._db
 
     # --- keyword & antrean -------------------------------------------------
     def _queue_item(self, row: sqlite3.Row) -> QueueItem:
