@@ -27,3 +27,90 @@ def make_row(keyword, volume, cr, comp, kind="count", source="user", parent=None
     return ResultRow(keyword_id=keyword_id, keyword=keyword, source=source,
                      depth=0 if source == "user" else 1, parent_keyword=parent,
                      status="done" if has_data else "no_data", checked_at=T0, metrics=metrics)
+
+
+# --- Fakes untuk tes sesi --------------------------------------------------
+import random  # noqa: E402
+
+from etsy_insights.config import Config  # noqa: E402
+from etsy_insights.models import (  # noqa: E402
+    BrowserClosed, CapturedResponse, DangerSignal, PageLoadTimeout, ParseError)
+
+
+class FakeClock:
+    def __init__(self, start, interrupt_on_sleep=None):
+        self._now = start
+        self._interrupt_on_sleep = interrupt_on_sleep
+        self.sleeps: list[float] = []
+
+    def now(self):
+        return self._now
+
+    def advance(self, seconds):
+        self._now += timedelta(seconds=seconds)
+
+    def sleep(self, seconds):
+        if self._interrupt_on_sleep is not None and len(self.sleeps) + 1 == self._interrupt_on_sleep:
+            raise KeyboardInterrupt
+        self.sleeps.append(seconds)
+        self.advance(seconds)
+
+
+class FakePage:
+    def __init__(self, clock, outcomes=None, related=None, danger_on_open=None, open_error=None):
+        self.clock = clock
+        self.outcomes = outcomes or {}
+        self.related = related or {}
+        self.danger_on_open = danger_on_open
+        self.open_error = open_error
+        self.opened = 0
+        self.searched: list[str] = []
+        self.dwells: list[tuple[float, bool]] = []
+        self._danger = None
+
+    def open(self):
+        self.opened += 1
+        if self.open_error:
+            raise self.open_error
+        self._danger = self.danger_on_open
+
+    def search(self, keyword):
+        self.searched.append(keyword)
+        outcome = self.outcomes.get(keyword, "ok")
+        if outcome == "timeout":
+            raise PageLoadTimeout(keyword)
+        if outcome == "closed":
+            raise BrowserClosed()
+        if outcome == "interrupt":
+            raise KeyboardInterrupt
+        if outcome == "captcha":
+            self._danger = DangerSignal("captcha", "iframe captcha")
+        if outcome == "403":
+            self._danger = DangerSignal("http_403", "HTTP 403")
+        body = {"outcome": outcome, "related": list(self.related.get(keyword, ()))}
+        return RawResult(keyword, INSIGHTS, (CapturedResponse("https://www.etsy.com/x", 200, body),), "")
+
+    def check_danger(self):
+        return self._danger
+
+    def dwell(self, seconds, scroll):
+        self.dwells.append((seconds, scroll))
+        self.clock.advance(seconds)
+
+
+def fake_parse(raw):
+    body = raw.responses[0].body
+    if body["outcome"] == "parse_error":
+        raise ParseError("tidak terbaca")
+    if body["outcome"] == "no_data":
+        return KeywordMetrics(has_data=False)
+    return make_metrics(related=body["related"])
+
+
+def make_deps(store, page, clock, cfg=None, seed=1):
+    from etsy_insights.pacer import Pacer
+    from etsy_insights.session import SessionDeps
+    cfg = cfg or Config()
+    return SessionDeps(store=store, page=page, parse=fake_parse, pacer=Pacer(cfg, random.Random(seed)),
+                       cfg=cfg, clock=clock.now, sleep=clock.sleep, log=lambda msg: None,
+                       parser_version="test")
