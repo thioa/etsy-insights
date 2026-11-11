@@ -89,7 +89,7 @@ dan tidak pernah memasukkan keyword ke antrean tanpa klik pengguna.
 | `etsy_insights/config.py`, `settings.py` | Kunci baru `advisor_batas_bulanan_usd` (§9) |
 | `etsy_insights/web/advisor.py` (baru) | Halaman `/advisor`, `/advisor/<id>`, dan API `/api/advisor/*` (§10) |
 | `web/templates/advisor.html`, `base.html`, `app.js`, `app.css` | Halaman Advisor, menu, polling status, tombol Add |
-| `requirements.txt`, `macos/bootstrap.py` | Library `anthropic` (versi dipatok) dan pemeriksaan import |
+| `requirements.txt` | Library `anthropic>=2.8,<3`. Peluncur memasang ulang venv otomatis karena isi file ini berubah |
 
 `advisor_ai` adalah satu-satunya modul yang mengenal library `anthropic`. Modul lain memakai antarmukanya
 lewat objek yang bisa diganti saat tes.
@@ -128,7 +128,7 @@ lewat objek yang bisa diganti saat tes.
 - nama semua kategori katalog Printify (tanpa *Other*);
 - 20 keyword terbaik menurut skor (teks keyword saja).
 
-**Permintaan:** model `claude-opus-5-5`, effort `medium`, adaptive thinking, streaming, `max_tokens` 16000,
+**Permintaan:** model `claude-opus-5-5`, effort `medium`, adaptive thinking, streaming, `max_tokens` 32000,
 tool `web_search_20260209` dengan `max_uses: 5` dan lokasi perkiraan negara `US`.
 
 **Tugas AI:**
@@ -180,7 +180,7 @@ dengan rata-rata semua hari sebelumnya. Butuh minimal 14 titik dan rata-rata lam
 **Tidak pernah dikirim:** token Printify, API key (selain sebagai kunci akses ke Anthropic), login atau cookie
 Etsy, nama toko, URL listing, contoh listing, isi rekaman, judul produk Printify milik pengguna.
 
-**Permintaan:** model `claude-opus-5-5`, effort `high`, adaptive thinking, streaming, `max_tokens` 32000, format
+**Permintaan:** model `claude-opus-5-5`, effort `high`, adaptive thinking, streaming, `max_tokens` 64000, format
 JSON tetap (`output_config.format`), tanpa tool.
 
 **Aturan di prompt sistem (bahasa Inggris):**
@@ -266,7 +266,8 @@ sama seperti Research di Tahap 5).
 | `AuthenticationError` (401) | `KeyRejected` | *Claude rejected this API key. Check it at console.anthropic.com.* |
 | `PermissionDeniedError` (403), `NotFoundError` (404) | `NoModelAccess` | *This API key can't use Claude Opus 5.5.* |
 | `BadRequestError` (400) | `ClaudeRequestFailed` | *Claude could not run the analysis: <pesan Anthropic>* (misalnya saldo habis) |
-| `RateLimitError` (429), `InternalServerError` (5xx/529) | `ClaudeBusy` | *Claude is busy. Try again in a few minutes.* |
+| `RateLimitError` (429) | `ClaudeBusy` | *Claude is busy or a usage limit on your Anthropic account was reached. Try again in a few minutes. Details: <pesan Anthropic>* |
+| `InternalServerError` (5xx/529), error `overloaded_error`/`api_error` di tengah streaming | `ClaudeBusy` | *Claude is busy. Try again in a few minutes.* |
 | `APIConnectionError`, `APITimeoutError` | `ClaudeUnreachable` | *Could not reach Anthropic. Check your internet connection and try again.* |
 | Error sertifikat SSL | `ClaudeCertificateProblem` | Pesan sertifikat yang sama dengan Printify 4.0.1 |
 | `stop_reason: refusal` | `ClaudeRefused` | *Claude declined this analysis.* |
@@ -421,9 +422,8 @@ Tidak ada tes yang menghubungi Anthropic, Etsy, atau Printify.
 
 ## 14. Paket dan dokumentasi
 
-- `requirements.txt`: `anthropic` dengan versi dipatok (versi yang mendukung semua fitur §7 dipastikan saat
-  rencana kerja). Peluncur memasang ulang library otomatis karena stamp venv berubah.
-- `macos/bootstrap.py`: pemeriksaan import mencakup `anthropic`.
+- `requirements.txt`: `anthropic>=2.8,<3` (2.8.0 sudah diuji dengan semua fitur §7). Peluncur memasang ulang
+  library otomatis karena stamp venv berubah. `macos/bootstrap.py` tidak berubah.
 - README (bahasa Indonesia), bagian baru **"AI Advisor"**: cara membuat API key dan mengisi saldo, perkiraan
   biaya, batas bulanan, saran memasang batas belanja di console Anthropic, data yang dikirim dan yang tidak,
   cara kerja pencarian web. `macos/README.txt` versi singkat.
@@ -438,4 +438,4 @@ Tidak ada tes yang menghubungi Anthropic, Etsy, atau Printify.
 5. `advisor_result` dan `AdvisorJob`
 6. API `/api/advisor/*`
 7. Halaman Advisor, menu, JS, CSS
-8. Smoke test, README, bootstrap, paket 6.0.0
+8. Smoke test, README, paket 6.0.0
