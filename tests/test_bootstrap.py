@@ -200,3 +200,43 @@ def test_launcher_skips_the_system_python_stub_without_developer_tools(tmp_path)
     fallback = _fake_python(tmp_path / "py1", calls)
     _run_launcher(tmp_path, ["/usr/bin/python3", fallback])
     assert calls.read_text().split() == [str(fallback)]
+
+
+def test_venv_rebuilt_when_cpu_architecture_changes(tmp_path, monkeypatch):
+    req = tmp_path / "requirements.txt"
+    req.write_text("flask\n")
+    calls = []
+
+    def run(args, **kw):
+        calls.append(args)
+        return OK
+    monkeypatch.setattr(bootstrap.platform, "machine", lambda: "x86_64")
+    bootstrap.ensure_venv(tmp_path, "python3", req, run=run)
+    n = len(calls)
+    bootstrap.ensure_venv(tmp_path, "python3", req, run=run)
+    assert len(calls) == n
+    monkeypatch.setattr(bootstrap.platform, "machine", lambda: "arm64")  # dulu lewat Rosetta, kini native
+    bootstrap.ensure_venv(tmp_path, "python3", req, run=run)
+    assert len(calls) > n and "--clear" in calls[n]
+
+
+def _fake_tool(path, body):
+    path.write_text("#!/bin/sh\n" + body)
+    path.chmod(0o755)
+    return path
+
+
+def test_launcher_restarts_natively_under_rosetta(tmp_path):
+    calls = tmp_path / "arch-calls.txt"
+    arch = _fake_tool(tmp_path / "arch", f'echo "$@" >> "{calls}"\nexit 0\n')
+    translated = _fake_tool(tmp_path / "sysctl-1", 'echo 1\n')
+    native = _fake_tool(tmp_path / "sysctl-0", 'echo 0\n')
+    launcher = Path(__file__).parent.parent / "macos" / "launcher.sh"
+    base = {"PATH": "/usr/bin:/bin", "HOME": str(tmp_path), "ETSY_INSIGHTS_PYTHONS": "", "ETSY_INSIGHTS_ARCH": str(arch)}
+    subprocess.run(["/bin/bash", str(launcher)], env={**base, "ETSY_INSIGHTS_SYSCTL": str(translated)},
+                   capture_output=True, timeout=20)
+    assert calls.read_text().split() == ["-arm64", "/bin/bash", str(launcher)]
+    calls.unlink()
+    subprocess.run(["/bin/bash", str(launcher)], env={**base, "ETSY_INSIGHTS_SYSCTL": str(native)},
+                   capture_output=True, timeout=20)
+    assert not calls.exists()

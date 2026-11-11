@@ -1,6 +1,14 @@
 #!/bin/bash
 # Etsy Insights launcher: finds Python 3.11+ and Google Chrome, then hands over to bootstrap.py.
 RES="$(cd "$(dirname "$0")/../Resources" && pwd)"
+SYSCTL="${ETSY_INSIGHTS_SYSCTL:-/usr/sbin/sysctl}"  # dapat diganti untuk tes
+ARCH="${ETSY_INSIGHTS_ARCH:-/usr/bin/arch}"
+
+# On Apple chips, Finder can start this script under Rosetta (Intel emulation). Python and Chrome started
+# from here would inherit it and run slowly, so restart natively first.
+if [ "$("$SYSCTL" -n sysctl.proc_translated 2>/dev/null)" = "1" ]; then
+  exec "$ARCH" -arm64 /bin/bash "$0" "$@"
+fi
 
 ask() {  # ask "message" "Button" -> 0 when the button was clicked
   /usr/bin/osascript -e "display dialog \"$1\" with title \"Etsy Insights\" buttons {\"Cancel\", \"$2\"} default button \"$2\" with icon caution" >/dev/null 2>&1

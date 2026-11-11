@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import socket
 import subprocess
+import sys
 import time
 import urllib.request
 from collections.abc import Iterator, Sequence
@@ -52,9 +53,24 @@ def port_in_use(port: int) -> bool:
         return sock.connect_ex(("127.0.0.1", port)) == 0
 
 
+ARCH = "/usr/bin/arch"
+
+
+def is_apple_silicon(*, platform: str = sys.platform, run=subprocess.run) -> bool:
+    """True di Mac berchip Apple, juga saat proses ini sendiri berjalan lewat Rosetta (mode Intel)."""
+    if platform != "darwin":
+        return False
+    try:
+        result = run(["/usr/sbin/sysctl", "-n", "hw.optional.arm64"], capture_output=True, text=True, timeout=5)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return result.returncode == 0 and result.stdout.strip() == "1"
+
+
 def ensure_chrome(port: int, profile_dir: Path = PROFILE_DIR, chrome_path: Path = CHROME_PATH,
                   extra_args: Sequence[str] = (), *, launch=subprocess.Popen, probe=probe_debug_port,
-                  in_use=port_in_use, sleep=time.sleep, wait_seconds: float = 15.0) -> str:
+                  in_use=port_in_use, sleep=time.sleep, wait_seconds: float = 15.0,
+                  apple_silicon=is_apple_silicon) -> str:
     """Pastikan Chrome profil Etsy Riset berjalan dengan port debug; kembalikan endpoint-nya."""
     endpoint = f"http://127.0.0.1:{port}"
     info = probe(port)
@@ -67,8 +83,11 @@ def ensure_chrome(port: int, profile_dir: Path = PROFILE_DIR, chrome_path: Path 
         raise ChromeNotFound(f"Google Chrome was not found at {chrome_path}. "
                              "Install Chrome from https://www.google.com/chrome/ and try again.")
     Path(profile_dir).mkdir(parents=True, exist_ok=True)
-    launch(chrome_args(chrome_path, port, profile_dir, extra_args),
-           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+    args = chrome_args(chrome_path, port, profile_dir, extra_args)
+    if apple_silicon():
+        # Program yang dibuka proses Intel (Rosetta) ikut jadi Intel; Chrome lewat Rosetta sangat berat.
+        args = [ARCH, "-arm64", "-x86_64", *args]
+    launch(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
     for _ in range(max(1, int(wait_seconds / _POLL_SECONDS))):
         info = probe(port)
         if info and "Chrome" in str(info.get("Browser", "")):

@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import platform
 import re
 import shutil
 import socket
@@ -63,7 +64,8 @@ def ensure_venv(home: Path, python: str, requirements: Path, *, run=subprocess.r
     """Create or update the app's venv when requirements.txt changed. Returns the venv's python."""
     home = Path(home)
     stamp = home / ".requirements-hash"
-    digest = requirements_hash(requirements)
+    # Arsitektur ikut dicatat: paket untuk Intel (Rosetta) tidak bisa dimuat oleh Python native, dan sebaliknya.
+    digest = f"{requirements_hash(requirements)}:{platform.machine()}"
     target = venv_python(home)
     if not force and stamp.exists() and stamp.read_text(encoding="utf-8").strip() == digest:
         return target
@@ -71,7 +73,7 @@ def ensure_venv(home: Path, python: str, requirements: Path, *, run=subprocess.r
         notify(SETUP_MESSAGE)
     log = home / "setup.log"
     with open(log, "w", encoding="utf-8") as out:
-        steps = ([python, "-m", "venv", str(home / "venv")],
+        steps = ([python, "-m", "venv", "--clear", str(home / "venv")],
                  [str(target), "-m", "pip", "install", "--upgrade", "pip"],
                  [str(target), "-m", "pip", "install", "-r", str(requirements)])
         for args in steps:

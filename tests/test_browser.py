@@ -46,3 +46,25 @@ def test_port_busy(tmp_path):
 def test_chrome_missing(tmp_path):
     with pytest.raises(ChromeNotFound):
         ensure_chrome(9222, tmp_path / "p", tmp_path / "tidak-ada", probe=lambda port: None, in_use=lambda port: False)
+
+
+def test_launches_natively_on_apple_chips(tmp_path):
+    """Kalau Python berjalan lewat Rosetta, Chrome jangan ikut jadi Intel (berat): paksa arm64 dulu."""
+    chrome = fake_chrome(tmp_path)
+    for apple, prefix in ((True, ["/usr/bin/arch", "-arm64", "-x86_64"]), (False, [])):
+        launched, answers = [], iter([None, INFO])
+        ensure_chrome(9333, tmp_path / "p", chrome, launch=lambda args, **k: launched.append(args),
+                      probe=lambda port: next(answers), in_use=lambda port: False, sleep=lambda s: None,
+                      apple_silicon=lambda: apple)
+        assert launched[0][:len(prefix)] == prefix and launched[0][len(prefix)] == str(chrome)
+
+
+def test_apple_silicon_detection():
+    from subprocess import CompletedProcess
+
+    from etsy_insights.browser import is_apple_silicon
+    answer = lambda out, code=0: (lambda args, **k: CompletedProcess(args, code, stdout=out))  # noqa: E731
+    assert is_apple_silicon(platform="darwin", run=answer("1\n")) is True
+    assert is_apple_silicon(platform="darwin", run=answer("0\n")) is False
+    assert is_apple_silicon(platform="darwin", run=answer("", 1)) is False
+    assert is_apple_silicon(platform="linux", run=answer("1\n")) is False
