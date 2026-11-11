@@ -3,3 +3,4 @@ openpyxl>=3.1,<4
 flask>=3,<4
 truststore>=0.9,<1
 certifi>=2024.2.2
+anthropic>=2.8,<3

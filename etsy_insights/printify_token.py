@@ -1,9 +1,10 @@
 """Token Printify: disimpan di file `printify-token` (izin 0600) di folder data aplikasi, tidak pernah ditampilkan."""
 from __future__ import annotations
 
-import os
 import re
 from pathlib import Path
+
+from .secret_file import delete_secret, load_secret, save_secret
 
 TOKEN_FILE = "printify-token"
 _BEARER = re.compile(r"^bearer(\s+|$)", re.IGNORECASE)
@@ -23,29 +24,18 @@ def save_token(home: Path, token: str) -> str:
     cleaned = clean_token(token)
     if not looks_like_token(cleaned):
         raise ValueError("That does not look like a Printify token.")
-    home = Path(home)
-    home.mkdir(parents=True, exist_ok=True)
-    temp = home / f".{TOKEN_FILE}.tmp"
-    fd = os.open(temp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-    try:
-        os.write(fd, cleaned.encode("utf-8"))
-    finally:
-        os.close(fd)
-    os.chmod(temp, 0o600)
-    os.replace(temp, home / TOKEN_FILE)
+    save_secret(home, TOKEN_FILE, cleaned)
     return cleaned
 
 
 def load_token(home: Path) -> str | None:
-    path = Path(home) / TOKEN_FILE
-    if not path.exists():
-        return None
-    token = clean_token(path.read_text(encoding="utf-8"))
+    text = load_secret(home, TOKEN_FILE)
+    token = clean_token(text) if text is not None else ""
     return token or None
 
 
 def delete_token(home: Path) -> None:
-    (Path(home) / TOKEN_FILE).unlink(missing_ok=True)
+    delete_secret(home, TOKEN_FILE)
 
 
 def token_hint(token: str) -> str:
