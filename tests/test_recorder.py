@@ -91,3 +91,13 @@ def test_redact_html_is_fast_on_long_tokens():
 def test_redact_html_object_under_sensitive_key():
     out = redact_html('<script>window.s = {"auth":{"bearer":"Q5"},"q":"boho"};</script>')
     assert "Q5" not in out and '"q":"boho"' in out
+
+
+FAKE_JWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImFAYi5jbyIsIm5hbWUiOiJYIn0.c2lnbmF0dXJlX2hlcmVfMTIz"
+
+
+def test_jwt_under_unlisted_key_is_redacted():
+    html = '<script>window.c = "{\\"zd_messaging_JWT_key\\":\\"' + FAKE_JWT + '\\",\\"q\\":\\"boho\\"}";</script>'
+    out = redact_html(html)
+    assert FAKE_JWT not in out and "eyJ" not in out and '\\"q\\":\\"boho\\"' in out
+    assert redact({"widget": {"credential": FAKE_JWT}})["widget"]["credential"] == REDACTED

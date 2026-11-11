@@ -21,7 +21,7 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 from playwright.sync_api import Error as PlaywrightError
 
 SENSITIVE_KEYS = ("csrf", "token", "email", "session", "cookie", "password", "secret",
-                  "auth", "phone", "address", "nonce", "nnc")
+                  "auth", "phone", "address", "nonce", "nnc", "jwt", "bearer")
 REDACTED = "[DIHAPUS]"
 MAX_BODY_CHARS = 2_000_000
 FORMAT = "etsy-insights-kenali/1"
@@ -42,6 +42,8 @@ _TAG_VALUE_RE = re.compile(r'\b(value|content)\s*=\s*"[^"]*"', re.I)
 _SENSITIVE_ATTR_RE = re.compile(rf'(\b[\w:-]{{0,64}}(?:{_SENS})[\w:-]{{0,64}}\s*=\s*)"[^"]*"', re.I)
 _QUERY_PARAM_RE = re.compile(
     rf'([?&;#](?:amp;)?[^=&"\'\s<>]{{0,64}}(?:{_SENS})[^=&"\'\s<>]{{0,64}}=)[^&"\'\s<>#]*', re.I)
+# Token berbentuk JWT (header.payload.signature) disensor di mana pun, apa pun nama kuncinya.
+_JWT_RE = re.compile(r"eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{0,1024}")
 _PAIR_NAME_KEYS = ("name", "key", "id", "field")
 _PAIR_VALUE_KEYS = ("value", "content")
 
@@ -72,6 +74,7 @@ def redact_html(text: str) -> str:
     text = _ESCAPED_PAIR_RE.sub(rf'\1\\"{REDACTED}\\"', text)
     text = _QUOT_PAIR_RE.sub(rf'\1&quot;{REDACTED}&quot;', text)
     text = _QUERY_PARAM_RE.sub(rf'\1{REDACTED}', text)
+    text = _JWT_RE.sub(REDACTED, text)
     return _EMAIL_RE.sub(REDACTED, text)
 
 
