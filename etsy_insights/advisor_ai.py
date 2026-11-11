@@ -167,8 +167,13 @@ def answer_schema(category_keys: Sequence[str]) -> dict:
     })
 
 
+def redact_key(text: str) -> str:
+    """Ganti apa pun yang menyerupai API key Anthropic dengan "…" (untuk pesan error dan log)."""
+    return re.sub(r"sk-ant-[A-Za-z0-9_\-]+", "…", text)
+
+
 def _redact(text: str) -> str:
-    return re.sub(r"sk-ant-[A-Za-z0-9_\-]+", "…", text)[:MAX_DETAIL]
+    return redact_key(text)[:MAX_DETAIL]
 
 
 def _detail(exc: anthropic.APIError) -> str:
