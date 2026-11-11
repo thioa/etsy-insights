@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% from "catalog.html" import research_button with context %}
+{% block title %}{{ s.info.name }} · Catalog · Etsy Insights{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <a class="back" href="/catalog">← Catalog</a>
+    <h1>{{ s.info.name }}</h1>
+    <p class="muted">{{ s.models }} Printify product{{ '' if s.models == 1 else 's' }} · <span class="badge badge--status-{{ s.status }}">{{ status_text[s.status] }}</span></p>
+  </div>
+  <div class="actions">{{ research_button(s) }}</div>
+</div>
+{% if s.research.status == 'available' %}<p class="muted small">Research uses up to 3 of your daily searches.</p>{% endif %}
+
+<section class="cards" aria-label="Key numbers">
+  <div class="card"><div class="card__label">Keywords with data</div><div class="card__value">{{ s.keywords }}</div></div>
+  <div class="card"><div class="card__label">Most searched</div><div class="card__value card__value--small">{% if s.most_searched %}{{ s.most_searched[0] }} · {{ number(s.most_searched[1]) }}/mo{% else %}—{% endif %}</div></div>
+  <div class="card"><div class="card__label">Opportunities</div><div class="card__value card__value--small">{{ s.gold }} Gold · {{ s.potential }} Potential</div></div>
+  <div class="card"><div class="card__label">Ready to sell</div><div class="card__value">{{ s.ready if s.ready is not none else '—' }}</div></div>
+</section>
+
+<section class="panel" aria-label="Top keywords">
+  <div class="panel__head"><h2>Top keywords</h2><a href="/opportunities?q={{ s.info.main | urlencode }}">See all in Opportunities</a></div>
+  {% if rows %}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th scope="col">Keyword</th><th scope="col" class="num">Searches/month</th><th scope="col" class="num">Competing listings</th>
+      <th scope="col">Conversion</th><th scope="col">Label</th><th scope="col" class="num">Margin</th></tr></thead>
+    <tbody>{% for r in rows %}<tr>
+      <td><a class="kw" href="/keyword/{{ r.keyword | urlencode }}">{{ r.keyword }}</a></td>
+      <td class="num">{{ r.volume }}</td><td class="num">{{ r.competition }}</td>
+      <td><span class="conv conv--{{ r.conversion_class }}">{{ r.conversion }}</span></td>
+      <td><span class="badge badge--{{ r.label | lower }}">{{ r.label }}</span></td>
+      <td class="num"><span class="margin margin--{{ r.margin_class }}">{{ r.margin_text }}</span></td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="muted">No keywords yet. Click Research to add this category's keywords to the queue.</p>{% endif %}
+</section>
+
+<section class="panel" aria-label="Products">
+  <h2>Products</h2>
+  <div class="grid-cards grid-cards--products">
+  {% for b in s.info.blueprints %}
+  <article class="product-card" data-blueprint="{{ b.id }}">
+    <div class="product-card__photo">{% if b.image_url %}<img src="{{ b.image_url }}" alt="{{ b.title }}" loading="lazy">{% else %}<span class="no-photo">No photo</span>{% endif %}</div>
+    <h3 class="product-card__title">{{ b.title }}</h3>
+    <p class="muted small">{{ b.brand or '—' }}{% if b.model %} · {{ b.model }}{% endif %}</p>
+    {% if b.id in mine_ids %}<p><span class="badge badge--ready">In my products</span></p>{% endif %}
+    <button type="button" class="btn btn--small" data-choose-provider>Choose provider</button>
+    <div class="provider-pick" hidden>
+      <div class="field"><label>Print provider<select data-provider><option value="">Choose…</option></select></label></div>
+      <p class="small" data-shipping></p>
+      <div class="field"><label>Production cost <span class="muted">(US$, optional)</span><input class="input--money" inputmode="decimal" data-cost></label></div>
+      <p class="error" data-pick-error></p>
+      <button type="button" class="btn btn--primary btn--small" data-add-type>Add to my product types</button>
+    </div>
+  </article>
+  {% endfor %}
+  </div>
+</section>
+{% endblock %}

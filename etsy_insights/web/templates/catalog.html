@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Catalog · Etsy Insights{% endblock %}
+{% macro research_button(s) %}
+  {% if s.research.status == 'available' %}<button type="button" class="btn btn--primary btn--small" data-api="/api/catalog/research" data-body='{{ {"category": s.info.main} | tojson }}'>Research</button>
+  {% elif s.research.status == 'in_queue' %}<span class="badge badge--queue">In queue: {{ s.research.pending }} keyword{{ '' if s.research.pending == 1 else 's' }}</span>
+  {% elif s.research.status == 'researched' %}<button type="button" class="btn btn--small" disabled>Researched</button>{% endif %}
+{% endmacro %}
+{% block content %}
+<div class="page-head"><div>
+  <h1>Printify catalog</h1>
+  <p class="muted">Everything Printify can make, grouped by product. See where Etsy demand is.</p>
+</div></div>
+{% if not has_catalog %}
+<section class="panel">
+  <p>Connect Printify and run Sync to load the catalog.</p>
+  <a class="btn btn--primary" href="/printify">Go to Printify</a>
+</section>
+{% else %}
+{% if no_photos %}<p class="notice">Run Sync to load product photos.</p>{% endif %}
+<form class="filters panel" method="get" action="/catalog">
+  <div class="field field--grow"><label for="q">Search</label>
+    <input id="q" name="q" type="search" value="{{ q }}" placeholder="e.g. necklace, Gildan 18000"></div>
+  <div class="field"><label for="sort">Sort</label>
+    <select id="sort" name="sort">{% for value, text in sorts %}<option value="{{ value }}" {{ 'selected' if sort == value }}>{{ text }}</option>{% endfor %}</select></div>
+  <fieldset><legend>Show</legend>
+    <label class="chip"><input type="radio" name="status" value="" {{ 'checked' if not status }}> All</label>
+    <label class="chip"><input type="radio" name="status" value="researched" {{ 'checked' if status == 'researched' }}> Researched</label>
+    <label class="chip"><input type="radio" name="status" value="not_researched" {{ 'checked' if status == 'not_researched' }}> Not researched yet</label>
+    <label class="chip"><input type="checkbox" name="mine" value="1" {{ 'checked' if mine }}> In my products</label>
+  </fieldset>
+  <button class="btn btn--primary" type="submit">Apply</button>
+</form>
+<p class="muted small">{{ cards | length }} categories · {{ total_models }} Printify products</p>
+<div class="grid-cards">
+{% for s in cards %}
+<article class="category-card" data-category="{{ s.info.main }}">
+  <a class="category-card__photo" href="/catalog/{{ s.info.slug }}">{% if s.info.photo %}<img src="{{ s.info.photo }}" alt="{{ s.info.name }}" loading="lazy">{% else %}<span class="no-photo">No photo</span>{% endif %}</a>
+  <div class="category-card__body">
+    <h2 class="category-card__name">{{ s.info.name }}</h2>
+    <p class="muted small">{{ s.models }} product{{ '' if s.models == 1 else 's' }}{% if s.in_my_products %} · <span class="badge badge--ready">In my products</span>{% endif %}</p>
+    <p><span class="badge badge--status-{{ s.status }}">{{ status_text[s.status] }}</span></p>
+    <p class="small">Most searched: {% if s.most_searched %}<strong>{{ s.most_searched[0] }}</strong> · {{ number(s.most_searched[1]) }}/mo{% else %}—{% endif %}</p>
+    <p class="small">Opportunities: {{ s.gold }} Gold · {{ s.potential }} Potential</p>
+    {% if s.ready is not none %}<p class="small">Ready to sell: {{ s.ready }}</p>{% endif %}
+    <div class="actions">{{ research_button(s) }}<a class="btn btn--small" href="/catalog/{{ s.info.slug }}">View products</a></div>
+    {% if s.research.status == 'available' %}<p class="muted small">Uses up to 3 of your daily searches.</p>{% endif %}
+  </div>
+</article>
+{% else %}
+<p class="muted">No categories match these filters.</p>
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -175,6 +175,60 @@
     });
   }
 
+  // Catalog: choose a print provider for a Printify product, see US shipping, add it to my product types
+  function getJSON(url) {
+    return fetch(url, { headers: { "X-App-Token": token } }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) { return { ok: res.ok, data: data }; });
+    });
+  }
+  document.querySelectorAll("[data-choose-provider]").forEach(function (button) {
+    var cardEl = button.closest("[data-blueprint]");
+    var pick = cardEl.querySelector(".provider-pick");
+    var select = cardEl.querySelector("[data-provider]");
+    var shipping = cardEl.querySelector("[data-shipping]");
+    var errorEl = cardEl.querySelector("[data-pick-error]");
+    var blueprint = cardEl.getAttribute("data-blueprint");
+    button.addEventListener("click", function () {
+      button.disabled = true;
+      errorEl.textContent = "";
+      getJSON("/api/printify/providers?blueprint_id=" + blueprint).then(function (r) {
+        button.disabled = false;
+        if (!r.ok) { errorEl.textContent = r.data.error || "Could not load print providers."; pick.hidden = false; return; }
+        select.length = 1;
+        r.data.providers.forEach(function (p) {
+          var option = document.createElement("option");
+          option.value = p.id;
+          option.textContent = p.title;
+          select.appendChild(option);
+        });
+        pick.hidden = false;
+        button.hidden = true;
+      });
+    });
+    select.addEventListener("change", function () {
+      shipping.textContent = "";
+      errorEl.textContent = "";
+      if (!select.value) return;
+      shipping.textContent = "Checking shipping…";
+      getJSON("/api/catalog/shipping?blueprint_id=" + blueprint + "&provider_id=" + select.value).then(function (r) {
+        if (!r.ok) { shipping.textContent = ""; errorEl.textContent = r.data.error || "Could not load shipping."; return; }
+        shipping.textContent = "US shipping: " + r.data.shipping_text +
+          (r.data.handling_days ? " · Production time: " + r.data.handling_days + " days" : "");
+      });
+    });
+    cardEl.querySelector("[data-add-type]").addEventListener("click", function () {
+      if (!select.value) { errorEl.textContent = "Choose a print provider first."; return; }
+      var add = this;
+      add.disabled = true;
+      post("/api/printify/types/add", {
+        blueprint_id: Number(blueprint), print_provider_id: Number(select.value),
+        cost_usd: cardEl.querySelector("[data-cost]").value
+      }).then(function (r) {
+        if (r.ok) { location.reload(); } else { add.disabled = false; errorEl.textContent = r.data.error || "Something went wrong."; }
+      });
+    });
+  });
+
   // Keyword detail: link the keyword to a Printify product type
   var linkSelect = document.querySelector("select[data-link-keyword]");
   if (linkSelect) {
