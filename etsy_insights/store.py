@@ -5,11 +5,11 @@ import dataclasses
 import json
 import re
 import sqlite3
-from collections.abc import Collection, Iterable
+from collections.abc import Collection, Iterable, Sequence
 from datetime import date, datetime, timedelta, timezone, tzinfo
 from pathlib import Path
 
-from .models import KeywordMetrics, QueueItem, RawResult, ResultRow
+from .models import KeywordMetrics, QueueItem, RawResult, RelatedKeyword, ResultRow
 
 MAX_FAILURES = 3
 
@@ -37,7 +37,10 @@ CREATE TABLE IF NOT EXISTS results (
     trend_json TEXT,
     related_json TEXT,
     raw_json TEXT,
-    parser_version TEXT
+    parser_version TEXT,
+    kind TEXT NOT NULL DEFAULT 'search',
+    conversion_level INTEGER,
+    wow_pct REAL
 );
 CREATE TABLE IF NOT EXISTS sessions (
     id INTEGER PRIMARY KEY,
@@ -54,6 +57,10 @@ _KEYWORD_COLUMNS = """
     k.status, k.fail_count, k.added_at
 """
 _QUEUE_ORDER = "CASE k.source WHEN 'user' THEN 0 ELSE 1 END, k.depth, k.added_at, k.id"
+# Status antrean saat sebuah keyword dikembalikan: keyword Anda menunggu, keyword panen kembali ke panen.
+_QUEUE_STATUS = "CASE source WHEN 'user' THEN 'pending' ELSE 'harvested' END"
+_REUSABLE_PANEN_STATUSES = ("pending", "harvested", "failed")
+_MIGRATIONS = (("kind", "TEXT NOT NULL DEFAULT 'search'"), ("conversion_level", "INTEGER"), ("wow_pct", "REAL"))
 
 
 def normalize_keyword(text: str) -> str:
@@ -99,6 +106,14 @@ class Store:
         self._db = sqlite3.connect(str(path), isolation_level=None)
         self._db.row_factory = sqlite3.Row
         self._db.executescript(_SCHEMA)
+        self._migrate()
+
+    def _migrate(self) -> None:
+        """Tambahkan kolom baru ke database lama (dibuat oleh versi sebelumnya)."""
+        existing = {row[1] for row in self._db.execute("PRAGMA table_info(results)")}
+        for name, ddl in _MIGRATIONS:
+            if name not in existing:
+                self._db.execute(f"ALTER TABLE results ADD COLUMN {name} {ddl}")
 
     def close(self) -> None:
         self._db.close()
@@ -175,15 +190,52 @@ class Store:
     def return_to_pending(self, keyword_id: int) -> None:
         self._db.execute("UPDATE keywords SET status = 'pending' WHERE id = ?", (keyword_id,))
 
+    def return_to_queue(self, keyword_id: int) -> None:
+        self._db.execute(f"UPDATE keywords SET status = {_QUEUE_STATUS} WHERE id = ?", (keyword_id,))
+
     def recover_in_progress(self) -> int:
-        return self._db.execute("UPDATE keywords SET status = 'pending' WHERE status = 'in_progress'").rowcount
+        return self._db.execute(
+            f"UPDATE keywords SET status = {_QUEUE_STATUS} WHERE status = 'in_progress'").rowcount
 
     def record_failure(self, keyword_id: int) -> str:
         self._db.execute("UPDATE keywords SET fail_count = fail_count + 1 WHERE id = ?", (keyword_id,))
-        fails = self._db.execute("SELECT fail_count FROM keywords WHERE id = ?", (keyword_id,)).fetchone()[0]
-        status = "failed" if fails >= MAX_FAILURES else "pending"
+        fails, source = self._db.execute(
+            "SELECT fail_count, source FROM keywords WHERE id = ?", (keyword_id,)).fetchone()
+        if fails >= MAX_FAILURES:
+            status = "failed"
+        else:
+            status = "pending" if source == "user" else "harvested"
         self._db.execute("UPDATE keywords SET status = ? WHERE id = ?", (status, keyword_id))
         return status
+
+    def next_user_pending(self, exclude_ids: Collection[int] = ()) -> QueueItem | None:
+        exclude = list(exclude_ids)
+        not_in = f"AND k.id NOT IN ({','.join('?' * len(exclude))})" if exclude else ""
+        row = self._db.execute(
+            f"SELECT {_KEYWORD_COLUMNS} FROM keywords k LEFT JOIN keywords p ON k.parent_id = p.id "
+            f"WHERE k.status = 'pending' {not_in} ORDER BY {_QUEUE_ORDER} LIMIT 1", exclude).fetchone()
+        return self._queue_item(row) if row else None
+
+    def next_recheck(self, now: datetime, recheck_days: int,
+                     exclude_ids: Collection[int] = ()) -> QueueItem | None:
+        exclude = list(exclude_ids)
+        not_in = f"AND k.id NOT IN ({','.join('?' * len(exclude))})" if exclude else ""
+        row = self._db.execute(
+            f"SELECT {_KEYWORD_COLUMNS} FROM keywords k LEFT JOIN keywords p ON k.parent_id = p.id "
+            f"WHERE k.status IN ('done', 'no_data') AND k.last_checked_at < ? {not_in} "
+            "ORDER BY k.last_checked_at, k.id LIMIT 1",
+            [_ts(now - timedelta(days=recheck_days)), *exclude]).fetchone()
+        return self._queue_item(row) if row else None
+
+    def harvest_candidates(self, max_depth: int, exclude_ids: Collection[int] = ()) -> list[ResultRow]:
+        """Hasil terbaru keyword panen yang boleh dicari (kedalaman < max_depth)."""
+        exclude = list(exclude_ids)
+        not_in = f"AND k.id NOT IN ({','.join('?' * len(exclude))})" if exclude else ""
+        rows = self._db.execute(
+            self._RESULT_SELECT + f" WHERE k.status = 'harvested' AND k.depth < ? {not_in} AND r.id = "
+            "(SELECT r2.id FROM results r2 WHERE r2.keyword_id = r.keyword_id "
+            "ORDER BY r2.checked_at DESC, r2.id DESC LIMIT 1) ORDER BY k.keyword", [max_depth, *exclude]).fetchall()
+        return [self._result_row(r) for r in rows]
 
     def status_counts(self) -> dict[str, int]:
         rows = self._db.execute("SELECT status, COUNT(*) FROM keywords GROUP BY status").fetchall()
@@ -194,25 +246,60 @@ class Store:
                     parser_version: str) -> None:
         self._db.execute(
             "INSERT INTO results (keyword_id, checked_at, has_data, search_volume, conversion_rate, "
-            "competition_value, competition_kind, trend_json, related_json, raw_json, parser_version) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "competition_value, competition_kind, trend_json, related_json, raw_json, parser_version, "
+            "kind, conversion_level, wow_pct) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'search', ?, ?)",
             (keyword_id, _ts(now), int(metrics.has_data), metrics.search_volume, metrics.conversion_rate,
              metrics.competition_value, metrics.competition_kind, json.dumps(list(metrics.trend)),
              json.dumps(list(metrics.related), ensure_ascii=False),
-             json.dumps(dataclasses.asdict(raw), ensure_ascii=False, default=str), parser_version))
+             json.dumps(dataclasses.asdict(raw), ensure_ascii=False, default=str), parser_version,
+             metrics.conversion_level, metrics.wow_pct))
         status = "done" if metrics.has_data else "no_data"
         self._db.execute("UPDATE keywords SET status = ?, last_checked_at = ?, fail_count = 0 WHERE id = ?",
                          (status, _ts(now), keyword_id))
+
+    def save_harvest(self, parent_id: int, related: Sequence[RelatedKeyword], max_count: int, max_depth: int,
+                     now: datetime) -> int:
+        """Simpan keyword terkait beserta datanya. Mengembalikan jumlah keyword baru."""
+        parent = self._db.execute("SELECT depth FROM keywords WHERE id = ?", (parent_id,)).fetchone()
+        if parent is None or parent["depth"] + 1 > max_depth:
+            return 0
+        unique: dict[str, RelatedKeyword] = {}
+        for item in related:
+            keyword = normalize_keyword(item.keyword)
+            if keyword:
+                unique.setdefault(keyword, item)
+        added = 0
+        for keyword, item in list(unique.items())[:max_count]:
+            existing = self._db.execute("SELECT id, status FROM keywords WHERE keyword = ?", (keyword,)).fetchone()
+            if existing is None:
+                keyword_id = self._db.execute(
+                    "INSERT INTO keywords (keyword, source, parent_id, depth, status, added_at) "
+                    "VALUES (?, 'related', ?, ?, 'harvested', ?)",
+                    (keyword, parent_id, parent["depth"] + 1, _ts(now))).lastrowid
+                added += 1
+            elif existing["status"] in _REUSABLE_PANEN_STATUSES:
+                keyword_id = existing["id"]
+                self._db.execute("DELETE FROM results WHERE keyword_id = ? AND kind = 'panen'", (keyword_id,))
+            else:
+                continue
+            self._db.execute(
+                "INSERT INTO results (keyword_id, checked_at, has_data, search_volume, competition_value, "
+                "competition_kind, trend_json, related_json, kind, conversion_level) "
+                "VALUES (?, ?, ?, ?, ?, ?, '[]', '[]', 'panen', ?)",
+                (keyword_id, _ts(now), int(bool(item.search_volume)), item.search_volume, item.competition_value,
+                 "count" if item.competition_value is not None else None, item.conversion_level))
+        return added
 
     def _result_row(self, row: sqlite3.Row) -> ResultRow:
         metrics = KeywordMetrics(
             has_data=bool(row["has_data"]), search_volume=row["search_volume"],
             conversion_rate=row["conversion_rate"], competition_value=row["competition_value"],
             competition_kind=row["competition_kind"], trend=tuple(json.loads(row["trend_json"] or "[]")),
-            related=tuple(json.loads(row["related_json"] or "[]")))
+            related=tuple(json.loads(row["related_json"] or "[]")),
+            conversion_level=row["conversion_level"], wow_pct=row["wow_pct"])
         return ResultRow(keyword_id=row["keyword_id"], keyword=row["keyword"], source=row["source"],
                          depth=row["depth"], parent_keyword=row["parent_keyword"], status=row["status"],
-                         checked_at=_dt(row["checked_at"]), metrics=metrics)
+                         checked_at=_dt(row["checked_at"]), metrics=metrics, kind=row["kind"])
 
     _RESULT_SELECT = """
         SELECT r.*, k.keyword, k.source, k.depth, k.status, p.keyword AS parent_keyword
@@ -245,6 +332,11 @@ class Store:
     def checked_on(self, day: date, tz: tzinfo) -> int:
         rows = self._db.execute("SELECT started_at, checked_count FROM sessions").fetchall()
         return sum(count for started, count in rows if _dt(started).astimezone(tz).date() == day)
+
+    def stop_reasons_on(self, day: date, tz: tzinfo) -> list[str]:
+        rows = self._db.execute(
+            "SELECT started_at, stop_reason FROM sessions WHERE stop_reason IS NOT NULL ORDER BY id").fetchall()
+        return [reason for started, reason in rows if _dt(started).astimezone(tz).date() == day]
 
     def active_cooldown_until(self, now: datetime) -> datetime | None:
         rows = self._db.execute("SELECT cooldown_until FROM sessions WHERE cooldown_until IS NOT NULL").fetchall()

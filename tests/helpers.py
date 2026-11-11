@@ -3,16 +3,21 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
-from etsy_insights.models import KeywordMetrics, RawResult, ResultRow
+from etsy_insights.models import KeywordMetrics, RawResult, RelatedKeyword, ResultRow
 
 T0 = datetime(2026, 11, 11, 10, 0, tzinfo=timezone(timedelta(hours=7)))
 INSIGHTS = "https://www.etsy.com/your/shops/me/marketplace-insights"
 
 
-def make_metrics(volume=1000, cr=0.05, comp=100.0, kind="count", related=(), trend=(), has_data=True):
+def make_metrics(volume=1000, cr=0.05, comp=100.0, kind="count", related=(), trend=(), has_data=True,
+                 level=2, wow=None):
     return KeywordMetrics(has_data=has_data, search_volume=volume, conversion_rate=cr,
                           competition_value=comp, competition_kind=kind,
-                          trend=tuple(trend), related=tuple(related))
+                          trend=tuple(trend), related=tuple(related), conversion_level=level, wow_pct=wow)
+
+
+def make_related(keyword, volume=1000, comp=100, level=2):
+    return RelatedKeyword(keyword, volume, comp, level)
 
 
 def make_raw(keyword):
