@@ -8,7 +8,7 @@ from enum import Enum
 
 from .config import Config
 from .models import (BrowserClosed, DangerSignal, InsightsPage, KeywordMetrics, NotLoggedIn,
-                     PageLoadTimeout, ParseError, RawResult)
+                     PageLoadTimeout, RawResult)
 from .pacer import Pacer, cooldown_end, remaining_quota
 from .store import Store
 
@@ -140,6 +140,12 @@ def _loop(deps: SessionDeps, state: _State, limit: int, start: datetime) -> None
         try:
             raw = page.search(item.keyword)
         except PageLoadTimeout:
+            danger = page.check_danger()
+            if danger is not None:
+                store.return_to_pending(item.id)
+                state.current_id = None
+                _stop_for_danger(deps, state, danger)
+                return
             store.record_failure(item.id)
             state.current_id = None
             state.failed += 1
@@ -159,7 +165,7 @@ def _loop(deps: SessionDeps, state: _State, limit: int, start: datetime) -> None
                 return
             try:
                 metrics = deps.parse(raw)
-            except ParseError as exc:
+            except Exception as exc:  # ParseError, atau parser crash karena data Etsy berubah
                 store.record_failure(item.id)
                 state.current_id = None
                 state.failed += 1
@@ -217,7 +223,7 @@ def run_session(deps: SessionDeps, max_keywords: int | None = None,
         state.reason = StopReason.INTERRUPTED
     except Exception:
         if state.current_id is not None:
-            store.return_to_pending(state.current_id)
+            store.record_failure(state.current_id)
         store.end_session(state.session_id, deps.clock(), "error", None)
         raise
     if state.current_id is not None:

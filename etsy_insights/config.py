@@ -1,6 +1,7 @@
 """Membaca config.toml dan memaksakan batas keras keamanan."""
 from __future__ import annotations
 
+import math
 import re
 import tomllib
 from dataclasses import dataclass, fields, replace
@@ -51,7 +52,7 @@ _WEIGHT_KEYS = ("volume", "conversion", "kompetisi")
 
 
 def _is_number(value: Any) -> bool:
-    return isinstance(value, (int, float)) and not isinstance(value, bool)
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
 
 def _parse_scalar(key: str, value: Any, default: int, warnings: list[str]) -> int:
@@ -111,7 +112,12 @@ def load_config(path: Path) -> tuple[Config, list[str]]:
     if not path.exists():
         return Config(), []
     try:
-        data = tomllib.loads(path.read_text(encoding="utf-8"))
+        text = path.read_text(encoding="utf-8-sig")
+    except UnicodeDecodeError as exc:
+        raise ConfigError("config.toml bukan teks UTF-8. Buka dengan TextEdit, lalu simpan ulang "
+                          "dengan encoding UTF-8 (Format > Make Plain Text).") from exc
+    try:
+        data = tomllib.loads(text)
     except tomllib.TOMLDecodeError as exc:
         match = re.search(r"line (\d+)", str(exc))
         line = match.group(1) if match else "?"

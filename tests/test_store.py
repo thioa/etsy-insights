@@ -110,3 +110,12 @@ def test_latest_results_newest_per_keyword_with_parent():
     [row] = s.latest_results()
     assert (row.keyword, row.parent_keyword, row.metrics.search_volume, row.metrics.related) == ("b", "a", 2, ("z",))
     assert len(s.all_results()) == 2
+
+
+def test_read_keywords_file_other_encodings(tmp_path):
+    p = tmp_path / "k16.txt"
+    p.write_bytes("café mug\nboho\n".encode("utf-16"))
+    assert read_keywords_file(p) == ["café mug", "boho"]
+    p2 = tmp_path / "kmac.txt"
+    p2.write_bytes("café mug\n".encode("mac_roman"))
+    assert read_keywords_file(p2) == ["café mug"]

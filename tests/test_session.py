@@ -141,3 +141,17 @@ def test_unexpected_error_returns_keyword_and_closes_session():
     with pytest.raises(RuntimeError):
         run_session(make_deps(store, page, clock))
     assert store.status_counts() == {"pending": 1} and store.last_session()["stop_reason"] == "error"
+    assert store.get("a").fail_count == 1
+
+
+def test_timeout_with_danger_stops_with_cooldown():
+    clock, store, page = setup("a", "b", "c", outcomes={"a": "timeout_captcha"})
+    s = run_session(make_deps(store, page, clock))
+    assert s.stop_reason is StopReason.DANGER and s.cooldown_until is not None
+    assert page.searched == ["a"] and (store.get("a").status, store.get("a").fail_count) == ("pending", 0)
+
+
+def test_parser_crash_counts_as_failure_and_session_continues():
+    clock, store, page = setup("a", "b", outcomes={"a": "parse_crash"})
+    s = run_session(make_deps(store, page, clock))
+    assert (s.failed, s.succeeded, store.get("a").fail_count) == (1, 1, 1)

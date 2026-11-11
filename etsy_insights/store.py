@@ -60,12 +60,22 @@ def normalize_keyword(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip().lower()
 
 
+def _decode_text(data: bytes) -> str:
+    """UTF-16 (dengan BOM), UTF-8, lalu Mac Roman sebagai cadangan (file dari Excel Mac)."""
+    if data.startswith((b"\xff\xfe", b"\xfe\xff")):
+        return data.decode("utf-16")
+    try:
+        return data.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        return data.decode("mac_roman")
+
+
 def read_keywords_file(path: Path) -> list[str]:
     path = Path(path)
     if not path.exists():
         return []
     seen: dict[str, None] = {}
-    for line in path.read_text(encoding="utf-8-sig").splitlines():
+    for line in _decode_text(path.read_bytes()).splitlines():
         if line.strip().startswith("#"):
             continue
         keyword = normalize_keyword(line)

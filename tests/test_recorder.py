@@ -54,3 +54,40 @@ def test_url_query_secrets_redacted():
     r.add_response("https://www.etsy.com/api/x?keyword=boho&_nnc=abc123", 200, "application/json", "{}", T0)
     url = r.responses[0]["url"]
     assert "keyword=boho" in url and "abc123" not in url
+
+
+def test_redact_scans_string_values():
+    out = redact({"html": '<input type=hidden name="_nnc" value="NNC_SECRET">', "owner": "seller@toko.com",
+                  "payload": '{"csrf_token":"TOK"}', "fields": [{"name": "csrf_nonce", "value": "X"}], "q": "boho"})
+    dumped = json.dumps(out)
+    for secret in ("NNC_SECRET", "seller@toko.com", "TOK", '"X"'):
+        assert secret not in dumped
+    assert out["q"] == "boho"
+
+
+def test_redact_html_more_patterns():
+    html = ('<a href="/logout.php?ref=x&amp;_nnc=Q1">x</a><img src="https://i.etsy.com/a.png?auth_token=Q2">'
+            '<div data-csrf-nonce="Q3" data-listing="ok"></div>'
+            '<div data-state="{&quot;api_token&quot;:&quot;Q4&quot;,&quot;q&quot;:&quot;boho&quot;}"></div>')
+    out = redact_html(html)
+    for secret in ("Q1", "Q2", "Q3", "Q4"):
+        assert secret not in out
+    assert 'data-listing="ok"' in out and "&quot;q&quot;:&quot;boho&quot;" in out and "ref=x" in out
+
+
+def test_url_fragment_secrets_redacted():
+    r = Recording(T0)
+    r.add_response("https://www.etsy.com/cb#access_token=Z9&state=ok", 200, "application/json", "{}", T0)
+    assert "Z9" not in r.responses[0]["url"] and "state=ok" in r.responses[0]["url"]
+
+
+def test_redact_html_is_fast_on_long_tokens():
+    import time
+    start = time.perf_counter()
+    redact_html("a" * 60_000)
+    assert time.perf_counter() - start < 1.0
+
+
+def test_redact_html_object_under_sensitive_key():
+    out = redact_html('<script>window.s = {"auth":{"bearer":"Q5"},"q":"boho"};</script>')
+    assert "Q5" not in out and '"q":"boho"' in out

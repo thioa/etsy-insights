@@ -39,8 +39,12 @@ tebakan. **Di mode ini tidak ada otomatisasi:** Anda sendiri yang mencari.
 7. Rekaman tersimpan di `rekaman/kenali-YYYYMMDD-HHMM.json`. **Kirim file itu ke Claude**,
    bersama screenshot halaman Insights untuk satu keyword.
 
-Sebelum disimpan, nilai sensitif seperti token, email, cookie, nomor telepon, dan
-alamat diganti `[DIHAPUS]`. Header request dan cookie tidak direkam sama sekali.
+Hanya tab Marketplace Insights yang direkam. Sebelum disimpan, nilai yang dikenali
+sebagai sensitif diganti `[DIHAPUS]`: token, nonce, cookie, sesi, kata sandi, alamat email,
+dan nilai di bawah kunci seperti `email`, `phone`, atau `address`. Header request dan
+cookie tidak direkam sama sekali. Penyensoran ini otomatis dan berbasis pola, jadi tidak
+dijamin sempurna. **Screenshot berisi apa pun yang tampil di layar**, jadi tutup dulu
+informasi pribadi (misalnya data pembeli) sebelum merekam.
 
 ## 3. Excel (`export.command`)
 

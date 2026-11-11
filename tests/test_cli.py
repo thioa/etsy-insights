@@ -36,3 +36,26 @@ def test_command_scripts_are_valid_and_executable():
         p = Path(name)
         assert p.stat().st_mode & 0o111, name
         assert subprocess.run(["bash", "-n", name]).returncode == 0
+
+
+def test_cli_playwright_error_has_no_traceback(tmp_path, capsys, monkeypatch):
+    from playwright.sync_api import Error as PlaywrightError
+    import etsy_insights.__main__ as cli
+
+    def boom(*a, **k):
+        raise PlaywrightError("Target page has been closed")
+    monkeypatch.setattr(cli, "_kenali", boom)
+    assert main(["kenali"], base_dir=project(tmp_path), now=lambda: T0) == 1
+    out = capsys.readouterr().out
+    assert "Chrome" in out and "Traceback" not in out
+
+
+def test_cli_unexpected_error_has_no_traceback(tmp_path, capsys, monkeypatch):
+    import etsy_insights.__main__ as cli
+
+    def boom(*a, **k):
+        raise RuntimeError("aneh")
+    monkeypatch.setattr(cli, "_status", boom)
+    assert main(["status"], base_dir=project(tmp_path), now=lambda: T0) == 1
+    out = capsys.readouterr().out
+    assert "kesalahan tak terduga" in out and "aneh" in out

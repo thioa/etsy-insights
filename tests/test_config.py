@@ -71,3 +71,23 @@ def test_wrong_type_uses_default_with_warning(tmp_path):
 def test_unknown_key_warns(tmp_path):
     cfg, warnings = load_config(write(tmp_path, "kuota = 10\n"))
     assert cfg == Config() and any("kuota" in w for w in warnings)
+
+
+def test_config_with_bom_is_fine(tmp_path):
+    p = tmp_path / "config.toml"
+    p.write_bytes("﻿kuota_harian = 30\n".encode("utf-8"))
+    assert load_config(p)[0].kuota_harian == 30
+
+
+def test_config_not_utf8_raises_config_error(tmp_path):
+    p = tmp_path / "config.toml"
+    p.write_bytes("# catatan café\nkuota_harian = 30\n".encode("cp1252"))
+    with pytest.raises(ConfigError, match="UTF-8"):
+        load_config(p)
+
+
+def test_non_finite_numbers_use_default(tmp_path):
+    cfg, warnings = load_config(write(tmp_path,
+        "kuota_harian = inf\nistirahat_setiap = [8, inf]\njeda_antar_keyword_detik = [20, nan]\n"))
+    assert (cfg.kuota_harian, cfg.istirahat_setiap, cfg.jeda_antar_keyword_detik) == (50, (8, 12), (20, 60))
+    assert len(warnings) == 3

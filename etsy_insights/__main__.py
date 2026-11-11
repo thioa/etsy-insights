@@ -6,6 +6,8 @@ from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 
+from playwright.sync_api import Error as PlaywrightError
+
 from .browser import ChromeNotFound, ChromeStartTimeout, PortBusy, connected_browser, ensure_chrome
 from .config import Config, ConfigError, load_config
 from .export import export_excel
@@ -81,9 +83,16 @@ def main(argv: list[str] | None = None, *, base_dir: Path | None = None,
     except (ConfigError, ChromeNotFound, PortBusy, ChromeStartTimeout) as exc:
         print(str(exc))
         return 1
+    except PlaywrightError as exc:
+        print(f"Chrome tertutup atau tidak merespons: {exc}\nBuka lagi kenali.command untuk mencoba ulang.")
+        return 1
     except KeyboardInterrupt:
         print("\nDihentikan.")
         return 130
+    except Exception as exc:  # pesan yang bisa dibaca, bukan traceback
+        print(f"Terjadi kesalahan tak terduga: {type(exc).__name__}: {exc}\n"
+              "Salin pesan ini dan kirim ke Claude.")
+        return 1
 
 
 if __name__ == "__main__":

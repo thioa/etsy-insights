@@ -79,6 +79,9 @@ class FakePage:
         outcome = self.outcomes.get(keyword, "ok")
         if outcome == "timeout":
             raise PageLoadTimeout(keyword)
+        if outcome == "timeout_captcha":
+            self._danger = DangerSignal("captcha", "CAPTCHA menggantikan halaman")
+            raise PageLoadTimeout(keyword)
         if outcome == "closed":
             raise BrowserClosed()
         if outcome == "interrupt":
@@ -102,6 +105,8 @@ def fake_parse(raw):
     body = raw.responses[0].body
     if body["outcome"] == "parse_error":
         raise ParseError("tidak terbaca")
+    if body["outcome"] == "parse_crash":
+        return {}["field_hilang"]
     if body["outcome"] == "no_data":
         return KeywordMetrics(has_data=False)
     return make_metrics(related=body["related"])
