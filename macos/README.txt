@@ -25,6 +25,9 @@ Etsy Insights — cara memasang
 
 5. Browser terbuka ke Etsy Insights. Mulai dari "Test run (3 searches)".
 
+Printify (opsional): menu Printify -> tempel token (izin shops.read, products.read,
+catalog.read) -> Sync now. Aplikasi hanya membaca dari Printify.
+
 Keluar: Settings -> Quit Etsy Insights (lakukan ini juga sebelum mengganti aplikasi).
 Data aplikasi: ~/Library/Application Support/Etsy Insights
 File Excel: Documents/Etsy Insights

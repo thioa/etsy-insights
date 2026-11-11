@@ -64,7 +64,7 @@ def client(app):
     return app.test_client()
 
 
-def printify_app(home: Path, fake, *, spawn=lambda f: f()):
+def printify_app(home: Path, fake, *, spawn=lambda f: f(), port: int = 8765):
     """App dengan klien Printify yang mengarah ke server Printify palsu (tanpa jeda, tanpa proxy)."""
     from etsy_insights.printify_api import PrintifyClient
     from etsy_insights.web import create_app
@@ -72,7 +72,8 @@ def printify_app(home: Path, fake, *, spawn=lambda f: f()):
 
     def factory(token):
         return PrintifyClient(token, base_url=fake.url, min_interval=0, sleep=lambda s: None, opener=no_proxy_opener())
-    app = create_app(home, token=TOKEN, runner=FakeRunner(), printify_client=factory, printify_spawn=spawn)
+    app = create_app(home, token=TOKEN, runner=FakeRunner(), port=port, printify_client=factory,
+                     printify_spawn=spawn)
     return app, client(app)
 
 

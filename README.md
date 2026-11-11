@@ -60,7 +60,53 @@ Tampilan aplikasinya berbahasa Inggris; README ini berbahasa Indonesia.
 - **Settings:** kuota harian (1–30), jeda, durasi sesi, dan bobot skor. Tombol
   **Quit Etsy Insights** ada di halaman ini.
 
-## 3. Kalau sesi berhenti
+## 3. Printify: produk dan margin
+
+Etsy Insights bisa membaca produk Printify Anda untuk menjawab dua pertanyaan: **keyword ini bisa saya
+jual dengan produk apa**, dan **berapa sisa uang saya per penjualan**. Aplikasi **hanya membaca**
+dari Printify; tidak bisa mengubah, membuat, atau mem-publish apa pun di toko Printify Anda.
+
+**Menghubungkan (sekali saja)**
+
+1. Di Printify, buka **My Profile → Connections** dan buat *personal access token*.
+2. Centang **hanya** tiga izin ini: `shops.read`, `products.read`, `catalog.read`.
+3. Di Etsy Insights, buka menu **Printify**, tempel token, lalu klik **Test and save**.
+   Token disimpan di Mac Anda saja dan tidak ditampilkan lagi. Token Printify berlaku 1 tahun.
+4. Klik **Sync now**. Aplikasi membaca produk Anda, biaya produksinya, dan ongkir ke AS.
+   Kalau akun Anda punya lebih dari satu toko, pilih toko yang terhubung ke Etsy.
+
+Klik **Sync now** lagi kapan saja kalau Anda menambah produk atau Printify mengubah harga.
+
+**Membaca hasilnya**
+
+- Di **Opportunities**, kolom **Product** menunjukkan produk Printify yang cocok, dan **Margin**
+  menunjukkan perkiraan sisa uang per penjualan:
+  harga yang dibayar pembeli − biaya produksi − ongkir ke AS (gratis ongkir) − fee Etsy.
+  - Hijau: di atas margin minimum Anda. Kuning: untung tipis. Merah: rugi.
+  - *Search to see price*: harga pembeli baru diketahui setelah keyword itu dicari. Klik
+    **Prioritize** di halaman keyword supaya dicari di sesi berikutnya.
+  - *No match*: tidak ada produk yang cocok. Di halaman keyword, Anda bisa menautkannya sendiri lewat
+    **Link to product type**.
+- Centang **Ready to sell** untuk melihat keyword berlabel Gold/Potential yang produknya ada dan
+  marginnya di atas batas minimum.
+- Halaman keyword menampilkan rincian biaya dan **harga jual minimal** untuk mencapai margin minimum.
+
+**Produk yang belum pernah Anda buat**
+
+Di **Add from catalog**, cari produk Printify (misalnya "tumbler" atau "Gildan 18000"), pilih print
+provider, lalu isi biaya produksinya sendiri. Printify tidak membagikan biaya produk yang belum Anda
+buat. Biaya itu bisa dilihat di Printify saat membuat produk.
+
+**Kata produk.** Sebuah keyword cocok dengan produk kalau mengandung salah satu *product words*-nya
+(misalnya *sweatshirt, crewneck*). Kata ini dibuat otomatis dan bisa Anda ubah di tabel Product types.
+
+**Suggested keywords.** Usulan keyword dari tags produk Anda dan jenis produknya. Centang yang Anda
+mau, lalu klik **Add selected** untuk memasukkannya ke antrean riset.
+
+**Fee Etsy.** Default-nya 9,5% + US$0,45 per penjualan, dengan margin minimum US$5. Cocokkan dengan
+fee di Shop Manager Anda (Finances), lalu ubah di **Settings → Selling on Etsy**.
+
+## 4. Kalau sesi berhenti
 
 | Pesan | Artinya | Yang perlu dilakukan |
 |---|---|---|
@@ -75,7 +121,7 @@ Tampilan aplikasinya berbahasa Inggris; README ini berbahasa Indonesia.
 Cooldown **bisa** dilewati lewat tautan *Ignore cooldown* (Anda harus mengetik `YES`), tetapi
 itu **tidak disarankan**.
 
-## 4. Letak data
+## 5. Letak data
 
 - **Data aplikasi:** `~/Library/Application Support/Etsy Insights/` (database, `keywords.txt`,
   `config.toml`, log, rekaman).
@@ -83,7 +129,7 @@ itu **tidak disarankan**.
   Data tetap aman.
 - **File Excel:** *Documents → Etsy Insights* (`opportunities-TANGGAL.xlsx`).
 
-## 5. Cadangan lewat Terminal
+## 6. Cadangan lewat Terminal
 
 Perintah Terminal tetap ada lewat aplikasinya. Perintah ini memakai data yang sama dengan aplikasi
 (bukan data di folder lama):
@@ -94,7 +140,7 @@ Perintah Terminal tetap ada lewat aplikasinya. Perintah ini memakai data yang sa
 
 Perintah lain: `--cli run`, `--cli status`, `--cli export`, `--cli kenali` (mode rekam).
 
-## 6. Risiko yang perlu Anda ketahui
+## 7. Risiko yang perlu Anda ketahui
 
 - **Ketentuan Etsy melarang akses otomatis.** Desain alat ini menekan risikonya: pelan, volume kecil,
   Chrome asli dari IP Anda sendiri, dan langsung berhenti saat ada tanda bahaya. Tetapi risikonya
