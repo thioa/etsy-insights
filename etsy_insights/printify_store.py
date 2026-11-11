@@ -169,6 +169,17 @@ class PrintifyStore:
     def __init__(self, store: Store) -> None:
         self._db = store.connection
 
+    def change_stamp(self) -> tuple:
+        """Sidik murah yang berubah setiap kali jenis produk, tautan, atau katalog berubah."""
+        types = self._db.execute(
+            "SELECT COUNT(*), TOTAL(id * coalesce(cost_min_cents, -1)), TOTAL(id * available), "
+            "TOTAL(id * length(words_json)), TOTAL(id * coalesce(shipping_us_cents, -1)), "
+            "TOTAL(id * (source = 'own')), group_concat(words_json, '|') FROM printify_types").fetchone()
+        links = self._db.execute("SELECT COUNT(*), TOTAL(keyword_id * type_id) FROM keyword_product_links").fetchone()
+        blueprints = self._db.execute("SELECT COUNT(*), TOTAL(id), TOTAL(length(coalesce(image_url, ''))), "
+                                      "TOTAL(length(title)) FROM printify_blueprints").fetchone()
+        return tuple(types) + tuple(links) + tuple(blueprints)
+
     # --- meta ---------------------------------------------------------------
     def meta(self, key: str) -> str | None:
         row = self._db.execute("SELECT value FROM printify_meta WHERE key = ?", (key,)).fetchone()

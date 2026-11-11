@@ -80,13 +80,27 @@ SWEAT_TITLE = "Unisex Heavy Blend™ Crewneck Sweatshirt"
 MUG_TITLE = "Accent Coffee Mug, 11oz"
 
 
-def seed_printify(home: Path, *, mug_cost: int = 512, mug_shipping: int | None = 699) -> dict[str, int]:
-    """Dua jenis produk *own* (tanpa koneksi Printify): sweatshirt 13.50/4.75 dan mug."""
+def _catalog_blueprints():
+    from etsy_insights.printify_store import Blueprint
+    return (Blueprint(6, SWEAT_TITLE, "Gildan", "18000", "https://images.printify.com/sweat.png"),
+            Blueprint(68, MUG_TITLE, "Generic brand", "", ""),
+            Blueprint(384, "Unisex Jersey Short Sleeve Tee", "Bella+Canvas", "3001", ""),
+            Blueprint(1000, "Heart Necklace", "Generic brand", "", ""),
+            Blueprint(1100, "Pet Bowl", "Generic brand", "", ""),
+            Blueprint(2000, "Something Unusual", "", "", ""))
+
+
+CATALOG_BLUEPRINTS = _catalog_blueprints()
+
+
+def seed_printify(home: Path, *, mug_cost: int = 512, mug_shipping: int | None = 699,
+                  blueprints=CATALOG_BLUEPRINTS) -> dict[str, int]:
+    """Dua jenis produk *own* (tanpa koneksi Printify): sweatshirt 13.50/4.75 dan mug, plus katalog kecil."""
     from etsy_insights.printify_store import PrintifyStore, SyncedType, SyncResult
     store = Store(Path(home) / "data" / "etsy.db")
     try:
         printify = PrintifyStore(store)
-        printify.apply_sync(SyncResult(111, "My Etsy Shop", (), (), (
+        printify.apply_sync(SyncResult(111, "My Etsy Shop", tuple(blueprints), (), (
             SyncedType(6, 99, SWEAT_TITLE, "Monster Digital", "own", 1350, 1600, 475, 3, True),
             SyncedType(68, 1, MUG_TITLE, "SPOKE Custom Products", "own", mug_cost, mug_cost, mug_shipping, 2, True),
         )), datetime.now().astimezone())

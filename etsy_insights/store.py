@@ -104,6 +104,7 @@ class Store:
     def __init__(self, path: str | Path) -> None:
         if str(path) != ":memory:":
             Path(path).parent.mkdir(parents=True, exist_ok=True)
+        self._path = str(Path(path).resolve()) if str(path) != ":memory:" else f":memory:{id(self)}"
         self._db = sqlite3.connect(str(path), timeout=10, isolation_level=None)
         self._db.row_factory = sqlite3.Row
         if str(path) != ":memory:":
@@ -125,6 +126,10 @@ class Store:
 
     def close(self) -> None:
         self._db.close()
+
+    @property
+    def path(self) -> str:
+        return self._path
 
     @property
     def connection(self) -> sqlite3.Connection:
@@ -237,6 +242,10 @@ class Store:
             "TOTAL(id * depth), TOTAL(id * (source = 'user')), TOTAL(id * (parent_id IS NULL)) FROM keywords"
         ).fetchone())
         return results + keywords
+
+    def keyword_statuses(self) -> dict[str, str]:
+        """keyword -> status (pending, in_progress, done, no_data, harvested, …)."""
+        return {row[0]: row[1] for row in self._db.execute("SELECT keyword, status FROM keywords")}
 
     def keyword_texts(self) -> set[str]:
         """Semua keyword di database (status apa pun)."""
