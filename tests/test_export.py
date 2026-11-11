@@ -71,4 +71,23 @@ def test_export_selera_sheet(tmp_path):
     assert row["Listing 1"].hyperlink.target.startswith("https://www.etsy.com/listing/")
     pel = wb["Opportunities"]
     by_kw = {pel.cell(r, 1).value: [c.value for c in pel[r]] for r in range(3, pel.max_row + 1)}
-    assert by_kw["sweatshirt"][-2:] == ["US$15.30 – US$18.70", "Hard"] and by_kw["mug"][-2:] == [None, None]
+    assert by_kw["sweatshirt"][11:13] == ["US$15.30 – US$18.70", "Hard"] and by_kw["mug"][11:13] == [None, None]
+
+
+def test_excel_printify_columns(tmp_path):
+    from etsy_insights.margin import Fees, compute
+    from etsy_insights.printify_store import ProductType
+    from etsy_insights.product_fit import ProductFit
+    scored = score_all(ROWS, Config())
+    names = [s.row.keyword for s in scored if s.eligible]
+    sweat = ProductType(1, 6, 99, "Unisex Heavy Blend Crewneck Sweatshirt", "Monster Digital", "own", 1350, 1600,
+                        475, 3, ("sweatshirt",), False, True, None)
+    loss, ok = compute(1700, 1350, 475, Fees(9.5, 45), 500), compute(3000, 1241, 475, Fees(9.5, 45), 500)
+    fits = {names[0]: ProductFit(sweat, loss, (), False, False), names[1]: ProductFit(sweat, ok, (), True, False)}
+    ws = load_workbook(export_excel(scored, ROWS, [], tmp_path, T0.date(), fits=fits))["Opportunities"]
+    assert [c.value for c in ws[2]][-4:] == ["Printify product", "Est. margin (USD)", "Margin %", "Ready to sell"]
+    rows = {r[0]: r for r in ws.iter_rows(min_row=3, values_only=True)}
+    assert rows[names[0]][-4:] == ("Unisex Heavy Blend Crewneck Sweatshirt", -3.32, -19.5, None)
+    assert rows[names[1]][-1] == "Yes"
+    plain = load_workbook(export_excel(scored, ROWS, [], tmp_path / "plain", T0.date()))["Opportunities"]
+    assert all(v is None for r in plain.iter_rows(min_row=3, values_only=True) for v in r[-4:])

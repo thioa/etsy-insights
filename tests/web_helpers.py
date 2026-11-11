@@ -74,3 +74,48 @@ def printify_app(home: Path, fake, *, spawn=lambda f: f()):
         return PrintifyClient(token, base_url=fake.url, min_interval=0, sleep=lambda s: None, opener=no_proxy_opener())
     app = create_app(home, token=TOKEN, runner=FakeRunner(), printify_client=factory, printify_spawn=spawn)
     return app, client(app)
+
+
+SWEAT_TITLE = "Unisex Heavy Blend™ Crewneck Sweatshirt"
+MUG_TITLE = "Accent Coffee Mug, 11oz"
+
+
+def seed_printify(home: Path, *, mug_cost: int = 512, mug_shipping: int | None = 699) -> dict[str, int]:
+    """Dua jenis produk *own* (tanpa koneksi Printify): sweatshirt 13.50/4.75 dan mug."""
+    from etsy_insights.printify_store import PrintifyStore, SyncedType, SyncResult
+    store = Store(Path(home) / "data" / "etsy.db")
+    try:
+        printify = PrintifyStore(store)
+        printify.apply_sync(SyncResult(111, "My Etsy Shop", (), (), (
+            SyncedType(6, 99, SWEAT_TITLE, "Monster Digital", "own", 1350, 1600, 475, 3, True),
+            SyncedType(68, 1, MUG_TITLE, "SPOKE Custom Products", "own", mug_cost, mug_cost, mug_shipping, 2, True),
+        )), datetime.now().astimezone())
+        ids = {t.title: t.id for t in printify.types()}
+        return {"sweatshirt": ids[SWEAT_TITLE], "mug": ids[MUG_TITLE]}
+    finally:
+        store.close()
+
+
+def seed_ready_keyword(home: Path, keyword: str = "custom mug") -> str:
+    """Hasil pencarian sintetis berlabel Gold/Potential dengan harga pembeli US$15.30–18.70."""
+    import dataclasses
+    store = Store(Path(home) / "data" / "etsy.db")
+    try:
+        now = datetime.now().astimezone()
+        from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+
+        def retarget(url: str) -> str:  # respons Etsy dicocokkan lewat parameter `query` di URL
+            parts = urlsplit(url)
+            query = [(k, keyword if k == "query" else v) for k, v in parse_qsl(parts.query, keep_blank_values=True)]
+            return urlunsplit(parts._replace(query=urlencode(query)))
+        original = load_raw("sweatshirt")
+        raw = dataclasses.replace(original, keyword=keyword, responses=tuple(
+            dataclasses.replace(r, url=retarget(r.url)) for r in original.responses))
+        metrics = dataclasses.replace(parse_search(load_raw("sweatshirt")).main, search_volume=1_000_000,
+                                      conversion_level=4, competition_value=1)
+        if store.get(keyword) is None:
+            store.sync_user_keywords([keyword], now)
+        store.save_result(store.get(keyword).id, metrics, raw, now, PARSER_VERSION)
+        return keyword
+    finally:
+        store.close()

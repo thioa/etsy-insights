@@ -62,6 +62,32 @@
   {% endif %}
 </section>
 
+<section class="panel" aria-label="Printify">
+  <h2>Printify</h2>
+  {% if fit.candidates %}
+  {% if no_price %}<p class="notice">Search to see price. The price buyers pay is known only after this keyword is searched.</p>
+  {% else %}<p class="muted">Price buyers pay (middle of the range): <strong>{{ price_text }}</strong>. Free shipping to the US.</p>{% endif %}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th scope="col">Product type</th><th scope="col" class="num">Cost</th><th scope="col" class="num">US shipping</th>
+      <th scope="col" class="num">Etsy fees</th><th scope="col" class="num">Margin</th>
+      <th scope="col" class="num">Price needed for a {{ min_text }} margin</th></tr></thead>
+    <tbody>{% for c in candidates %}<tr>
+      <td>{% if c.primary %}<strong>{{ c.title }}</strong> <span class="badge badge--ready">Best</span>{% else %}{{ c.title }}{% endif %}{% if c.provider %} · <span class="muted">{{ c.provider }}</span>{% endif %}</td>
+      <td class="num">{{ c.cost }}</td><td class="num">{{ c.shipping }}</td><td class="num">{{ c.fee }}</td>
+      <td class="num"><span class="margin margin--{{ c.margin[1] }}">{{ c.margin[0] }}</span></td>
+      <td class="num">{{ c.needed }}</td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="muted">No match. No Printify product type matches this keyword. Link one below, or add product words on the Printify page.</p>{% endif %}
+  {% if link_options %}
+  <div class="field"><label for="link-type">Link to product type</label>
+    <select id="link-type" data-link-keyword="{{ item.keyword }}">
+      <option value="" {{ 'selected' if linked_id is none }}>Automatic</option>
+      {% for t in link_options %}<option value="{{ t.id }}" {{ 'selected' if linked_id == t.id }}>{{ t.title }}{% if t.provider_title %} · {{ t.provider_title }}{% endif %}</option>{% endfor %}
+    </select></div>
+  {% endif %}
+</section>
+
 {% if children %}
 <section class="panel" aria-label="Harvested keywords">
   <h2>Keywords harvested from "{{ item.keyword }}"</h2>

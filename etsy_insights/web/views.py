@@ -10,7 +10,11 @@ from flask import Blueprint, abort, current_app, render_template, request
 
 from ..export import STATUS_TEXT
 from ..keywords import list_user_keywords
+from ..margin import STATUS_TEXT as MARGIN_STATUS_TEXT
+from ..margin import money, paid_price_cents
 from ..models import CONVERSION_LEVEL_TEXT
+from ..printify_store import PrintifyStore
+from ..product_fit import ProductFit, fees_from_config, fit_keyword, fits_for_store, minimum_cents
 from ..score import ScoredKeyword, score_all
 from ..settings import settings_form
 from ..store import normalize_keyword
@@ -49,6 +53,22 @@ def _range(low, high) -> str:
     return f"{low} – {high}" if low and high else ""
 
 
+def usd_short(cents: int) -> str:
+    """500 → "$5", 550 → "$5.50" (untuk teks "Price needed for a $5 margin")."""
+    return f"${cents // 100}" if cents % 100 == 0 else f"${cents / 100:.2f}"
+
+
+def margin_display(fit: ProductFit | None, minimum: int) -> tuple[str, str, int | None]:
+    """(teks, kelas CSS, margin dalam sen) untuk kolom Margin."""
+    if fit is None:
+        return MARGIN_STATUS_TEXT["no_match"], "unknown", None
+    m = fit.margin
+    if m.status != "ok" or m.margin_cents is None:
+        return MARGIN_STATUS_TEXT.get(m.status, m.status), "unknown", None
+    css = "good" if m.margin_cents >= minimum else ("ok" if m.margin_cents >= 0 else "bad")
+    return f"{money(m.margin_cents)} · {m.margin_percent:.1f}%", css, m.margin_cents
+
+
 @dataclass(frozen=True)
 class Row:
     keyword: str
@@ -61,11 +81,17 @@ class Row:
     difficulty: str
     market_price: str
     wow: str
+    product: str = ""
+    margin_text: str = ""
+    margin_class: str = "unknown"
+    margin_cents: int | None = None
+    ready: bool = False
 
 
-def _row(s: ScoredKeyword, profile: TasteProfile | None) -> Row:
+def _row(s: ScoredKeyword, profile: TasteProfile | None, fit: ProductFit | None = None, minimum: int = 0) -> Row:
     m = s.row.metrics
     level = m.conversion_level
+    margin_text, margin_class, margin_cents = margin_display(fit, minimum)
     return Row(
         keyword=s.row.keyword, volume=_number(m.search_volume), competition=_number(m.competition_value),
         conversion=CONVERSION_LEVEL_TEXT.get(level, "—") if isinstance(level, int) else "—",
@@ -73,7 +99,9 @@ def _row(s: ScoredKeyword, profile: TasteProfile | None) -> Row:
         score=f"{s.score:.1f}" if s.score is not None else "—", label=s.label,
         difficulty=profile.difficulty if profile else "Not searched yet",
         market_price=_range(profile.paid_price_low, profile.paid_price_high) if profile else "",
-        wow=f"{m.wow_pct:+.1f}%" if m.wow_pct is not None else "")
+        wow=f"{m.wow_pct:+.1f}%" if m.wow_pct is not None else "",
+        product=fit.primary.title if fit and fit.primary else "", margin_text=margin_text,
+        margin_class=margin_class, margin_cents=margin_cents, ready=bool(fit and fit.ready))
 
 
 def _page(name: str, **context):
@@ -103,6 +131,9 @@ def opportunities():
     conv_min = _int_arg("conv_min")
     vol_min = _int_arg("vol_min")
     query = normalize_keyword(request.args.get("q", ""))
+    ready_only = request.args.get("ready") == "1"
+    fits = fits_for_store(store, cfg, scored, profiles)
+    minimum = minimum_cents(cfg)
 
     def keep(s: ScoredKeyword) -> bool:
         m, profile = s.row.metrics, profiles.get(s.row.keyword)
@@ -110,19 +141,30 @@ def opportunities():
         return ((not labels or s.label in labels) and (not difficulties or difficulty in difficulties)
                 and (conv_min is None or (m.conversion_level is not None and m.conversion_level >= conv_min))
                 and (vol_min is None or (m.search_volume or 0) >= vol_min)
-                and (not query or query in s.row.keyword))
+                and (not query or query in s.row.keyword)
+                and (not ready_only or fits[s.row.keyword].ready))
 
     sort = request.args.get("sort", "score")
-    sort = sort if sort in SORT_KEYS else "score"
+    sort = sort if sort in SORT_KEYS or sort == "margin" else "score"
     direction = request.args.get("dir", "asc" if sort == "keyword" else "desc")
-    rows = sorted(filter(keep, scored), key=SORT_KEYS[sort], reverse=direction == "desc")
+    kept = list(filter(keep, scored))
+    if sort == "margin":  # margin yang belum diketahui selalu di bawah
+        known = [s for s in kept if fits[s.row.keyword].margin.margin_cents is not None]
+        unknown = sorted((s for s in kept if fits[s.row.keyword].margin.margin_cents is None),
+                         key=lambda s: s.row.keyword)
+        rows = sorted(known, key=lambda s: fits[s.row.keyword].margin.margin_cents,
+                      reverse=direction == "desc") + unknown
+    else:
+        rows = sorted(kept, key=SORT_KEYS[sort], reverse=direction == "desc")
     pages = max(1, math.ceil(len(rows) / PAGE_SIZE))
     page = min(max(1, _int_arg("page", 1) or 1), pages)
-    shown = [_row(s, profiles.get(s.row.keyword)) for s in rows[(page - 1) * PAGE_SIZE: page * PAGE_SIZE]]
+    shown = [_row(s, profiles.get(s.row.keyword), fits.get(s.row.keyword), minimum)
+             for s in rows[(page - 1) * PAGE_SIZE: page * PAGE_SIZE]]
 
     def link(**changes) -> str:
         params = {"label": labels, "difficulty": difficulties, "conv_min": conv_min, "vol_min": vol_min,
-                  "q": request.args.get("q", ""), "sort": sort, "dir": direction, "page": page}
+                  "q": request.args.get("q", ""), "ready": "1" if ready_only else None, "sort": sort,
+                  "dir": direction, "page": page}
         params.update(changes)
         return "/opportunities?" + urlencode({k: v for k, v in params.items() if v not in (None, "", [])},
                                              doseq=True)
@@ -134,7 +176,8 @@ def opportunities():
     page_links = [(n, link(page=n)) for n in range(1, pages + 1)]
     return _page("opportunities", rows=shown, total=len(rows), ranked=len(scored), labels=labels,
                  difficulties=difficulties, conv_min=conv_min, vol_min=vol_min, q=request.args.get("q", ""),
-                 sort=sort, direction=direction, page=page, pages=pages, page_links=page_links,
+                 ready_only=ready_only, sort=sort, direction=direction, page=page, pages=pages,
+                 page_links=page_links,
                  sort_link=sort_link, all_labels=LABELS, all_difficulties=DIFFICULTIES,
                  conversion_levels=CONVERSION_LEVEL_TEXT)
 
@@ -158,6 +201,20 @@ def keyword_detail(keyword: str):
             "conversion": CONVERSION_LEVEL_TEXT.get(level, "—") if isinstance(level, int) else "—",
             "conversion_class": CONVERSION_CLASS.get(level, "none") if isinstance(level, int) else "none",
             "can_prioritize": child.status == "harvested"})
+    printify = PrintifyStore(store)
+    types, links = printify.types(), printify.links()
+    fees, minimum = fees_from_config(cfg), minimum_cents(cfg)
+    price = paid_price_cents(profile.paid_price_low, profile.paid_price_high) if profile else None
+    fit = fit_keyword(item.keyword, scored.label if scored else "Not enough data", price, types,
+                      links.get(item.keyword), fees, minimum)
+    candidates = [{
+        "title": c.type.title, "provider": c.type.provider_title or "", "primary": c.type is fit.primary,
+        "cost": money(c.type.cost_min_cents) if c.type.cost_min_cents is not None else "Cost unknown",
+        "shipping": money(c.type.shipping_us_cents) if c.type.shipping_us_cents is not None else "No US shipping",
+        "fee": money(c.margin.fee_cents) if c.margin.fee_cents is not None else "—",
+        "margin": margin_display(ProductFit(c.type, c.margin, (), False, False), minimum),
+        "needed": money(c.margin.price_needed_cents) if c.margin.price_needed_cents is not None else "—",
+    } for c in fit.candidates]
     per_listing = None
     if metrics and metrics.search_volume and metrics.competition_value:
         per_listing = f"{metrics.search_volume / metrics.competition_value:.3f}"
@@ -175,7 +232,10 @@ def keyword_detail(keyword: str):
         points=trend_points(metrics.trend) if metrics else "",
         paid=_range(profile.paid_price_low, profile.paid_price_high) if profile else "",
         listing_range=_range(profile.listing_price_low, profile.listing_price_high) if profile else "",
-        children=children, can_prioritize=item.status == "harvested")
+        children=children, can_prioritize=item.status == "harvested",
+        fit=fit, candidates=candidates, no_price=price is None, min_text=usd_short(minimum),
+        link_options=[t for t in types if t.available], linked_id=links.get(item.keyword),
+        price_text=money(price) if price is not None else "")
 
 
 @bp.get("/keywords")

@@ -119,3 +119,10 @@ textarea { width: 100%; margin: 8px 0; }
 .input--money { width: 110px; }
 form.inline { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; margin: 0; }
 form.inline .error { flex-basis: 100%; text-align: right; }
+.margin { font-weight: 600; white-space: nowrap; }
+.margin--good { color: #1F6F5C; }
+.margin--ok { color: #8A6100; }
+.margin--bad { color: var(--danger); }
+.margin--unknown { color: #6B7075; font-weight: 400; }
+.badge--ready { background: var(--accent-soft); color: var(--accent-dark); }
+.table td.product-cell { white-space: normal; min-width: 150px; max-width: 220px; }

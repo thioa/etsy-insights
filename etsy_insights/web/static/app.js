@@ -170,6 +170,19 @@
     });
   }
 
+  // Keyword detail: link the keyword to a Printify product type
+  var linkSelect = document.querySelector("select[data-link-keyword]");
+  if (linkSelect) {
+    linkSelect.addEventListener("change", function () {
+      post("/api/printify/link", {
+        keyword: linkSelect.getAttribute("data-link-keyword"),
+        type_id: linkSelect.value ? Number(linkSelect.value) : null
+      }).then(function (r) {
+        if (r.ok) { location.reload(); } else { alert(r.data.error || "Something went wrong."); }
+      });
+    });
+  }
+
   // Printify: sync progress (the page reloads when the sync has finished)
   var printifyRoot = document.querySelector("[data-printify]");
   function pollSync() {

@@ -13,6 +13,9 @@
   <fieldset><legend>Label</legend>
     {% for l in all_labels %}<label class="chip"><input type="checkbox" name="label" value="{{ l }}" {{ 'checked' if l in labels }}> {{ l }}</label>{% endfor %}
   </fieldset>
+  <fieldset><legend>Printify</legend>
+    <label class="chip"><input type="checkbox" name="ready" value="1" {{ 'checked' if ready_only }}> Ready to sell</label>
+  </fieldset>
   <fieldset><legend>Entry difficulty</legend>
     {% for d in all_difficulties %}<label class="chip"><input type="checkbox" name="difficulty" value="{{ d }}" {{ 'checked' if d in difficulties }}> {{ d }}</label>{% endfor %}
   </fieldset>
@@ -38,25 +41,29 @@
     <th scope="col"><a href="{{ sort_link('conversion') }}">Conversion</a></th>
     <th scope="col" class="num"><a href="{{ sort_link('score') }}">Score</a></th>
     <th scope="col">Label</th>
+    <th scope="col">Product</th>
+    <th scope="col" class="num"><a href="{{ sort_link('margin') }}">Margin</a></th>
     <th scope="col">Entry difficulty</th>
     <th scope="col">Market price</th>
     <th scope="col">Week over week</th>
   </tr></thead>
   <tbody>
   {% for row in rows %}
-    <tr data-label="{{ row.label }}">
+    <tr data-label="{{ row.label }}" data-margin="{{ row.margin_cents if row.margin_cents is not none else '' }}">
       <td><a class="kw" href="/keyword/{{ row.keyword | urlencode }}">{{ row.keyword }}</a></td>
       <td class="num">{{ row.volume }}</td>
       <td class="num">{{ row.competition }}</td>
       <td><span class="conv conv--{{ row.conversion_class }}">{{ row.conversion }}</span></td>
       <td class="num strong">{{ row.score }}</td>
       <td><span class="badge badge--{{ row.label | lower }}">{{ row.label }}</span></td>
+      <td class="product-cell">{{ row.product or '—' }}</td>
+      <td class="num"><span class="margin margin--{{ row.margin_class }}">{{ row.margin_text }}</span>{% if row.ready %} <span class="badge badge--ready">Ready to sell</span>{% endif %}</td>
       <td class="muted">{{ row.difficulty }}</td>
       <td class="muted">{{ row.market_price or '—' }}</td>
       <td class="muted">{{ row.wow or '—' }}</td>
     </tr>
   {% else %}
-    <tr><td colspan="9" class="muted">No keywords match these filters yet.</td></tr>
+    <tr><td colspan="11" class="muted">No keywords match these filters yet.</td></tr>
   {% endfor %}
   </tbody>
 </table>

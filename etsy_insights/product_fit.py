@@ -7,7 +7,7 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from .config import Config
 from .margin import NO_MATCH, Fees, Margin, compute, is_ready, paid_price_cents
-from .printify_store import ProductType
+from .printify_store import PrintifyStore, ProductType
 from .product_words import normalize_words
 
 
@@ -113,3 +113,9 @@ def match_counts(keywords: Iterable[str], types: Sequence[ProductType], links: M
         for kind in matcher.matching(normalize_words(keyword)):
             counts[kind.id] += 1
     return counts
+
+
+def fits_for_store(store, cfg: Config, scored: Sequence, profiles: Mapping) -> dict[str, ProductFit]:
+    """fit_all dengan jenis produk dan tautan manual dari database."""
+    printify = PrintifyStore(store)
+    return fit_all(scored, profiles, printify.types(), printify.links(), cfg)

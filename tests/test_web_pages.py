@@ -4,7 +4,7 @@ import pytest
 
 from etsy_insights.web import create_app
 from etsy_insights.web.views import trend_points
-from tests.web_helpers import TOKEN, FakeRunner, client, seeded_home
+from tests.web_helpers import TOKEN, FakeRunner, client, seed_printify, seed_ready_keyword, seeded_home
 
 
 @pytest.fixture
@@ -65,3 +65,60 @@ def test_log_page_shows_latest_output(tmp_path):
 
 def test_log_page_without_logs(c):
     assert "No session log yet." in c.get("/log").get_data(as_text=True)
+
+
+def _row(html, keyword):
+    match = re.search(r"<tr[^>]*>(?:(?!</tr>).)*>" + re.escape(keyword) + r"</a>(?:(?!</tr>).)*</tr>", html, re.S)
+    assert match, keyword
+    return match.group(0)
+
+
+@pytest.fixture
+def home(tmp_path):
+    return seeded_home(tmp_path)
+
+
+def test_opportunities_product_and_margin(home):
+    seed_printify(home)
+    c = client(create_app(home, token=TOKEN, runner=FakeRunner()))
+    html = c.get("/opportunities?q=sweatshirt").get_data(as_text=True)
+    sweat = _row(html, "sweatshirt")
+    assert "Unisex Heavy Blend" in sweat and "-US$3.32" in sweat and "margin--bad" in sweat
+    assert "Search to see price" in _row(html, "dog sweatshirt")
+    assert "No match" in _row(c.get("/opportunities?q=personalized").get_data(as_text=True), "personalized")
+    assert ">Product<" in html and ">Margin<" in html
+
+
+def test_ready_filter_and_margin_sort(home):
+    seed_ready_keyword(home)
+    seed_printify(home, mug_cost=100, mug_shipping=0)
+    c = client(create_app(home, token=TOKEN, runner=FakeRunner()))
+    html = c.get("/opportunities?ready=1").get_data(as_text=True)
+    assert "US$13.93 · 81.9%" in _row(html, "custom mug")
+    assert ">sweatshirt</a>" not in html
+    assert re.search(r'name="ready" value="1" checked', html) and "Ready to sell" in html
+    html = c.get("/opportunities?sort=margin&dir=desc").get_data(as_text=True)
+    margins = [None if m == "" else int(m) for m in re.findall(r'data-margin="(-?\d*)"', html)]
+    known = [m for m in margins if m is not None]
+    assert known[:2] == [1393, -332] and known == sorted(known, reverse=True)
+    assert margins[:len(known)] == known
+
+
+def test_keyword_detail_printify_panel(home):
+    seed_printify(home)
+    html = client(create_app(home, token=TOKEN, runner=FakeRunner())).get("/keyword/sweatshirt").get_data(as_text=True)
+    for text in ("Printify", "Unisex Heavy Blend", "US$13.50", "US$4.75", "US$2.07", "-US$3.32",
+                 "Price needed for a $5 margin", "US$26.19", "Link to product type", "Automatic"):
+        assert text in html, text
+
+
+def test_keyword_detail_search_to_see_price(home):
+    seed_printify(home)
+    html = client(create_app(home, token=TOKEN, runner=FakeRunner())).get("/keyword/dog sweatshirt").get_data(as_text=True)
+    assert "Search to see price" in html and "Prioritize" in html
+
+
+def test_settings_selling_section(c):
+    html = c.get("/settings").get_data(as_text=True)
+    for text in ("Selling on Etsy", "Etsy fees (% of sale)", "Fixed fee per sale (US$)", "Minimum margin (US$)"):
+        assert text in html

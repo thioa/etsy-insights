@@ -21,6 +21,12 @@
     <div class="field"><label for="bobot_conversion">Conversion</label><input id="bobot_conversion" name="bobot_conversion" type="number" step="any" min="0" value="{{ form.bobot_conversion }}"><p class="error" data-error-for="bobot_conversion"></p></div>
     <div class="field"><label for="bobot_kompetisi">Few competitors</label><input id="bobot_kompetisi" name="bobot_kompetisi" type="number" step="any" min="0" value="{{ form.bobot_kompetisi }}"><p class="error" data-error-for="bobot_kompetisi"></p></div>
   </fieldset>
+  <fieldset><legend>Selling on Etsy</legend>
+    <p class="muted small">Used for the estimated margin. Check the fees on your Etsy Shop Manager (Finances).</p>
+    <div class="field"><label for="fee_etsy_persen">Etsy fees (% of sale) <span class="muted">(0–30)</span></label><input id="fee_etsy_persen" name="fee_etsy_persen" type="number" step="any" min="0" max="30" value="{{ form.fee_etsy_persen }}"><p class="error" data-error-for="fee_etsy_persen"></p></div>
+    <div class="field"><label for="fee_etsy_tetap_usd">Fixed fee per sale (US$) <span class="muted">(0–5)</span></label><input id="fee_etsy_tetap_usd" name="fee_etsy_tetap_usd" type="number" step="any" min="0" max="5" value="{{ form.fee_etsy_tetap_usd }}"><p class="error" data-error-for="fee_etsy_tetap_usd"></p></div>
+    <div class="field"><label for="margin_minimum_usd">Minimum margin (US$) <span class="muted">(0–100, for "Ready to sell")</span></label><input id="margin_minimum_usd" name="margin_minimum_usd" type="number" step="any" min="0" max="100" value="{{ form.margin_minimum_usd }}"><p class="error" data-error-for="margin_minimum_usd"></p></div>
+  </fieldset>
   <p class="error" data-error></p>
   <button class="btn btn--primary" type="submit">Save settings</button>
 </form>

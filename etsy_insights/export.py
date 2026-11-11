@@ -17,7 +17,8 @@ from .taste import TasteProfile
 
 OPPORTUNITIES_HEADERS = ["Keyword", "Searches/month", "Competing listings", "Conversion", "Conversion rate",
                          "Searches per listing", "Score", "Label", "Week over week", "Source", "Date",
-                         "Market price", "Entry difficulty"]
+                         "Market price", "Entry difficulty", "Printify product", "Est. margin (USD)", "Margin %",
+                         "Ready to sell"]
 TASTE_HEADERS = ["Keyword", "Score", "Label", "Price buyers pay", "Top listing prices", "Entry difficulty",
                  "Median reviews (top)", "% Bestseller", "% Star Seller", "Shops", "Popular themes",
                  "Listing 1", "Listing 2", "Listing 3", "Listing 4", "Listing 5"]
@@ -105,10 +106,20 @@ def _write_table(ws: Worksheet, info: str, headers: list[str], rows: list[list],
         ws.column_dimensions[get_column_letter(i)].width = width
 
 
+def _fit_values(fit) -> list:
+    """Kolom Printify: produk utama, margin (US$), margin %, Ready to sell."""
+    if fit is None or fit.primary is None:
+        return [None, None, None, None]
+    margin = fit.margin
+    return [fit.primary.title, margin.margin_cents / 100 if margin.margin_cents is not None else None,
+            margin.margin_percent, "Yes" if fit.ready else None]
+
+
 def export_excel(scored: Sequence[ScoredKeyword], history: Sequence[ResultRow],
                  queue: Sequence[QueueItem], out_dir: Path, today: date,
-                 profiles: Mapping[str, TasteProfile] | None = None) -> Path:
+                 profiles: Mapping[str, TasteProfile] | None = None, fits: Mapping | None = None) -> Path:
     profiles = profiles or {}
+    fits = fits or {}
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / f"opportunities-{today.isoformat()}.xlsx"
@@ -128,9 +139,11 @@ def export_excel(scored: Sequence[ScoredKeyword], history: Sequence[ResultRow],
           round(s.score, 1), s.label, _wow_text(s.row), _origin(s.row), _local_date(s.row.checked_at),
           _range(profiles[s.row.keyword].paid_price_low, profiles[s.row.keyword].paid_price_high)
           if s.row.keyword in profiles else "",
-          profiles[s.row.keyword].difficulty if s.row.keyword in profiles else ""]
+          profiles[s.row.keyword].difficulty if s.row.keyword in profiles else "",
+          *_fit_values(fits.get(s.row.keyword))]
          for s in ranked],
-        [30, 16, 17, 14, 14, 20, 8, 12, 14, 30, 12, 22, 16], formats={5: _RATE_FORMAT})
+        [30, 16, 17, 14, 14, 20, 8, 12, 14, 30, 12, 22, 16, 34, 16, 10, 13],
+        formats={5: _RATE_FORMAT, 15: "0.00", 16: "0.0"})
     for r in range(3, peluang.max_row + 1):
         label_cell = peluang.cell(r, _LABEL_COLUMN)
         color = LABEL_FILLS.get(label_cell.value)

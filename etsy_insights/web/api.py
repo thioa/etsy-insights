@@ -10,6 +10,7 @@ from ..keywords import add_keywords, prioritize, remove_keyword
 from ..pacer import remaining_quota
 from ..paths import excel_dir
 from ..planner import harvest_queue_size, upcoming
+from ..product_fit import fits_for_store
 from ..runner import RunnerBusy
 from ..score import score_all
 from ..session import REASON_TEXT, StopReason, precheck, reason_text
@@ -152,6 +153,7 @@ def quit_app():
 @bp.get("/download/excel")
 def download_excel():
     store, cfg, now = get_store(), get_config(), ctx().now()
-    path = export_excel(score_all(store.latest_results(), cfg), store.all_results(), upcoming(store, cfg),
-                        excel_dir(home()), now.date(), profiles=build_profiles(store))
+    scored, profiles = score_all(store.latest_results(), cfg), build_profiles(store)
+    path = export_excel(scored, store.all_results(), upcoming(store, cfg), excel_dir(home()), now.date(),
+                        profiles=profiles, fits=fits_for_store(store, cfg, scored, profiles))
     return send_file(path, as_attachment=True, download_name=path.name)
