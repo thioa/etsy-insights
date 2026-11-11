@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ item.keyword }} · Etsy Insights{% endblock %}
+{% block content %}
+<a href="/opportunities" class="back">← Back to opportunities</a>
+<div class="page-head">
+  <div>
+    <h1>{{ item.keyword }}</h1>
+    <p class="muted">{{ status_text }}{% if scored and scored.score is not none %} · Score {{ '%.1f' % scored.score }} · <span class="badge badge--{{ scored.label | lower }}">{{ scored.label }}</span>{% endif %}</p>
+  </div>
+  {% if can_prioritize %}<button type="button" class="btn btn--primary" data-api="/api/keywords/prioritize" data-body='{{ {"keyword": item.keyword} | tojson }}'>Prioritize</button>{% endif %}
+</div>
+
+<section class="cards" aria-label="Key numbers">
+  <div class="card"><div class="card__label">Searches/month</div><div class="card__value">{{ volume }}</div></div>
+  <div class="card"><div class="card__label">Competing listings</div><div class="card__value">{{ competition }}</div></div>
+  <div class="card"><div class="card__label">Conversion</div><div class="card__value card__value--small"><span class="conv conv--{{ conversion_class }}">{{ conversion }}</span></div></div>
+  <div class="card"><div class="card__label">Week over week</div><div class="card__value">{{ wow }}</div></div>
+  <div class="card"><div class="card__label">Searches per listing</div><div class="card__value">{{ per_listing }}</div></div>
+</section>
+
+{% if points %}
+<section class="panel" aria-label="Search trend">
+  <h2>Daily searches, last 30 days</h2>
+  <svg class="chart" viewBox="-10 -10 780 220" role="img" aria-label="Daily searches for {{ item.keyword }}">
+    <line x1="0" y1="200" x2="760" y2="200" class="chart__axis"></line>
+    <polyline points="{{ points }}" class="chart__line"></polyline>
+  </svg>
+</section>
+{% endif %}
+
+<section class="panel" aria-label="Buyer taste">
+  <h2>Buyer taste</h2>
+  {% if profile %}
+    <p class="muted small">From the {{ profile.listing_count }} top listings Marketplace Insights shows for this keyword.</p>
+    <h3>Popular themes</h3>
+    <ul class="tags">{% for term, n in profile.top_terms %}<li>{{ term }} <span>({{ n }})</span></li>{% endfor %}</ul>
+    <div class="cards cards--3">
+      <div class="card"><div class="card__label">Price buyers pay</div><div class="card__value card__value--small">{{ paid or '—' }}</div></div>
+      <div class="card"><div class="card__label">Top listing prices</div><div class="card__value card__value--small">{{ listing_range or '—' }}</div></div>
+      <div class="card card--{{ profile.difficulty | lower }}"><div class="card__label">Entry difficulty</div>
+        <div class="card__value card__value--small">{{ profile.difficulty }}</div>
+        <div class="muted small">Median {{ profile.median_reviews if profile.median_reviews is not none else '—' }} reviews · Bestseller {{ '%.0f' % (profile.bestseller_share * 100) }}% · Star Seller {{ '%.0f' % (profile.star_seller_share * 100) }}% · {{ profile.unique_shops }} shops</div></div>
+    </div>
+    <h3>Top 5 listings</h3>
+    <div class="listings">
+    {% for card in profile.examples %}
+      <article class="listing">
+        {% if card.image_url %}<img src="{{ card.image_url }}" alt="{{ card.title }}" loading="lazy">{% else %}<div class="listing__noimg">No photo</div>{% endif %}
+        <div class="listing__body">
+          <div class="listing__title">{{ card.title }}</div>
+          <div class="muted small">{{ card.shop }}</div>
+          <div class="strong">{{ card.price_text }}</div>
+          <div class="small">{{ card.reviews if card.reviews is not none else '?' }} reviews</div>
+          <div class="badges">{% if card.bestseller %}<span class="badge badge--gold">Bestseller</span>{% endif %}{% if card.star_seller %}<span class="badge badge--star">Star Seller</span>{% endif %}</div>
+          {% if card.url %}<a href="{{ card.url }}" target="_blank" rel="noopener">View on Etsy ↗</a>{% endif %}
+        </div>
+      </article>
+    {% endfor %}
+    </div>
+  {% else %}
+    <p class="muted">Buyer taste appears after this keyword is searched.</p>
+  {% endif %}
+</section>
+
+{% if children %}
+<section class="panel" aria-label="Harvested keywords">
+  <h2>Keywords harvested from "{{ item.keyword }}"</h2>
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th scope="col">Keyword</th><th scope="col" class="num">Searches/month</th><th scope="col" class="num">Competing listings</th><th scope="col">Conversion</th><th scope="col"><span class="sr-only">Action</span></th></tr></thead>
+    <tbody>{% for child in children %}<tr>
+      <td><a class="kw" href="/keyword/{{ child.keyword | urlencode }}">{{ child.keyword }}</a></td>
+      <td class="num">{{ child.volume }}</td><td class="num">{{ child.competition }}</td>
+      <td><span class="conv conv--{{ child.conversion_class }}">{{ child.conversion }}</span></td>
+      <td class="right">{% if child.can_prioritize %}<button type="button" class="btn btn--small" data-api="/api/keywords/prioritize" data-body='{{ {"keyword": child.keyword} | tojson }}'>Prioritize</button>{% endif %}</td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+{% endif %}
+{% endblock %}

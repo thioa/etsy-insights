@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}My keywords · Etsy Insights{% endblock %}
+{% block content %}
+<div class="page-head"><div>
+  <h1>My keywords</h1>
+  <p class="muted">Your keywords are searched first. After that, the best harvested keywords are searched automatically.</p>
+</div></div>
+<form class="panel" data-api="/api/keywords/add">
+  <label for="text" class="strong">Add keywords</label>
+  <p class="muted small">One keyword per line.</p>
+  <textarea id="text" name="text" rows="5" placeholder="personalized cutting board&#10;custom pet portrait"></textarea>
+  <p class="error" data-error></p>
+  <button class="btn btn--primary" type="submit">Add keywords</button>
+</form>
+<section class="panel" aria-label="Your keywords">
+  <h2>Your list ({{ entries | length }})</h2>
+  {% if entries %}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th scope="col">Keyword</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Action</span></th></tr></thead>
+    <tbody>{% for e in entries %}<tr>
+      <td><a class="kw" href="/keyword/{{ e.keyword | urlencode }}">{{ e.keyword }}</a></td>
+      <td>{{ e.status }}</td>
+      <td class="right">{% if e.removable %}<button type="button" class="btn btn--small" data-api="/api/keywords/remove" data-body='{{ {"keyword": e.keyword} | tojson }}'>Remove</button>{% endif %}</td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="muted">No keywords yet.</p>{% endif %}
+</section>
+{% endblock %}

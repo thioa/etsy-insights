@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Settings · Etsy Insights{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Settings</h1>
+  <p class="muted">Safe defaults are already set. Values outside the safety limits are refused.</p></div></div>
+<form class="panel form" data-api="/api/settings">
+  <div class="field"><label for="kuota_harian">Daily searches <span class="muted">(1–30)</span></label>
+    <input id="kuota_harian" name="kuota_harian" type="number" min="1" max="30" value="{{ form.kuota_harian }}">
+    <p class="error" data-error-for="kuota_harian"></p></div>
+  <div class="field"><label for="jeda_min">Pause between searches, minimum <span class="muted">(seconds, 15–600)</span></label>
+    <input id="jeda_min" name="jeda_min" type="number" min="15" max="600" value="{{ form.jeda_min }}">
+    <p class="error" data-error-for="jeda_min"></p></div>
+  <div class="field"><label for="jeda_max">Pause between searches, maximum <span class="muted">(seconds, up to 600)</span></label>
+    <input id="jeda_max" name="jeda_max" type="number" min="15" max="600" value="{{ form.jeda_max }}">
+    <p class="error" data-error-for="jeda_max"></p></div>
+  <div class="field"><label for="durasi_sesi_menit">Session length <span class="muted">(minutes, 1–60)</span></label>
+    <input id="durasi_sesi_menit" name="durasi_sesi_menit" type="number" min="1" max="60" value="{{ form.durasi_sesi_menit }}">
+    <p class="error" data-error-for="durasi_sesi_menit"></p></div>
+  <fieldset><legend>Score weights</legend>
+    <div class="field"><label for="bobot_volume">Searches</label><input id="bobot_volume" name="bobot_volume" type="number" step="any" min="0" value="{{ form.bobot_volume }}"><p class="error" data-error-for="bobot_volume"></p></div>
+    <div class="field"><label for="bobot_conversion">Conversion</label><input id="bobot_conversion" name="bobot_conversion" type="number" step="any" min="0" value="{{ form.bobot_conversion }}"><p class="error" data-error-for="bobot_conversion"></p></div>
+    <div class="field"><label for="bobot_kompetisi">Few competitors</label><input id="bobot_kompetisi" name="bobot_kompetisi" type="number" step="any" min="0" value="{{ form.bobot_kompetisi }}"><p class="error" data-error-for="bobot_kompetisi"></p></div>
+  </fieldset>
+  <p class="error" data-error></p>
+  <button class="btn btn--primary" type="submit">Save settings</button>
+</form>
+<section class="panel" aria-label="Quit">
+  <h2>Quit Etsy Insights</h2>
+  <p class="muted">Stops the app on this Mac. Open it again from Applications.</p>
+  <button type="button" class="btn btn--danger" data-quit>Quit Etsy Insights</button>
+</section>
+{% endblock %}

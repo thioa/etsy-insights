@@ -299,6 +299,26 @@ class Store:
             "ORDER BY r2.checked_at DESC, r2.id DESC LIMIT 1) ORDER BY k.keyword").fetchall()
         return [self._result_row(r) for r in rows]
 
+    def harvested_from(self, parent_id: int, limit: int = 50) -> list[ResultRow]:
+        """Hasil terbaru keyword yang dipanen dari induk ini, volume terbesar dulu."""
+        rows = self._db.execute(
+            self._RESULT_SELECT + " WHERE k.parent_id = ? AND r.id = (SELECT r2.id FROM results r2 "
+            "WHERE r2.keyword_id = r.keyword_id ORDER BY r2.checked_at DESC, r2.id DESC LIMIT 1) "
+            "ORDER BY r.search_volume DESC, k.keyword LIMIT ?", (parent_id, limit)).fetchall()
+        return [self._result_row(r) for r in rows]
+
+    def latest_search_raw(self, keyword_id: int) -> RawResult | None:
+        """Data mentah pencarian terbaru untuk satu keyword (untuk halaman detail)."""
+        row = self._db.execute(
+            "SELECT raw_json FROM results WHERE keyword_id = ? AND kind = 'search' AND raw_json IS NOT NULL "
+            "ORDER BY checked_at DESC, id DESC LIMIT 1", (keyword_id,)).fetchone()
+        if row is None:
+            return None
+        data = json.loads(row[0])
+        return RawResult(data["keyword"], data["page_url"],
+                         tuple(CapturedResponse(r["url"], r["status"], r["body"]) for r in data["responses"]),
+                         data.get("html", ""))
+
     def latest_search_raws(self) -> dict[int, RawResult]:
         """keyword_id -> data mentah dari pencarian terbaru (dipakai untuk profil selera)."""
         rows = self._db.execute(

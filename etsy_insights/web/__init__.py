@@ -27,14 +27,9 @@ def create_app(home: Path, *, token: str, runner, port: int = 8765,
         runner=runner, now=now or (lambda: datetime.now().astimezone()), on_quit=on_quit or _default_quit)
     security.install(app, port)
 
-    from . import api
+    from . import api, views
     app.register_blueprint(api.bp)
-    try:
-        from . import views
-    except ImportError:  # halaman ditambahkan di tahap berikutnya
-        views = None
-    if views is not None:
-        app.register_blueprint(views.bp)
+    app.register_blueprint(views.bp)
 
     @app.teardown_appcontext
     def close_store(exc):

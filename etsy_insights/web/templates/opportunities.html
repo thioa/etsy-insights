@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Opportunities · Etsy Insights{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Keyword opportunities</h1>
+    <p class="muted">High searches, high conversion, few competing listings. Click a keyword to see buyer taste.</p>
+  </div>
+  <a class="btn" href="/download/excel">Download Excel</a>
+</div>
+
+<form class="filters panel" method="get" action="/opportunities">
+  <fieldset><legend>Label</legend>
+    {% for l in all_labels %}<label class="chip"><input type="checkbox" name="label" value="{{ l }}" {{ 'checked' if l in labels }}> {{ l }}</label>{% endfor %}
+  </fieldset>
+  <fieldset><legend>Entry difficulty</legend>
+    {% for d in all_difficulties %}<label class="chip"><input type="checkbox" name="difficulty" value="{{ d }}" {{ 'checked' if d in difficulties }}> {{ d }}</label>{% endfor %}
+  </fieldset>
+  <div class="field"><label for="conv_min">Minimum conversion</label>
+    <select id="conv_min" name="conv_min"><option value="">Any</option>
+      {% for value, text in conversion_levels.items() %}<option value="{{ value }}" {{ 'selected' if conv_min == value }}>{{ text }} or higher</option>{% endfor %}
+    </select></div>
+  <div class="field"><label for="vol_min">Minimum searches/month</label>
+    <input id="vol_min" name="vol_min" type="number" min="0" value="{{ vol_min if vol_min is not none else '' }}"></div>
+  <div class="field field--grow"><label for="q">Search keyword</label>
+    <input id="q" name="q" type="search" value="{{ q }}" placeholder="e.g. cutting board"></div>
+  <button class="btn btn--primary" type="submit">Apply</button>
+</form>
+
+<p class="muted small">{{ ranked }} keywords ranked · {{ total }} match the filters · page {{ page }} of {{ pages }}</p>
+
+<div class="table-wrap">
+<table class="table">
+  <thead><tr>
+    <th scope="col"><a href="{{ sort_link('keyword') }}">Keyword</a></th>
+    <th scope="col" class="num"><a href="{{ sort_link('volume') }}">Searches/month</a></th>
+    <th scope="col" class="num"><a href="{{ sort_link('competition') }}">Competing listings</a></th>
+    <th scope="col"><a href="{{ sort_link('conversion') }}">Conversion</a></th>
+    <th scope="col" class="num"><a href="{{ sort_link('score') }}">Score</a></th>
+    <th scope="col">Label</th>
+    <th scope="col">Entry difficulty</th>
+    <th scope="col">Market price</th>
+    <th scope="col">Week over week</th>
+  </tr></thead>
+  <tbody>
+  {% for row in rows %}
+    <tr data-label="{{ row.label }}">
+      <td><a class="kw" href="/keyword/{{ row.keyword | urlencode }}">{{ row.keyword }}</a></td>
+      <td class="num">{{ row.volume }}</td>
+      <td class="num">{{ row.competition }}</td>
+      <td><span class="conv conv--{{ row.conversion_class }}">{{ row.conversion }}</span></td>
+      <td class="num strong">{{ row.score }}</td>
+      <td><span class="badge badge--{{ row.label | lower }}">{{ row.label }}</span></td>
+      <td class="muted">{{ row.difficulty }}</td>
+      <td class="muted">{{ row.market_price or '—' }}</td>
+      <td class="muted">{{ row.wow or '—' }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="9" class="muted">No keywords match these filters yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% if pages > 1 %}
+<nav class="pager" aria-label="Pages">
+  {% for n, url in page_links %}{% if n == page %}<a class="pager__item current" href="{{ url }}" aria-current="page">{{ n }}</a>{% else %}<a class="pager__item" href="{{ url }}">{{ n }}</a>{% endif %}{% endfor %}
+</nav>
+{% endif %}
+{% endblock %}

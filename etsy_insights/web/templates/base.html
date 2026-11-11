@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="app-token" content="{{ token }}">
+<title>{% block title %}Etsy Insights{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <nav class="topbar__nav" aria-label="Main">
+    <span class="brand">Etsy Insights</span>
+    <a href="/" class="{{ 'active' if active == 'session' }}">Session</a>
+    <a href="/opportunities" class="{{ 'active' if active == 'opportunities' }}">Opportunities</a>
+    <a href="/keywords" class="{{ 'active' if active == 'keywords' }}">My keywords</a>
+    <a href="/settings" class="{{ 'active' if active == 'settings' }}">Settings</a>
+  </nav>
+</header>
+<div class="banner" data-offline hidden>Etsy Insights is not running. Open it again from Applications.</div>
+<main class="page">
+{% block content %}{% endblock %}
+</main>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

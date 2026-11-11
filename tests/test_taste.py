@@ -38,3 +38,7 @@ def test_profile_custom_and_personalized_difficulty():
 
 def test_profile_none_without_cards():
     assert build_profile(load_raw("swearshirt")) is None
+
+
+def test_listing_card_image_url():
+    assert build_profile(load_raw("sweatshirt")).examples[0].image_url.startswith("https://i.etsystatic.com/")

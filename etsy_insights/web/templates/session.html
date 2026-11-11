@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Session · Etsy Insights{% endblock %}
+{% block content %}
+<div data-status-root>
+  <div class="page-head">
+    <div>
+      <h1>Search session</h1>
+      <p class="muted">Sessions run in the "Etsy Riset" Chrome. While one runs, keep that window visible and don't click in it.</p>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn" data-start='{"test_run": true}' {{ 'disabled' if not status.can_start }}>Test run (3 searches)</button>
+      <button type="button" class="btn btn--primary" data-start='{"test_run": false}' {{ 'disabled' if not status.can_start }}>Start session</button>
+    </div>
+  </div>
+  <p class="notice" data-blocker {{ 'hidden' if not status.blocker or status.runner.running }}>{{ status.blocker or '' }}
+    <button type="button" class="linklike" data-ignore-cooldown {{ 'hidden' if status.account.state != 'cooldown' }}>Ignore cooldown</button>
+  </p>
+
+  <section class="cards" aria-label="Today">
+    <div class="card"><div class="card__label">Searches today</div>
+      <div class="card__value"><span data-today>{{ status.today.searches }}</span> <small>/ {{ status.today.limit }}</small></div></div>
+    <div class="card"><div class="card__label">Keywords collected</div>
+      <div class="card__value" data-collected>{{ status.collected }}</div></div>
+    <div class="card"><div class="card__label">Queue</div>
+      <div class="card__value" data-queue>{{ status.queue }}</div></div>
+    <div class="card card--{{ status.account.state }}" data-account><div class="card__label">Account status</div>
+      <div class="card__status" data-account-message>{{ status.account.message }}</div></div>
+  </section>
+
+  <div class="split">
+    <section class="panel split__main" data-running {{ 'hidden' if not status.runner.running }} aria-label="Running session">
+      <div class="panel__head">
+        <h2><span class="dot" aria-hidden="true"></span> <span data-running-title>Session is running</span></h2>
+        <button type="button" class="btn btn--danger" data-stop {{ 'hidden' if status.runner.source == 'terminal' }}>Stop</button>
+      </div>
+      <div class="progress-text"><span data-progress-text>Search {{ status.runner.done }} of {{ status.runner.limit or '…' }}</span></div>
+      <div class="progress" role="progressbar" aria-label="Session progress" aria-valuemin="0"
+           aria-valuemax="{{ status.runner.limit or 0 }}" aria-valuenow="{{ status.runner.done }}">
+        <div class="progress__bar" data-progress-bar style="width: {{ (100 * status.runner.done / status.runner.limit) if status.runner.limit else 0 }}%"></div>
+      </div>
+      <div class="current"><div class="muted small">Searching now</div><div class="current__kw" data-current>{{ status.runner.current_keyword or '…' }}</div></div>
+      <h3>Log</h3>
+      <ol class="log" data-log>{% for line in status.runner.log_tail %}<li>{{ line }}</li>{% endfor %}</ol>
+    </section>
+
+    <aside class="split__side">
+      <section class="panel" aria-label="Last session">
+        <h2>Last session</h2>
+        <div data-last>
+        {% if status.last_session %}
+          <p><strong>{{ status.last_session.checked }}</strong> searches · {{ status.last_session.started_at[:16].replace('T', ' ') }}</p>
+          <p class="muted">{{ status.last_session.reason_text }}</p>
+        {% else %}
+          <p class="muted">No sessions yet. Add keywords in My keywords, then start a test run.</p>
+        {% endif %}
+        </div>
+      </section>
+      <a class="btn btn--primary btn--block" href="/opportunities">See opportunities</a>
+    </aside>
+  </div>
+</div>
+{% endblock %}

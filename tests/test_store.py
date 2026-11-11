@@ -212,3 +212,9 @@ def test_store_reads_while_other_connection_writes(tmp_path):
     assert s.get("a").fail_count == 0
     other.execute("COMMIT")
     assert s.get("a").fail_count == 1
+
+
+def test_harvested_from_sorted_by_volume():
+    s = new_store("a")
+    s.save_harvest(s.get("a").id, [make_related("x", 10), make_related("y", 500)], 200, 2, T0)
+    assert [r.keyword for r in s.harvested_from(s.get("a").id)] == ["y", "x"]

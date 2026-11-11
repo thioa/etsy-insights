@@ -33,6 +33,7 @@ class ListingCard:
     star_seller: bool
     shop: str
     url: str
+    image_url: str = ""
 
 
 @dataclass(frozen=True)
@@ -102,7 +103,7 @@ def _card(data: Any) -> ListingCard | None:
     return ListingCard(title=data["title"], price_text=price_text, price_value=parse_price(price_text),
                        reviews=_reviews(data.get("numberOfReviews")), bestseller=data.get("badgeText") == "Bestseller",
                        star_seller=bool(data.get("isStarSeller")), shop=str(data.get("shopName") or ""),
-                       url=str(data.get("listingUrl") or ""))
+                       url=str(data.get("listingUrl") or ""), image_url=str(data.get("imageUrl") or ""))
 
 
 def build_profile(raw: RawResult) -> TasteProfile | None:
