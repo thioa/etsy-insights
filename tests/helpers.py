@@ -24,14 +24,18 @@ def make_raw(keyword):
     return RawResult(keyword=keyword, page_url=INSIGHTS, responses=(), html="")
 
 
-def make_row(keyword, volume, cr, comp, kind="count", source="user", parent=None,
-             has_data=True, trend=(), keyword_id=0):
-    metrics = KeywordMetrics(has_data=has_data, search_volume=volume, conversion_rate=cr,
+def make_row(keyword, volume, level, comp, kind="count", source="user", parent=None,
+             has_data=True, trend=(), keyword_id=0, wow=None, rate=None, row_kind="search"):
+    metrics = KeywordMetrics(has_data=has_data, search_volume=volume, conversion_rate=rate,
                              competition_value=comp, competition_kind=kind if comp is not None else None,
-                             trend=tuple(trend))
+                             trend=tuple(trend), conversion_level=level, wow_pct=wow)
+    if row_kind == "panen":
+        status = "harvested"
+    else:
+        status = "done" if has_data else "no_data"
     return ResultRow(keyword_id=keyword_id, keyword=keyword, source=source,
                      depth=0 if source == "user" else 1, parent_keyword=parent,
-                     status="done" if has_data else "no_data", checked_at=T0, metrics=metrics)
+                     status=status, checked_at=T0, metrics=metrics, kind=row_kind)
 
 
 # --- Fakes untuk tes sesi --------------------------------------------------

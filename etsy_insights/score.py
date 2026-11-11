@@ -66,7 +66,7 @@ def score_all(rows: Sequence[ResultRow], cfg: Config) -> list[ScoredKeyword]:
     with_data = [r for r in rows if r.metrics.has_data]
     getters = {
         "volume": lambda r: r.metrics.search_volume,
-        "conversion": lambda r: r.metrics.conversion_rate,
+        "conversion": lambda r: r.metrics.conversion_level,
         "competition": lambda r: r.metrics.competition_value,
     }
     available = [name for name, get in getters.items() if any(get(r) is not None for r in with_data)]

@@ -11,8 +11,8 @@ def test_percentile_ranks():
 
 
 def test_score_example_from_spec():
-    rows = [make_row("a", 1000, 0.05, 100), make_row("b", 500, 0.03, 1000),
-            make_row("c", 2000, 0.01, 5000), make_row("d", 50, 0.10, 1)]
+    rows = [make_row("a", 1000, 3, 100), make_row("b", 500, 2, 1000),
+            make_row("c", 2000, 1, 5000), make_row("d", 50, 4, 1)]
     out = score_all(rows, Config())
     assert [s.row.keyword for s in out] == ["a", "c", "b", "d"]
     a, c, b, d = out
@@ -22,8 +22,8 @@ def test_score_example_from_spec():
 
 
 def test_emas_when_top_third_everywhere():
-    rows = [make_row("a", 1000, 0.05, 100), make_row("b", 500, 0.03, 1000),
-            make_row("c", 2000, 0.01, 5000), make_row("e", 4000, 0.09, 10)]
+    rows = [make_row("a", 1000, 3, 100), make_row("b", 500, 2, 1000),
+            make_row("c", 2000, 1, 5000), make_row("e", 4000, 4, 10)]
     e = score_all(rows, Config())[0]
     assert e.row.keyword == "e" and e.label == "Emas" and e.score == pytest.approx(100)
 
@@ -35,8 +35,8 @@ def test_label_boundaries():
 
 
 def test_competition_levels():
-    rows = [make_row("x", 1000, 0.05, 1, kind="level"), make_row("y", 1000, 0.05, 2, kind="level"),
-            make_row("z", 1000, 0.05, 3, kind="level")]
+    rows = [make_row("x", 1000, 2, 1, kind="level"), make_row("y", 1000, 2, 2, kind="level"),
+            make_row("z", 1000, 2, 3, kind="level")]
     by = {s.row.keyword: s for s in score_all(rows, Config())}
     assert (by["x"].p_low_competition, by["y"].p_low_competition, by["z"].p_low_competition) == (100, 50, 0)
     assert by["x"].searches_per_listing is None
@@ -52,3 +52,9 @@ def test_missing_metric_reweights():
 def test_no_data_rows_are_data_kurang():
     [s] = score_all([make_row("n", None, None, None, has_data=False)], Config())
     assert s.label == "Data kurang" and not s.eligible
+
+
+def test_conversion_uses_level_not_rate():
+    rows = [make_row("hi", 1000, 4, 100, rate=0.0001), make_row("lo", 1000, 0, 100, rate=0.9)]
+    by = {s.row.keyword: s for s in score_all(rows, Config())}
+    assert by["hi"].p_conversion == 100 and by["lo"].p_conversion == 0
