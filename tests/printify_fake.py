@@ -46,7 +46,10 @@ class FakePrintify:
                     self.wfile.write(b'[{"id": 1')
                     self.close_connection = True
                     return
-                payload = body.encode() if isinstance(body, str) else json.dumps(body).encode()
+                if isinstance(body, bytes):  # file mentah, misalnya foto
+                    payload = body
+                else:
+                    payload = body.encode() if isinstance(body, str) else json.dumps(body).encode()
                 self.send_response(status)
                 for name, value in headers.items():
                     self.send_header(name, value)

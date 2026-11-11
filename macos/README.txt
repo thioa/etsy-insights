@@ -28,6 +28,8 @@ Etsy Insights — cara memasang
 Printify (opsional): menu Printify -> tempel token (izin shops.read, products.read,
 catalog.read) -> Sync now. Aplikasi hanya membaca dari Printify.
 
+Catalog: semua produk Printify per kategori, dengan tombol Research (memakai kuota harian biasa).
+
 Keluar: Settings -> Quit Etsy Insights (lakukan ini juga sebelum mengganti aplikasi).
 Data aplikasi: ~/Library/Application Support/Etsy Insights
 File Excel: Documents/Etsy Insights

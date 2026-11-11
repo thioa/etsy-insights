@@ -106,7 +106,41 @@ mau, lalu klik **Add selected** untuk memasukkannya ke antrean riset.
 **Fee Etsy.** Default-nya 9,5% + US$0,45 per penjualan, dengan margin minimum US$5. Cocokkan dengan
 fee di Shop Manager Anda (Finances), lalu ubah di **Settings → Selling on Etsy**.
 
-## 4. Kalau sesi berhenti
+## 4. Catalog: semua produk Printify
+
+Menu **Catalog** menampilkan semua produk yang bisa dibuat Printify (lebih dari seribu model),
+dikelompokkan per kategori seperti *T-shirts*, *Mugs*, atau *Necklaces*. Katalog dan fotonya ikut
+terunduh saat Anda menekan **Sync now** di halaman Printify. Fotonya dimuat langsung dari server
+gambar Printify.
+
+**Membaca kartu kategori**
+- **Status riset:**
+  - *Not researched yet*: belum ada keyword sama sekali;
+  - *Harvested only*: hanya ada keyword hasil panen, harga pembeli belum diketahui;
+  - *Researched*: sudah ada keyword yang dicari langsung.
+- **Most searched:** keyword dengan pencarian terbanyak di kategori itu.
+- **Opportunities:** jumlah keyword Gold dan Potential.
+- **Ready to sell:** muncul kalau kategori itu sudah punya produk di Product types beserta biayanya.
+
+Urutan default *Best opportunities* menaruh kategori dengan peluang terbanyak di atas. Gunakan kotak
+pencarian dan filter (*Researched*, *Not researched yet*, *In my products*) untuk menyaring.
+
+**Tombol Research**
+- Memasukkan 3 keyword awal kategori ke depan antrean, misalnya *necklace*, *custom necklace*, dan
+  *personalized necklace*.
+- Memakai kuota harian biasa (paling banyak 3 pencarian). Tidak ada aturan keamanan sesi yang berubah.
+- Setelah diklik, kartu menampilkan *In queue*, lalu *Researched* setelah ketiganya dicari.
+
+**Menambahkan produk dari halaman kategori**
+1. Klik **View products** pada kartu kategori.
+2. Pada model yang Anda mau, klik **Choose provider** lalu pilih print provider. Ongkir ke AS dan waktu
+   produksi muncul otomatis.
+3. Isi biaya produksi (lihat di Printify saat membuat produk), lalu klik **Add to my product types**.
+
+Setelah itu, keyword di kategori itu mendapat kolom Product dan Margin di Opportunities. Data provider
+dan ongkir disimpan 30 hari, jadi membuka produk yang sama tidak meminta ke Printify lagi.
+
+## 5. Kalau sesi berhenti
 
 | Pesan | Artinya | Yang perlu dilakukan |
 |---|---|---|
@@ -121,7 +155,7 @@ fee di Shop Manager Anda (Finances), lalu ubah di **Settings → Selling on Etsy
 Cooldown **bisa** dilewati lewat tautan *Ignore cooldown* (Anda harus mengetik `YES`), tetapi
 itu **tidak disarankan**.
 
-## 5. Letak data
+## 6. Letak data
 
 - **Data aplikasi:** `~/Library/Application Support/Etsy Insights/` (database, `keywords.txt`,
   `config.toml`, log, rekaman).
@@ -129,7 +163,7 @@ itu **tidak disarankan**.
   Data tetap aman.
 - **File Excel:** *Documents → Etsy Insights* (`opportunities-TANGGAL.xlsx`).
 
-## 6. Cadangan lewat Terminal
+## 7. Cadangan lewat Terminal
 
 Perintah Terminal tetap ada lewat aplikasinya. Perintah ini memakai data yang sama dengan aplikasi
 (bukan data di folder lama):
@@ -140,7 +174,7 @@ Perintah Terminal tetap ada lewat aplikasinya. Perintah ini memakai data yang sa
 
 Perintah lain: `--cli run`, `--cli status`, `--cli export`, `--cli kenali` (mode rekam).
 
-## 7. Risiko yang perlu Anda ketahui
+## 8. Risiko yang perlu Anda ketahui
 
 - **Ketentuan Etsy melarang akses otomatis.** Desain alat ini menekan risikonya: pelan, volume kecil,
   Chrome asli dari IP Anda sendiri, dan langsung berhenti saat ada tanda bahaya. Tetapi risikonya
