@@ -175,3 +175,14 @@ def test_cli_run_log_file_and_yes(tmp_path, monkeypatch):
     assert main(["run", "--abaikan-pendinginan", "--yes", "--log-file", str(log)], base_dir=base,
                 now=lambda: T0, input_fn=no_input) == 0
     assert "[1/" in log.read_text(encoding="utf-8")
+
+
+def test_cli_web_port_in_use_and_serve(tmp_path, capsys, monkeypatch):
+    monkeypatch.setattr(cli, "port_in_use", lambda port: True)
+    assert main(["web", "--port", "8799"], base_dir=project(tmp_path), now=lambda: T0) == 2
+    assert "Port 8799 is in use" in capsys.readouterr().out
+    served = []
+    monkeypatch.setattr(cli, "port_in_use", lambda port: False)
+    monkeypatch.setattr(cli, "_serve", lambda app, port: served.append((app.config["APP_PORT"], port)))
+    assert main(["web"], base_dir=project(tmp_path), now=lambda: T0) == 0
+    assert served == [(8765, 8765)]

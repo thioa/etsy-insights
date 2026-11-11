@@ -301,6 +301,18 @@ def run_session(deps: SessionDeps, max_keywords: int | None = None,
     return _summary(deps, state)
 
 
+def reason_text(code: str | None) -> str:
+    """Teks yang bisa dibaca untuk kode alasan berhenti yang tersimpan di database."""
+    if code is None:
+        return "not finished"
+    if code == "error":
+        return "The session stopped because of an unexpected error. See the log."
+    try:
+        return REASON_TEXT[StopReason(code)]
+    except ValueError:
+        return code
+
+
 def format_summary(summary: SessionSummary) -> str:
     reason = REASON_TEXT[summary.stop_reason]
     if summary.test_run and summary.stop_reason is StopReason.QUOTA:

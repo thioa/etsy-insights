@@ -13,7 +13,7 @@ from pathlib import Path
 
 from playwright.sync_api import Error as PlaywrightError
 
-from .browser import ChromeNotFound, ChromeStartTimeout, PortBusy, connected_browser, ensure_chrome
+from .browser import ChromeNotFound, ChromeStartTimeout, PortBusy, connected_browser, ensure_chrome, port_in_use
 from .config import Config, ConfigError, load_config
 from .export import export_excel
 from .insights_page import EtsyInsightsPage
@@ -24,7 +24,7 @@ from .parser import PARSER_VERSION, parse_search
 from .planner import upcoming
 from .recorder import run_kenali
 from .score import score_all
-from .session import REASON_TEXT, SessionDeps, StopReason, format_summary, run_session
+from .session import SessionDeps, format_summary, reason_text, run_session
 from .store import Store, read_keywords_file
 from .taste import build_profiles
 
@@ -38,14 +38,7 @@ def _open_store(base: Path, now: datetime) -> Store:
 
 
 def _reason_text(code: str | None) -> str:
-    if code is None:
-        return "not finished"
-    if code == "error":
-        return "The session stopped because of an unexpected error. See the log."
-    try:
-        return REASON_TEXT[StopReason(code)]
-    except ValueError:
-        return code
+    return reason_text(code)
 
 
 @contextmanager
@@ -123,6 +116,25 @@ def _kenali(base: Path, cfg: Config, now_fn: Callable[[], datetime]) -> int:
     return 0
 
 
+def _serve(app, port: int) -> None:
+    app.run(host="127.0.0.1", port=port, threaded=True, use_reloader=False)
+
+
+def _web(base: Path, cfg: Config, port: int | None) -> int:
+    import secrets
+
+    from .runner import SessionRunner
+    from .web import create_app
+    port = port or cfg.port_web
+    if port_in_use(port):
+        print(f"Port {port} is in use. Change port_web in Settings or quit the other program.")
+        return 2
+    app = create_app(base, token=secrets.token_urlsafe(32), runner=SessionRunner(base), port=port)
+    print(f"Etsy Insights is running at http://127.0.0.1:{port}/")
+    _serve(app, port)
+    return 0
+
+
 def _make_logger(base: Path, now: datetime, log_file: Path | None = None) -> Callable[[str], None]:
     path = Path(log_file) if log_file else base / "logs" / f"sesi-{now:%Y%m%d-%H%M%S}.log"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -174,6 +186,8 @@ def main(argv: list[str] | None = None, *, base_dir: Path | None = None,
                      help="Run even during cooldown (asks you to type YES)")
     run.add_argument("--yes", action="store_true", help="Answer YES to the cooldown question (used by the app)")
     run.add_argument("--log-file", type=Path, help="Write the session log to this file")
+    web = sub.add_parser("web", help="Start the Etsy Insights web app on this Mac")
+    web.add_argument("--port", type=int, help="Port to use (default: port_web in config.toml)")
     sub.add_parser("status", help="Show the queue, today's searches and the last session")
     sub.add_parser("export", help="Create the latest Excel file")
     sub.add_parser("kenali", help="Recording mode: record Marketplace Insights data while you search by hand")
@@ -188,6 +202,8 @@ def main(argv: list[str] | None = None, *, base_dir: Path | None = None,
         if args.command == "run":
             return _run(base, cfg, now_fn, args.uji, args.abaikan_pendinginan, input_fn,
                         assume_yes=args.yes, log_file=args.log_file)
+        if args.command == "web":
+            return _web(base, cfg, args.port)
         if args.command == "status":
             return _status(base, cfg, now_fn())
         if args.command == "export":
