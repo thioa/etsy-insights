@@ -1,0 +1,7 @@
+data/
+hasil/
+logs/
+rekaman/
+.venv/
+__pycache__/
+*.pyc
