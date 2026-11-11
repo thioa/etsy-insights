@@ -1,0 +1,3107 @@
+{
+ "keyword": "sweatshirt",
+ "responses": [
+  {
+   "url": "https://www.etsy.com/api/v3/ajax/shop/12345678/marketplace-insights/llm-exploratory-keywords/search/poll",
+   "status": 200,
+   "body": {
+    "results": [
+     {
+      "searchTerm": "gift for her",
+      "searchVolume": 129021,
+      "avgTotalListings": 414555,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "craft supplies",
+      "searchVolume": 94051,
+      "avgTotalListings": 1158411,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "gift for him",
+      "searchVolume": 59206,
+      "avgTotalListings": 1287129,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "embroidered sweatshirt",
+      "searchVolume": 41188,
+      "avgTotalListings": 380692,
+      "cvr": 1
+     },
+     {
+      "searchTerm": "hoodie",
+      "searchVolume": 32797,
+      "avgTotalListings": 1735921,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "custom sweatshirt",
+      "searchVolume": 19398,
+      "avgTotalListings": 846256,
+      "cvr": 4
+     },
+     {
+      "searchTerm": "graphic tee",
+      "searchVolume": 18409,
+      "avgTotalListings": 1126105,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "sweatshirt women",
+      "searchVolume": 14166,
+      "avgTotalListings": 1468342,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "custom hoodie",
+      "searchVolume": 10217,
+      "avgTotalListings": 533144,
+      "cvr": 3
+     },
+     {
+      "searchTerm": "gift for friend",
+      "searchVolume": 6694,
+      "avgTotalListings": 908917,
+      "cvr": 1
+     },
+     {
+      "searchTerm": "embroidered sweater",
+      "searchVolume": 5559,
+      "avgTotalListings": 241377,
+      "cvr": 1
+     },
+     {
+      "searchTerm": "crewneck sweatshirt",
+      "searchVolume": 5147,
+      "avgTotalListings": 1096438,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "vintage sweatshirt",
+      "searchVolume": 4714,
+      "avgTotalListings": 743054,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "vintage sweater",
+      "searchVolume": 4551,
+      "avgTotalListings": 523457,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "personalized sweatshirt",
+      "searchVolume": 4209,
+      "avgTotalListings": 430871,
+      "cvr": 4
+     },
+     {
+      "searchTerm": "winter sweatshirt",
+      "searchVolume": 3826,
+      "avgTotalListings": 390157,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "long sleeve shirt",
+      "searchVolume": 3796,
+      "avgTotalListings": 1120128,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "funny sweatshirt",
+      "searchVolume": 3482,
+      "avgTotalListings": 899867,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "womens sweatshirt",
+      "searchVolume": 3230,
+      "avgTotalListings": 1712256,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "dog mom sweatshirt",
+      "searchVolume": 3035,
+      "avgTotalListings": 111397,
+      "cvr": 1
+     },
+     {
+      "searchTerm": "streetwear",
+      "searchVolume": 3018,
+      "avgTotalListings": 1545579,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "graphic sweatshirt",
+      "searchVolume": 2991,
+      "avgTotalListings": 1573324,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "college sweatshirt",
+      "searchVolume": 2536,
+      "avgTotalListings": 172122,
+      "cvr": 2
+     },
+     {
+      "searchTerm": "oversized sweatshirt",
+      "searchVolume": 2252,
+      "avgTotalListings": 237227,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "personalized hoodie",
+      "searchVolume": 2226,
+      "avgTotalListings": 241215,
+      "cvr": 4
+     },
+     {
+      "searchTerm": "hippie clothing",
+      "searchVolume": 2105,
+      "avgTotalListings": 663470,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "cute sweatshirt",
+      "searchVolume": 2035,
+      "avgTotalListings": 764944,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "oversized hoodie",
+      "searchVolume": 1948,
+      "avgTotalListings": 175952,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "holiday gift idea",
+      "searchVolume": 1865,
+      "avgTotalListings": 807733,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "winter clothing",
+      "searchVolume": 1860,
+      "avgTotalListings": 554305,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "t-shirt design",
+      "searchVolume": 1704,
+      "avgTotalListings": 1834360,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "graphic hoodie",
+      "searchVolume": 1692,
+      "avgTotalListings": 944438,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "custom t-shirt",
+      "searchVolume": 1535,
+      "avgTotalListings": 1337742,
+      "cvr": 4
+     },
+     {
+      "searchTerm": "cottagecore clothing",
+      "searchVolume": 1468,
+      "avgTotalListings": 285574,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "sweatshirt men",
+      "searchVolume": 1459,
+      "avgTotalListings": 1057863,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "retro sweatshirt",
+      "searchVolume": 1315,
+      "avgTotalListings": 539029,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "mens sweater",
+      "searchVolume": 1199,
+      "avgTotalListings": 593558,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "womens sweater",
+      "searchVolume": 1193,
+      "avgTotalListings": 885505,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "fall fashion",
+      "searchVolume": 1150,
+      "avgTotalListings": 423228,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "oversized tee",
+      "searchVolume": 996,
+      "avgTotalListings": 248988,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "90s sweatshirt",
+      "searchVolume": 982,
+      "avgTotalListings": 151981,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "cozy sweatshirt",
+      "searchVolume": 862,
+      "avgTotalListings": 471838,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "cropped sweatshirt",
+      "searchVolume": 840,
+      "avgTotalListings": 40001,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "hooded sweatshirt",
+      "searchVolume": 832,
+      "avgTotalListings": 146464,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "embroidered top",
+      "searchVolume": 827,
+      "avgTotalListings": 345150,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "tie dye sweatshirt",
+      "searchVolume": 788,
+      "avgTotalListings": 15406,
+      "cvr": 1
+     },
+     {
+      "searchTerm": "womens graphic tee",
+      "searchVolume": 788,
+      "avgTotalListings": 2476079,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "mens sweatshirt",
+      "searchVolume": 764,
+      "avgTotalListings": 1200377,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "cozy sweater",
+      "searchVolume": 752,
+      "avgTotalListings": 319765,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "long sleeve top",
+      "searchVolume": 709,
+      "avgTotalListings": 740287,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "crewneck sweater",
+      "searchVolume": 692,
+      "avgTotalListings": 752526,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "personalized t-shirt",
+      "searchVolume": 675,
+      "avgTotalListings": 700933,
+      "cvr": 4
+     },
+     {
+      "searchTerm": "youth sweatshirt",
+      "searchVolume": 638,
+      "avgTotalListings": 192673,
+      "cvr": 1
+     },
+     {
+      "searchTerm": "loungewear",
+      "searchVolume": 623,
+      "avgTotalListings": 127169,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "retro graphic tee",
+      "searchVolume": 615,
+      "avgTotalListings": 1302674,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "college apparel",
+      "searchVolume": 594,
+      "avgTotalListings": 199719,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "boho sweatshirt",
+      "searchVolume": 579,
+      "avgTotalListings": 132489,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "mens graphic tee",
+      "searchVolume": 574,
+      "avgTotalListings": 2154650,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "statement piece",
+      "searchVolume": 529,
+      "avgTotalListings": 354162,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "yoga sweatshirt",
+      "searchVolume": 509,
+      "avgTotalListings": 15700,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "cottagecore sweater",
+      "searchVolume": 478,
+      "avgTotalListings": 49299,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "everyday wear",
+      "searchVolume": 450,
+      "avgTotalListings": 405248,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "hoodie sweatshirt",
+      "searchVolume": 431,
+      "avgTotalListings": 1928059,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "aesthetic sweatshirt",
+      "searchVolume": 429,
+      "avgTotalListings": 182357,
+      "cvr": 2
+     },
+     {
+      "searchTerm": "pullover sweater",
+      "searchVolume": 412,
+      "avgTotalListings": 677154,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "embroidered pullover",
+      "searchVolume": 398,
+      "avgTotalListings": 175585,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "cat lover sweatshirt",
+      "searchVolume": 396,
+      "avgTotalListings": 86134,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "goth sweatshirt",
+      "searchVolume": 381,
+      "avgTotalListings": 36003,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "unisex sweatshirt",
+      "searchVolume": 377,
+      "avgTotalListings": 1337963,
+      "cvr": 1
+     },
+     {
+      "searchTerm": "cottagecore sweatshirt",
+      "searchVolume": 350,
+      "avgTotalListings": 50273,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "pullover sweatshirt",
+      "searchVolume": 348,
+      "avgTotalListings": 1219836,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "band t-shirt",
+      "searchVolume": 345,
+      "avgTotalListings": 203345,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "handmade top",
+      "searchVolume": 334,
+      "avgTotalListings": 414783,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "university sweatshirt",
+      "searchVolume": 332,
+      "avgTotalListings": 77609,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "y2k sweatshirt",
+      "searchVolume": 331,
+      "avgTotalListings": 28871,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "yoga top",
+      "searchVolume": 316,
+      "avgTotalListings": 66971,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "loungewear set",
+      "searchVolume": 281,
+      "avgTotalListings": 38911,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "cozy knitwear",
+      "searchVolume": 257,
+      "avgTotalListings": 26106,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "retro sweater",
+      "searchVolume": 243,
+      "avgTotalListings": 388894,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "winter fashion",
+      "searchVolume": 238,
+      "avgTotalListings": 301018,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "color block sweatshirt",
+      "searchVolume": 227,
+      "avgTotalListings": 10865,
+      "cvr": 1
+     },
+     {
+      "searchTerm": "casual top",
+      "searchVolume": 223,
+      "avgTotalListings": 529365,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "unisex clothing",
+      "searchVolume": 223,
+      "avgTotalListings": 1596317,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "minimalist sweatshirt",
+      "searchVolume": 220,
+      "avgTotalListings": 168748,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "winter pullover",
+      "searchVolume": 206,
+      "avgTotalListings": 221748,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "minimalist sweater",
+      "searchVolume": 201,
+      "avgTotalListings": 142661,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "blank sweatshirt",
+      "searchVolume": 198,
+      "avgTotalListings": 16335,
+      "cvr": 4
+     },
+     {
+      "searchTerm": "sweatshirt design",
+      "searchVolume": 196,
+      "avgTotalListings": 1009697,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "boho pullover",
+      "searchVolume": 194,
+      "avgTotalListings": 72547,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "winter wear",
+      "searchVolume": 191,
+      "avgTotalListings": 253065,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "sweatshirt jacket",
+      "searchVolume": 190,
+      "avgTotalListings": 100655,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "slow fashion",
+      "searchVolume": 187,
+      "avgTotalListings": 35941,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "travel sweatshirt",
+      "searchVolume": 184,
+      "avgTotalListings": 82253,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "fleece pullover",
+      "searchVolume": 180,
+      "avgTotalListings": 78177,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "tie front top",
+      "searchVolume": 166,
+      "avgTotalListings": 15465,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "color block sweater",
+      "searchVolume": 165,
+      "avgTotalListings": 8875,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "womens loungewear",
+      "searchVolume": 159,
+      "avgTotalListings": 100731,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "warm sweater",
+      "searchVolume": 157,
+      "avgTotalListings": 214402,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "sustainable clothing",
+      "searchVolume": 155,
+      "avgTotalListings": 218588,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "athletic wear",
+      "searchVolume": 154,
+      "avgTotalListings": 275376,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "distressed sweater",
+      "searchVolume": 152,
+      "avgTotalListings": 23399,
+      "cvr": 1
+     },
+     {
+      "searchTerm": "unique sweatshirt",
+      "searchVolume": 136,
+      "avgTotalListings": 269260,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "striped sweatshirt",
+      "searchVolume": 132,
+      "avgTotalListings": 33551,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "distressed sweatshirt",
+      "searchVolume": 128,
+      "avgTotalListings": 35867,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "soft sweatshirt",
+      "searchVolume": 123,
+      "avgTotalListings": 311461,
+      "cvr": 2
+     },
+     {
+      "searchTerm": "animal print shirt",
+      "searchVolume": 121,
+      "avgTotalListings": 527247,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "punk sweatshirt",
+      "searchVolume": 112,
+      "avgTotalListings": 16178,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "winter top",
+      "searchVolume": 109,
+      "avgTotalListings": 311426,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "mothers day sweatshirt",
+      "searchVolume": 105,
+      "avgTotalListings": 168957,
+      "cvr": 2
+     },
+     {
+      "searchTerm": "valentines day sweatshirt",
+      "searchVolume": 101,
+      "avgTotalListings": 68110,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "unique top",
+      "searchVolume": 98,
+      "avgTotalListings": 740998,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "streetwear sweatshirt",
+      "searchVolume": 96,
+      "avgTotalListings": 397044,
+      "cvr": 1
+     },
+     {
+      "searchTerm": "plaid sweatshirt",
+      "searchVolume": 94,
+      "avgTotalListings": 36031,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "animal print top",
+      "searchVolume": 94,
+      "avgTotalListings": 292596,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "designer sweatshirt",
+      "searchVolume": 79,
+      "avgTotalListings": 35854,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "unisex pullover",
+      "searchVolume": 77,
+      "avgTotalListings": 633473,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "workout sweatshirt",
+      "searchVolume": 68,
+      "avgTotalListings": 38896,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "artisan sweater",
+      "searchVolume": 67,
+      "avgTotalListings": 27268,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "lightweight sweatshirt",
+      "searchVolume": 62,
+      "avgTotalListings": 98485,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "travel outfit",
+      "searchVolume": 57,
+      "avgTotalListings": 44826,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "heavyweight sweatshirt",
+      "searchVolume": 54,
+      "avgTotalListings": 42800,
+      "cvr": 3
+     },
+     {
+      "searchTerm": "animal print sweatshirt",
+      "searchVolume": 49,
+      "avgTotalListings": 222667,
+      "cvr": 1
+     },
+     {
+      "searchTerm": "travel sweater",
+      "searchVolume": 47,
+      "avgTotalListings": 31574,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "minimalist top",
+      "searchVolume": 44,
+      "avgTotalListings": 422201,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "streetwear sweater",
+      "searchVolume": 37,
+      "avgTotalListings": 207470,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "cozy jumper",
+      "searchVolume": 32,
+      "avgTotalListings": 53510,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "athletic sweatshirt",
+      "searchVolume": 31,
+      "avgTotalListings": 279050,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "streetwear fashion",
+      "searchVolume": 31,
+      "avgTotalListings": 407321,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "teen fashion",
+      "searchVolume": 28,
+      "avgTotalListings": 80637,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "abstract art shirt",
+      "searchVolume": 27,
+      "avgTotalListings": 34973,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "warm sweatshirt",
+      "searchVolume": 27,
+      "avgTotalListings": 191473,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "wool blend sweater",
+      "searchVolume": 26,
+      "avgTotalListings": 52503,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "retro pullover",
+      "searchVolume": 26,
+      "avgTotalListings": 155146,
+      "cvr": 1
+     },
+     {
+      "searchTerm": "ribbed knit sweater",
+      "searchVolume": 25,
+      "avgTotalListings": 22143,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "textured sweater",
+      "searchVolume": 23,
+      "avgTotalListings": 29922,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "warm jumper",
+      "searchVolume": 23,
+      "avgTotalListings": 58035,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "diy sweatshirt",
+      "searchVolume": 22,
+      "avgTotalListings": 50214,
+      "cvr": 4
+     },
+     {
+      "searchTerm": "winter warmer",
+      "searchVolume": 22,
+      "avgTotalListings": 88534,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "striped pullover",
+      "searchVolume": 19,
+      "avgTotalListings": 24527,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "athleisure wear",
+      "searchVolume": 17,
+      "avgTotalListings": 24068,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "fleece lined sweater",
+      "searchVolume": 15,
+      "avgTotalListings": 10993,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "heavyweight sweater",
+      "searchVolume": 14,
+      "avgTotalListings": 14697,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "basic sweater",
+      "searchVolume": 14,
+      "avgTotalListings": 20487,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "warm top",
+      "searchVolume": 14,
+      "avgTotalListings": 123841,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "streetwear pullover",
+      "searchVolume": 14,
+      "avgTotalListings": 178286,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "ski lodge sweater",
+      "searchVolume": 12,
+      "avgTotalListings": 6841,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "artistic apparel",
+      "searchVolume": 12,
+      "avgTotalListings": 67166,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "sports fan gear",
+      "searchVolume": 12,
+      "avgTotalListings": 84440,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "geometric pattern shirt",
+      "searchVolume": 11,
+      "avgTotalListings": 16906,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "fathers day sweatshirt",
+      "searchVolume": 10,
+      "avgTotalListings": 41206,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "letter print sweatshirt",
+      "searchVolume": 9,
+      "avgTotalListings": 7691,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "meditation sweater",
+      "searchVolume": 9,
+      "avgTotalListings": 7712,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "activewear top",
+      "searchVolume": 9,
+      "avgTotalListings": 37715,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "minimalist pullover",
+      "searchVolume": 9,
+      "avgTotalListings": 107031,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "applique pullover",
+      "searchVolume": 8,
+      "avgTotalListings": 15195,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "lightweight pullover",
+      "searchVolume": 8,
+      "avgTotalListings": 60699,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "geometric print shirt",
+      "searchVolume": 8,
+      "avgTotalListings": 69319,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "everyday sweater",
+      "searchVolume": 7,
+      "avgTotalListings": 40970,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "concert outfit top",
+      "searchVolume": 7,
+      "avgTotalListings": 43288,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "floral print sweatshirt",
+      "searchVolume": 7,
+      "avgTotalListings": 79276,
+      "cvr": 4
+     },
+     {
+      "searchTerm": "gift for him sweater",
+      "searchVolume": 7,
+      "avgTotalListings": 89114,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "dark academia pullover",
+      "searchVolume": 6,
+      "avgTotalListings": 9102,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "utility sweatshirt",
+      "searchVolume": 6,
+      "avgTotalListings": 11543,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "basic pullover",
+      "searchVolume": 5,
+      "avgTotalListings": 7086,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "basic sweatshirt",
+      "searchVolume": 5,
+      "avgTotalListings": 29334,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "cotton blend sweater",
+      "searchVolume": 5,
+      "avgTotalListings": 50185,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "boho knit top",
+      "searchVolume": 5,
+      "avgTotalListings": 51843,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "basic knit top",
+      "searchVolume": 4,
+      "avgTotalListings": 14056,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "workwear pullover",
+      "searchVolume": 3,
+      "avgTotalListings": 4337,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "performance fleece",
+      "searchVolume": 3,
+      "avgTotalListings": 11565,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "adult knitwear",
+      "searchVolume": 3,
+      "avgTotalListings": 29138,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "punk rock pullover",
+      "searchVolume": 2,
+      "avgTotalListings": 7973,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "work from home sweater",
+      "searchVolume": 2,
+      "avgTotalListings": 8025,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "modern knitwear",
+      "searchVolume": 2,
+      "avgTotalListings": 19400,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "essential top",
+      "searchVolume": 2,
+      "avgTotalListings": 22862,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "simple pullover",
+      "searchVolume": 2,
+      "avgTotalListings": 26547,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "printed fleece top",
+      "searchVolume": 1,
+      "avgTotalListings": 1656,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "gift for her sweater",
+      "searchVolume": 1,
+      "avgTotalListings": 1695,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "work from home wear",
+      "searchVolume": 1,
+      "avgTotalListings": 7716,
+      "cvr": 0
+     },
+     {
+      "searchTerm": "urban knitwear",
+      "searchVolume": 1,
+      "avgTotalListings": 7924,
+      "cvr": 0
+     }
+    ],
+    "runId": "01a1c884-cf16-7cc3-9507-5a7764baa466",
+    "status": "success",
+    "llmResponseType": "langgraph",
+    "category": "",
+    "totalResultsCount": 180,
+    "totalFiltered": 0,
+    "inputKeyword": "swearshirt",
+    "resultsPerPage": 9,
+    "maxViewablePages": null,
+    "lookupFailed": false
+   }
+  },
+  {
+   "url": "https://www.etsy.com/api/v3/ajax/shop/12345678/marketplace-insights/llm-exploratory-keywords/search/enqueue",
+   "status": 200,
+   "body": {
+    "runId": null,
+    "threadId": null,
+    "cachedData": {
+     "totalResultsCount": 180,
+     "resultsPerPage": 9,
+     "maxViewablePages": null,
+     "lookupFailed": false,
+     "results": [
+      {
+       "searchTerm": "gift for her",
+       "searchVolume": 129021,
+       "avgTotalListings": 414555,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "gift for him",
+       "searchVolume": 59206,
+       "avgTotalListings": 1287129,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "ugly christmas sweater",
+       "searchVolume": 42314,
+       "avgTotalListings": 116840,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "embroidered sweatshirt",
+       "searchVolume": 41188,
+       "avgTotalListings": 380692,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom sweatshirt",
+       "searchVolume": 19398,
+       "avgTotalListings": 846256,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "cat lover gift",
+       "searchVolume": 10612,
+       "avgTotalListings": 523034,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "gift for friend",
+       "searchVolume": 6694,
+       "avgTotalListings": 908917,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "crewneck sweatshirt",
+       "searchVolume": 5147,
+       "avgTotalListings": 1096438,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "vintage sweatshirt",
+       "searchVolume": 4714,
+       "avgTotalListings": 743054,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized sweatshirt",
+       "searchVolume": 4209,
+       "avgTotalListings": 430871,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "long sleeve shirt",
+       "searchVolume": 3796,
+       "avgTotalListings": 1120128,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "zip up hoodie",
+       "searchVolume": 3663,
+       "avgTotalListings": 43758,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "cat sweatshirt",
+       "searchVolume": 3659,
+       "avgTotalListings": 117343,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "funny sweatshirt",
+       "searchVolume": 3482,
+       "avgTotalListings": 899867,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "womens sweatshirt",
+       "searchVolume": 3230,
+       "avgTotalListings": 1712256,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "dog sweatshirt",
+       "searchVolume": 3216,
+       "avgTotalListings": 179924,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "crew neck sweatshirt",
+       "searchVolume": 3209,
+       "avgTotalListings": 89634,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "valentines day gift",
+       "searchVolume": 3060,
+       "avgTotalListings": 953591,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "dog mom sweatshirt",
+       "searchVolume": 3035,
+       "avgTotalListings": 111397,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "graphic sweatshirt",
+       "searchVolume": 2991,
+       "avgTotalListings": 1573324,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "college sweatshirt",
+       "searchVolume": 2536,
+       "avgTotalListings": 172122,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "oversized sweatshirt",
+       "searchVolume": 2252,
+       "avgTotalListings": 237227,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized hoodie",
+       "searchVolume": 2226,
+       "avgTotalListings": 241215,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "oversized hoodie",
+       "searchVolume": 1948,
+       "avgTotalListings": 175952,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "winter clothing",
+       "searchVolume": 1860,
+       "avgTotalListings": 554305,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom crewneck",
+       "searchVolume": 1831,
+       "avgTotalListings": 307594,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "handmade sweater",
+       "searchVolume": 1809,
+       "avgTotalListings": 131478,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "mens hoodie",
+       "searchVolume": 1648,
+       "avgTotalListings": 975459,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "running shirt",
+       "searchVolume": 1586,
+       "avgTotalListings": 60307,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "funny graphic tee",
+       "searchVolume": 1551,
+       "avgTotalListings": 2015842,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "quarter zip sweatshirt",
+       "searchVolume": 1482,
+       "avgTotalListings": 29150,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "retro sweatshirt",
+       "searchVolume": 1315,
+       "avgTotalListings": 539029,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "tie dye hoodie",
+       "searchVolume": 1203,
+       "avgTotalListings": 14043,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "kids sweatshirt",
+       "searchVolume": 1199,
+       "avgTotalListings": 533326,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "womens sweater",
+       "searchVolume": 1193,
+       "avgTotalListings": 885505,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "fall fashion",
+       "searchVolume": 1150,
+       "avgTotalListings": 423228,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "trendy sweatshirt",
+       "searchVolume": 988,
+       "avgTotalListings": 226257,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "crew neck sweater",
+       "searchVolume": 911,
+       "avgTotalListings": 63790,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "womens hoodie",
+       "searchVolume": 906,
+       "avgTotalListings": 1046848,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "baby sweatshirt",
+       "searchVolume": 873,
+       "avgTotalListings": 193571,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "cozy sweatshirt",
+       "searchVolume": 862,
+       "avgTotalListings": 471838,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "cropped sweatshirt",
+       "searchVolume": 840,
+       "avgTotalListings": 40001,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "hooded sweatshirt",
+       "searchVolume": 832,
+       "avgTotalListings": 146464,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "sports sweatshirt",
+       "searchVolume": 812,
+       "avgTotalListings": 386302,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "tie dye sweatshirt",
+       "searchVolume": 788,
+       "avgTotalListings": 15406,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "mens sweatshirt",
+       "searchVolume": 764,
+       "avgTotalListings": 1200377,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "cozy sweater",
+       "searchVolume": 752,
+       "avgTotalListings": 319765,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "cold weather gear",
+       "searchVolume": 747,
+       "avgTotalListings": 5276,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "long sleeve top",
+       "searchVolume": 709,
+       "avgTotalListings": 740287,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "cozy outfit",
+       "searchVolume": 705,
+       "avgTotalListings": 18278,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "college hoodie",
+       "searchVolume": 588,
+       "avgTotalListings": 119955,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "boho sweatshirt",
+       "searchVolume": 579,
+       "avgTotalListings": 132489,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "funny quote shirt",
+       "searchVolume": 574,
+       "avgTotalListings": 472570,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "customizable sweatshirt",
+       "searchVolume": 572,
+       "avgTotalListings": 110926,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "cozy gift",
+       "searchVolume": 541,
+       "avgTotalListings": 1467143,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "yoga sweatshirt",
+       "searchVolume": 509,
+       "avgTotalListings": 15700,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "streetwear hoodie",
+       "searchVolume": 484,
+       "avgTotalListings": 312235,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "everyday wear",
+       "searchVolume": 450,
+       "avgTotalListings": 405248,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "zip up sweatshirt",
+       "searchVolume": 430,
+       "avgTotalListings": 38980,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "birthday gift idea",
+       "searchVolume": 427,
+       "avgTotalListings": 2288775,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "cat lover hoodie",
+       "searchVolume": 418,
+       "avgTotalListings": 59081,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "unique gift idea",
+       "searchVolume": 418,
+       "avgTotalListings": 842530,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "pullover sweater",
+       "searchVolume": 412,
+       "avgTotalListings": 677154,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "fall outfit",
+       "searchVolume": 411,
+       "avgTotalListings": 332280,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "embroidered pullover",
+       "searchVolume": 398,
+       "avgTotalListings": 175585,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "unisex sweatshirt",
+       "searchVolume": 377,
+       "avgTotalListings": 1337963,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "streetwear style",
+       "searchVolume": 365,
+       "avgTotalListings": 576754,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "cottagecore sweatshirt",
+       "searchVolume": 350,
+       "avgTotalListings": 50273,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "pullover sweatshirt",
+       "searchVolume": 348,
+       "avgTotalListings": 1219836,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "band t-shirt",
+       "searchVolume": 345,
+       "avgTotalListings": 203345,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "team spirit wear",
+       "searchVolume": 335,
+       "avgTotalListings": 92413,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "y2k sweatshirt",
+       "searchVolume": 331,
+       "avgTotalListings": 28871,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "cute graphic tee",
+       "searchVolume": 328,
+       "avgTotalListings": 1602853,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "heavyweight hoodie",
+       "searchVolume": 324,
+       "avgTotalListings": 23861,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "retro hoodie",
+       "searchVolume": 324,
+       "avgTotalListings": 271757,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "yoga top",
+       "searchVolume": 316,
+       "avgTotalListings": 66971,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "streetwear clothing",
+       "searchVolume": 298,
+       "avgTotalListings": 1474467,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "winter outfit",
+       "searchVolume": 284,
+       "avgTotalListings": 190396,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "loungewear set",
+       "searchVolume": 281,
+       "avgTotalListings": 38911,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "sleep shirt",
+       "searchVolume": 278,
+       "avgTotalListings": 57621,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "v neck sweater",
+       "searchVolume": 277,
+       "avgTotalListings": 30593,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "casual wear",
+       "searchVolume": 274,
+       "avgTotalListings": 1374189,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "maternity sweatshirt",
+       "searchVolume": 266,
+       "avgTotalListings": 33649,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "outdoor apparel",
+       "searchVolume": 258,
+       "avgTotalListings": 187930,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "cozy knitwear",
+       "searchVolume": 257,
+       "avgTotalListings": 26106,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "soft knitwear",
+       "searchVolume": 234,
+       "avgTotalListings": 56390,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "hooded jacket",
+       "searchVolume": 232,
+       "avgTotalListings": 49914,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "relaxed fit top",
+       "searchVolume": 225,
+       "avgTotalListings": 378104,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "casual top",
+       "searchVolume": 223,
+       "avgTotalListings": 529365,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "minimalist sweatshirt",
+       "searchVolume": 220,
+       "avgTotalListings": 168748,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "v neck sweatshirt",
+       "searchVolume": 211,
+       "avgTotalListings": 18921,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "bleached sweatshirt",
+       "searchVolume": 210,
+       "avgTotalListings": 10088,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "customizable hoodie",
+       "searchVolume": 210,
+       "avgTotalListings": 71387,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "knit pullover",
+       "searchVolume": 207,
+       "avgTotalListings": 120923,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "winter pullover",
+       "searchVolume": 206,
+       "avgTotalListings": 221748,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "retro graphic",
+       "searchVolume": 206,
+       "avgTotalListings": 1539822,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "minimalist hoodie",
+       "searchVolume": 202,
+       "avgTotalListings": 61124,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "minimalist sweater",
+       "searchVolume": 201,
+       "avgTotalListings": 142661,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "blank sweatshirt",
+       "searchVolume": 198,
+       "avgTotalListings": 16335,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "boho pullover",
+       "searchVolume": 194,
+       "avgTotalListings": 72547,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "travel hoodie",
+       "searchVolume": 191,
+       "avgTotalListings": 54940,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "winter wear",
+       "searchVolume": 191,
+       "avgTotalListings": 253065,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "travel sweatshirt",
+       "searchVolume": 184,
+       "avgTotalListings": 82253,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "fleece pullover",
+       "searchVolume": 180,
+       "avgTotalListings": 78177,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "summer top",
+       "searchVolume": 180,
+       "avgTotalListings": 754426,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "warm sweater",
+       "searchVolume": 157,
+       "avgTotalListings": 214402,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "athletic wear",
+       "searchVolume": 154,
+       "avgTotalListings": 275376,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "plain sweatshirt",
+       "searchVolume": 150,
+       "avgTotalListings": 21443,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "summer hoodie",
+       "searchVolume": 136,
+       "avgTotalListings": 30675,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "unique sweatshirt",
+       "searchVolume": 136,
+       "avgTotalListings": 269260,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "sports hoodie",
+       "searchVolume": 127,
+       "avgTotalListings": 286240,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "soft sweatshirt",
+       "searchVolume": 123,
+       "avgTotalListings": 311461,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "lightweight hoodie",
+       "searchVolume": 120,
+       "avgTotalListings": 98596,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "fitness clothing",
+       "searchVolume": 114,
+       "avgTotalListings": 389761,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "workout hoodie",
+       "searchVolume": 109,
+       "avgTotalListings": 32060,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "winter top",
+       "searchVolume": 109,
+       "avgTotalListings": 311426,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "teen sweatshirt",
+       "searchVolume": 105,
+       "avgTotalListings": 40971,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "fleece sweatshirt",
+       "searchVolume": 89,
+       "avgTotalListings": 175439,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "winter essentials",
+       "searchVolume": 86,
+       "avgTotalListings": 24968,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "mens crewneck",
+       "searchVolume": 82,
+       "avgTotalListings": 472412,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "womens pullover",
+       "searchVolume": 81,
+       "avgTotalListings": 854076,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "fleece lined hoodie",
+       "searchVolume": 80,
+       "avgTotalListings": 14448,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "travel clothing",
+       "searchVolume": 79,
+       "avgTotalListings": 321174,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "casual sweater",
+       "searchVolume": 78,
+       "avgTotalListings": 856777,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "unisex pullover",
+       "searchVolume": 77,
+       "avgTotalListings": 633473,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "daily wear",
+       "searchVolume": 76,
+       "avgTotalListings": 181880,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "workout sweatshirt",
+       "searchVolume": 68,
+       "avgTotalListings": 38896,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "gym clothing",
+       "searchVolume": 68,
+       "avgTotalListings": 167353,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "cozy loungewear",
+       "searchVolume": 66,
+       "avgTotalListings": 31286,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "mens pullover",
+       "searchVolume": 65,
+       "avgTotalListings": 545055,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "lightweight sweatshirt",
+       "searchVolume": 62,
+       "avgTotalListings": 98485,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "funny graphic hoodie",
+       "searchVolume": 56,
+       "avgTotalListings": 279776,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "heavyweight sweatshirt",
+       "searchVolume": 54,
+       "avgTotalListings": 42800,
+       "cvr": 3
+      },
+      {
+       "searchTerm": "cozy pullover",
+       "searchVolume": 53,
+       "avgTotalListings": 259076,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "yoga pullover",
+       "searchVolume": 50,
+       "avgTotalListings": 7683,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "novelty sweatshirt",
+       "searchVolume": 49,
+       "avgTotalListings": 588320,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "workout top",
+       "searchVolume": 46,
+       "avgTotalListings": 154797,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "basic top",
+       "searchVolume": 38,
+       "avgTotalListings": 92585,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "athletic sweatshirt",
+       "searchVolume": 31,
+       "avgTotalListings": 279050,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "soft knit sweater",
+       "searchVolume": 29,
+       "avgTotalListings": 267511,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "modern sweatshirt",
+       "searchVolume": 27,
+       "avgTotalListings": 64805,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "warm sweatshirt",
+       "searchVolume": 27,
+       "avgTotalListings": 191473,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "fleece lined sweatshirt",
+       "searchVolume": 26,
+       "avgTotalListings": 14886,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "ribbed knit sweater",
+       "searchVolume": 25,
+       "avgTotalListings": 22143,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "hipster clothing",
+       "searchVolume": 24,
+       "avgTotalListings": 55649,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "winter warmer",
+       "searchVolume": 22,
+       "avgTotalListings": 88534,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "performance hoodie",
+       "searchVolume": 20,
+       "avgTotalListings": 31222,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "everyday hoodie",
+       "searchVolume": 20,
+       "avgTotalListings": 125781,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "athletic hoodie",
+       "searchVolume": 18,
+       "avgTotalListings": 214120,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "maternity loungewear",
+       "searchVolume": 17,
+       "avgTotalListings": 8632,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "athleisure wear",
+       "searchVolume": 17,
+       "avgTotalListings": 24068,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "distressed pullover",
+       "searchVolume": 16,
+       "avgTotalListings": 7891,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "artistic sweater",
+       "searchVolume": 16,
+       "avgTotalListings": 34345,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "modern sweater",
+       "searchVolume": 14,
+       "avgTotalListings": 39833,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "warm top",
+       "searchVolume": 14,
+       "avgTotalListings": 123841,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "basic hoodie",
+       "searchVolume": 12,
+       "avgTotalListings": 24389,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "college style sweatshirt",
+       "searchVolume": 12,
+       "avgTotalListings": 34670,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "spandex top",
+       "searchVolume": 11,
+       "avgTotalListings": 46494,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "simple crewneck",
+       "searchVolume": 10,
+       "avgTotalListings": 28989,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "hooded pullover",
+       "searchVolume": 10,
+       "avgTotalListings": 89131,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "comfortable sweater",
+       "searchVolume": 10,
+       "avgTotalListings": 104053,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "raglan sleeve top",
+       "searchVolume": 9,
+       "avgTotalListings": 10478,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "activewear top",
+       "searchVolume": 9,
+       "avgTotalListings": 37715,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "minimalist pullover",
+       "searchVolume": 9,
+       "avgTotalListings": 107031,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "lightweight pullover",
+       "searchVolume": 8,
+       "avgTotalListings": 60699,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "handcrafted sweater",
+       "searchVolume": 7,
+       "avgTotalListings": 20235,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "athletic crewneck",
+       "searchVolume": 6,
+       "avgTotalListings": 58582,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "basic pullover",
+       "searchVolume": 5,
+       "avgTotalListings": 7086,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "basic sweatshirt",
+       "searchVolume": 5,
+       "avgTotalListings": 29334,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "athleisure clothing",
+       "searchVolume": 5,
+       "avgTotalListings": 41883,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "cotton blend sweater",
+       "searchVolume": 5,
+       "avgTotalListings": 50185,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "weekend wear",
+       "searchVolume": 4,
+       "avgTotalListings": 41682,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "loungewear top",
+       "searchVolume": 4,
+       "avgTotalListings": 53517,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "fleece lined top",
+       "searchVolume": 3,
+       "avgTotalListings": 13202,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "lounging clothes",
+       "searchVolume": 2,
+       "avgTotalListings": 16042,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "sporty sweater",
+       "searchVolume": 2,
+       "avgTotalListings": 18021,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "gift for her sweater",
+       "searchVolume": 1,
+       "avgTotalListings": 1695,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "activewear hoodie",
+       "searchVolume": 1,
+       "avgTotalListings": 2028,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "work from home wear",
+       "searchVolume": 1,
+       "avgTotalListings": 7716,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "warm knitwear",
+       "searchVolume": 1,
+       "avgTotalListings": 8212,
+       "cvr": 0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://www.etsy.com/api/v3/ajax/bespoke/shop/12345678/marketplace-insights/results-data?query=sweatshirt&search_term_hash=&search_trigger=results_search_bar",
+   "status": 200,
+   "body": {
+    "isSearchAllowed": true,
+    "isQuotaReached": false,
+    "searchTermId": "1108044460272339842",
+    "stats": {
+     "searchTerm": "sweatshirt",
+     "searchTermHash": "1108044460272339842",
+     "searchVolume": 46395,
+     "avgTotalListings": 1863632,
+     "cvr": 0,
+     "queryCvr": 0.00014224041690609525
+    },
+    "dailyStats": {
+     "stats": [
+      {
+       "date": "Oct 11",
+       "searchVolume": 1194,
+       "wowRollingAverage": 1296
+      },
+      {
+       "date": "Oct 12",
+       "searchVolume": 1483,
+       "wowRollingAverage": 1328
+      },
+      {
+       "date": "Oct 13",
+       "searchVolume": 1444,
+       "wowRollingAverage": 1348
+      },
+      {
+       "date": "Oct 14",
+       "searchVolume": 1520,
+       "wowRollingAverage": 1374
+      },
+      {
+       "date": "Oct 15",
+       "searchVolume": 1495,
+       "wowRollingAverage": 1396
+      },
+      {
+       "date": "Oct 16",
+       "searchVolume": 1472,
+       "wowRollingAverage": 1414
+      },
+      {
+       "date": "Oct 17",
+       "searchVolume": 1368,
+       "wowRollingAverage": 1425
+      },
+      {
+       "date": "Oct 18",
+       "searchVolume": 1359,
+       "wowRollingAverage": 1449
+      },
+      {
+       "date": "Oct 19",
+       "searchVolume": 1583,
+       "wowRollingAverage": 1463
+      },
+      {
+       "date": "Oct 20",
+       "searchVolume": 1505,
+       "wowRollingAverage": 1472
+      },
+      {
+       "date": "Oct 21",
+       "searchVolume": 1647,
+       "wowRollingAverage": 1490
+      },
+      {
+       "date": "Oct 22",
+       "searchVolume": 1510,
+       "wowRollingAverage": 1492
+      },
+      {
+       "date": "Oct 23",
+       "searchVolume": 1361,
+       "wowRollingAverage": 1476
+      },
+      {
+       "date": "Oct 24",
+       "searchVolume": 1253,
+       "wowRollingAverage": 1460
+      },
+      {
+       "date": "Oct 25",
+       "searchVolume": 1302,
+       "wowRollingAverage": 1452
+      },
+      {
+       "date": "Oct 26",
+       "searchVolume": 1460,
+       "wowRollingAverage": 1434
+      },
+      {
+       "date": "Oct 27",
+       "searchVolume": 1592,
+       "wowRollingAverage": 1446
+      },
+      {
+       "date": "Oct 28",
+       "searchVolume": 1589,
+       "wowRollingAverage": 1438
+      },
+      {
+       "date": "Oct 29",
+       "searchVolume": 1419,
+       "wowRollingAverage": 1425
+      },
+      {
+       "date": "Oct 30",
+       "searchVolume": 1376,
+       "wowRollingAverage": 1427
+      },
+      {
+       "date": "Oct 31",
+       "searchVolume": 1165,
+       "wowRollingAverage": 1415
+      },
+      {
+       "date": "Nov 1",
+       "searchVolume": 1483,
+       "wowRollingAverage": 1441
+      },
+      {
+       "date": "Nov 2",
+       "searchVolume": 1864,
+       "wowRollingAverage": 1498
+      },
+      {
+       "date": "Nov 3",
+       "searchVolume": 1760,
+       "wowRollingAverage": 1522
+      },
+      {
+       "date": "Nov 4",
+       "searchVolume": 1906,
+       "wowRollingAverage": 1568
+      },
+      {
+       "date": "Nov 5",
+       "searchVolume": 1498,
+       "wowRollingAverage": 1579
+      },
+      {
+       "date": "Nov 6",
+       "searchVolume": 1979,
+       "wowRollingAverage": 1665
+      },
+      {
+       "date": "Nov 7",
+       "searchVolume": 2298,
+       "wowRollingAverage": 1827
+      },
+      {
+       "date": "Nov 8",
+       "searchVolume": 1482,
+       "wowRollingAverage": 1827
+      },
+      {
+       "date": "Nov 9",
+       "searchVolume": 1949,
+       "wowRollingAverage": 1839
+      }
+     ]
+    },
+    "quotaData": {
+     "totalQuota": 15,
+     "remainingQuota": 15,
+     "lowRemainingQuotaThreshold": 5
+    },
+    "similarSearchTerms": {
+     "totalResultsCount": 0,
+     "resultsPerPage": 0,
+     "maxViewablePages": null,
+     "lookupFailed": false,
+     "results": []
+    },
+    "competitiveResearchListingCards": {
+     "listingCards": [
+      {
+       "id": "4591540946",
+       "title": "Oh What Fun Christmas Sweatshirt, Preppy Holiday Crewneck, Cute Christmas Shirt, Xmas Sweater, Festive Sweatshirt, Whimsical Christmas",
+       "rating": "4.9",
+       "numberOfReviews": "5499",
+       "shopName": "LuckyLimeCo",
+       "badgeText": null,
+       "isStarSeller": true,
+       "imageAlt": "Oh What Fun Christmas Sweatshirt, Preppy Holiday Crewneck, Cute Christmas Shirt, Xmas Sweater, Festive Sweatshirt, Whimsical Christmas",
+       "imageUrl": "https://i.etsystatic.com/36832672/r/il/93aa46/8646811550/il_fullxfull.8646811550_pdrl.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4591540946/oh-what-fun-christmas-sweatshirt-preppy",
+       "shopUrl": "https://www.etsy.com/shop/LuckyLimeCo",
+       "price": {
+        "formattedPrice": "Rp 712,738",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4558241766",
+       "title": "Coffee Weather Sweatshirt, Fall Coffee Lover Crewneck, Retro Autumn Sweater, Cozy Coffee Shirt, Pumpkin Spice Gift for Her, Cute Fall Shirts",
+       "rating": "4.9",
+       "numberOfReviews": "189",
+       "shopName": "DreamPrint95",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Coffee Weather Sweatshirt, Fall Coffee Lover Crewneck, Retro Autumn Sweater, Cozy Coffee Shirt, Pumpkin Spice Gift for Her, Cute Fall Shirts",
+       "imageUrl": "https://i.etsystatic.com/59307143/r/il/95eb32/8447495439/il_fullxfull.8447495439_eey7.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4558241766/coffee-weather-sweatshirt-fall-coffee",
+       "shopUrl": "https://www.etsy.com/shop/DreamPrint95",
+       "price": {
+        "formattedPrice": "Rp 569,962",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4405479620",
+       "title": "Midwest Sweatshirt Vintage Deer Sweater Hunting Season Gift Old Money Preppy Sweatshirt Country Western Boutique Outdoorsy Woodland Creature",
+       "rating": "4.9",
+       "numberOfReviews": "754",
+       "shopName": "BlackfordTattoo",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Midwest Sweatshirt Vintage Deer Sweater Hunting Season Gift Old Money Preppy Sweatshirt Country Western Boutique Outdoorsy Woodland Creature",
+       "imageUrl": "https://i.etsystatic.com/45157924/r/il/7b1c58/7448199105/il_fullxfull.7448199105_690x.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4405479620/midwest-sweatshirt-vintage-deer-sweater",
+       "shopUrl": "https://www.etsy.com/shop/BlackfordTattoo",
+       "price": {
+        "formattedPrice": "Rp 676,236",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4556848733",
+       "title": "Go With The Flow Embroidered Sweatshirt, Ocean Shirt, Marine Animals Shirt, Marine Life Gifts, Aquarium Lover Gift, Coastal Pullover",
+       "rating": "4.8",
+       "numberOfReviews": "603",
+       "shopName": "starment",
+       "badgeText": "Bestseller",
+       "isStarSeller": false,
+       "imageAlt": "Go With The Flow Embroidered Sweatshirt, Ocean Shirt, Marine Animals Shirt, Marine Life Gifts, Aquarium Lover Gift, Coastal Pullover",
+       "imageUrl": "https://i.etsystatic.com/39816661/r/il/7bd74b/8782050082/il_fullxfull.8782050082_czbj.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4556848733/go-with-the-flow-embroidered-sweatshirt",
+       "shopUrl": "https://www.etsy.com/shop/starment",
+       "price": {
+        "formattedPrice": "Rp 1,974,144",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "1663550427",
+       "title": "Custom Logo Sweatshirt, Small Business Custom Logo, Real Estate Sweatshirt, Team Staff Logo Shirt, Custom School Logo Shirt, Company Logo",
+       "rating": "4.8",
+       "numberOfReviews": "30307",
+       "shopName": "DiamondTeeDesign",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Custom Logo Sweatshirt, Small Business Custom Logo, Real Estate Sweatshirt, Team Staff Logo Shirt, Custom School Logo Shirt, Company Logo",
+       "imageUrl": "https://i.etsystatic.com/34072795/r/il/e0948f/7000783300/il_fullxfull.7000783300_b69e.jpg",
+       "listingUrl": "https://www.etsy.com/listing/1663550427/custom-logo-sweatshirt-small-business",
+       "shopUrl": "https://www.etsy.com/shop/DiamondTeeDesign",
+       "price": {
+        "formattedPrice": "Rp 146,008",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4469539006",
+       "title": "Retro Mount Rainier Washington Sweatshirt, Vintage 90s American Tradition Pacific Northwest Crewneck, Nostalgia Hiking Old School Gift",
+       "rating": "4.9",
+       "numberOfReviews": "15814",
+       "shopName": "OldSchoolCulture",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Retro Mount Rainier Washington Sweatshirt, Vintage 90s American Tradition Pacific Northwest Crewneck, Nostalgia Hiking Old School Gift",
+       "imageUrl": "https://i.etsystatic.com/41371150/r/il/ca4822/7837434367/il_fullxfull.7837434367_107i.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4469539006/retro-mount-rainier-washington",
+       "shopUrl": "https://www.etsy.com/shop/OldSchoolCulture",
+       "price": {
+        "formattedPrice": "Rp 665,399",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4318411646",
+       "title": "Reading is my favorite sport Sweatshirt, Vintage Reading Sweatshirt, Book lover gift, Bookish shirt, Bookworm, Reader Gift, Book crewneck",
+       "rating": "4.9",
+       "numberOfReviews": "11095",
+       "shopName": "TheLibraryCloset",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Reading is my favorite sport Sweatshirt, Vintage Reading Sweatshirt, Book lover gift, Bookish shirt, Bookworm, Reader Gift, Book crewneck",
+       "imageUrl": "https://i.etsystatic.com/27018553/r/il/0c6c82/6977024465/il_fullxfull.6977024465_7g8s.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4318411646/reading-is-my-favorite-sport-sweatshirt",
+       "shopUrl": "https://www.etsy.com/shop/TheLibraryCloset",
+       "price": {
+        "formattedPrice": "Rp 723,861",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4586740530",
+       "title": "Holiday Movie Lover Sweatshirt, Christmas Vacation Griswold Crewneck Gift, Griswold Crewneck",
+       "rating": "4.8",
+       "numberOfReviews": "1224",
+       "shopName": "majestickdesign",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Holiday Movie Lover Sweatshirt, Christmas Vacation Griswold Crewneck Gift, Griswold Crewneck",
+       "imageUrl": "https://i.etsystatic.com/54519437/r/il/00bb09/8657655839/il_fullxfull.8657655839_msjf.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4586740530/holiday-movie-lover-sweatshirt-christmas",
+       "shopUrl": "https://www.etsy.com/shop/majestickdesign",
+       "price": {
+        "formattedPrice": "Rp 1,406,844",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4584057388",
+       "title": "Christmas Sweatshirt, Retro Christmas Tree Sweatshirt, Most Wonderful Time of the Year Shirt, Vintage Christmas Crewneck, Holiday Sweatshirt",
+       "rating": "4.9",
+       "numberOfReviews": "7499",
+       "shopName": "KateTeesCollection",
+       "badgeText": null,
+       "isStarSeller": true,
+       "imageAlt": "Christmas Sweatshirt, Retro Christmas Tree Sweatshirt, Most Wonderful Time of the Year Shirt, Vintage Christmas Crewneck, Holiday Sweatshirt",
+       "imageUrl": "https://i.etsystatic.com/34672178/r/il/e2e0d3/8638616117/il_fullxfull.8638616117_mp3x.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4584057388/christmas-sweatshirt-retro-christmas",
+       "shopUrl": "https://www.etsy.com/shop/KateTeesCollection",
+       "price": {
+        "formattedPrice": "Rp 855,323",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "1872771173",
+       "title": "Custom Embroidered College Letter Sweatshirt: Retro Oversized Pullover",
+       "rating": "4.9",
+       "numberOfReviews": "2362",
+       "shopName": "ShopEnrose",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Custom Embroidered College Letter Sweatshirt: Retro Oversized Pullover",
+       "imageUrl": "https://i.etsystatic.com/56826140/r/il/edf63f/6687580421/il_fullxfull.6687580421_istd.jpg",
+       "listingUrl": "https://www.etsy.com/listing/1872771173/custom-embroidered-college-letter",
+       "shopUrl": "https://www.etsy.com/shop/ShopEnrose",
+       "price": {
+        "formattedPrice": "Rp 912,167",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4591628273",
+       "title": "Vintage Santa Reindeer Christmas Sweatshirt, Funny Boop Crewneck, Retro Xmas Graphic Sweatshirt",
+       "rating": "5.0",
+       "numberOfReviews": "4454",
+       "shopName": "ArtemOpus",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Vintage Santa Reindeer Christmas Sweatshirt, Funny Boop Crewneck, Retro Xmas Graphic Sweatshirt",
+       "imageUrl": "https://i.etsystatic.com/41282159/r/il/ac78c5/8730381418/il_fullxfull.8730381418_39da.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4591628273/vintage-santa-rudolph-christmas",
+       "shopUrl": "https://www.etsy.com/shop/ArtemOpus",
+       "price": {
+        "formattedPrice": "Rp 279,278",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4476337680",
+       "title": "Custom Chenille Lettering Team Name Sweatshirt, Embossed Mascot Sweatshirt, Custom School Sweatshirt, Gift Idea, 3D Chenille Embroidery",
+       "rating": "4.8",
+       "numberOfReviews": "924",
+       "shopName": "AlphaRomeoBoutique",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Custom Chenille Lettering Team Name Sweatshirt, Embossed Mascot Sweatshirt, Custom School Sweatshirt, Gift Idea, 3D Chenille Embroidery",
+       "imageUrl": "https://i.etsystatic.com/61871784/r/il/6bb8bb/7881827843/il_fullxfull.7881827843_eee4.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4476337680/custom-chenille-lettering-team-name",
+       "shopUrl": "https://www.etsy.com/shop/AlphaRomeoBoutique",
+       "price": {
+        "formattedPrice": "Rp 405,630",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4590515954",
+       "title": "BIG SALE Crewneck Sweatshirt, Unisex Sweatshirt, Blank Sweatshirt, Gildan and Jerseys Sweatshirt",
+       "rating": "4.8",
+       "numberOfReviews": "28429",
+       "shopName": "BespokeThreadandInk",
+       "badgeText": "Bestseller",
+       "isStarSeller": false,
+       "imageAlt": "BIG SALE Crewneck Sweatshirt, Unisex Sweatshirt, Blank Sweatshirt, Gildan and Jerseys Sweatshirt",
+       "imageUrl": "https://i.etsystatic.com/24645705/r/il/07891c/8686675863/il_fullxfull.8686675863_iwrw.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4590515954/crewneck-sweatshirt-unisex-sweatshirt",
+       "shopUrl": "https://www.etsy.com/shop/BespokeThreadandInk",
+       "price": {
+        "formattedPrice": "Rp 190,114",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4596637373",
+       "title": "Custom College Sweatshirt, Mock Neck Applique Shirt, Custom Embroidery Sweatshirt, Game Day Shirt, Cute Varsity Sweatshirt, Vintage State",
+       "rating": "4.8",
+       "numberOfReviews": "1484",
+       "shopName": "PixelandPaper003",
+       "badgeText": "Bestseller",
+       "isStarSeller": false,
+       "imageAlt": "Custom College Sweatshirt, Mock Neck Applique Shirt, Custom Embroidery Sweatshirt, Game Day Shirt, Cute Varsity Sweatshirt, Vintage State",
+       "imageUrl": "https://i.etsystatic.com/58128048/r/il/ff0028/8687644902/il_fullxfull.8687644902_1hws.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4596637373/custom-college-sweatshirt-mock-neck",
+       "shopUrl": "https://www.etsy.com/shop/PixelandPaper003",
+       "price": {
+        "formattedPrice": "Rp 817,490",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4592768486",
+       "title": "Santa's Favorite Sweatshirt, Funny Christmas Crewneck, Santa Favorite Shirt, Holiday Sweatshirt for Women, Christmas Gift for Her, Xmas Eve",
+       "rating": "5.0",
+       "numberOfReviews": "999",
+       "shopName": "yesyoucanfind",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Santa&#39;s Favorite Sweatshirt, Funny Christmas Crewneck, Santa Favorite Shirt, Holiday Sweatshirt for Women, Christmas Gift for Her, Xmas Eve",
+       "imageUrl": "https://i.etsystatic.com/59452751/r/il/f898a4/8656473504/il_fullxfull.8656473504_5s2v.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4592768486/santas-favorite-sweatshirt-funny",
+       "shopUrl": "https://www.etsy.com/shop/yesyoucanfind",
+       "price": {
+        "formattedPrice": "Rp 645,627",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "1593743413",
+       "title": "Monogram Quarter Zip Sweatshirt, Embroidered Quarter Zip, Monogrammed Gift, Personalized Monogram, Monogram Pullover, Christmas Gift",
+       "rating": "4.8",
+       "numberOfReviews": "13132",
+       "shopName": "MECOLLECTION15",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Monogram Quarter Zip Sweatshirt, Embroidered Quarter Zip, Monogrammed Gift, Personalized Monogram, Monogram Pullover, Christmas Gift",
+       "imageUrl": "https://i.etsystatic.com/12212700/r/il/89138a/5478579361/il_fullxfull.5478579361_elo1.jpg",
+       "listingUrl": "https://www.etsy.com/listing/1593743413/monogram-quarter-zip-sweatshirt",
+       "shopUrl": "https://www.etsy.com/shop/MECOLLECTION15",
+       "price": {
+        "formattedPrice": "Rp 691,065",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4586691854",
+       "title": "Oh What Fun Christmas Sweatshirt, Preppy Holiday Crewneck, Cute Christmas Shirt, Xmas Sweatshirt, Festive Sweatshirt, Whimsical Christmas",
+       "rating": "4.9",
+       "numberOfReviews": "5499",
+       "shopName": "LuckyLimeCo",
+       "badgeText": null,
+       "isStarSeller": true,
+       "imageAlt": "Oh What Fun Christmas Sweatshirt, Preppy Holiday Crewneck, Cute Christmas Shirt, Xmas Sweatshirt, Festive Sweatshirt, Whimsical Christmas",
+       "imageUrl": "https://i.etsystatic.com/36832672/r/il/7f7b77/8658698919/il_fullxfull.8658698919_am3x.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4586691854/oh-what-fun-stars-unisex-heavy-blend",
+       "shopUrl": "https://www.etsy.com/shop/LuckyLimeCo",
+       "price": {
+        "formattedPrice": "Rp 712,738",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4502966499",
+       "title": "Custom Fuzzy Letter Sweatshirt Chenille Yarn Embroidered Crewneck Personalized Varsity Style Sweatshirt",
+       "rating": "4.9",
+       "numberOfReviews": "374",
+       "shopName": "TheDCfashion",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Custom Fuzzy Letter Sweatshirt Chenille Yarn Embroidered Crewneck Personalized Varsity Style Sweatshirt",
+       "imageUrl": "https://i.etsystatic.com/59725162/r/il/129dd5/8054196501/il_fullxfull.8054196501_it5v.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4502966499/custom-fuzzy-letter-sweatshirt-chenille",
+       "shopUrl": "https://www.etsy.com/shop/TheDCfashion",
+       "price": {
+        "formattedPrice": "Rp 454,424",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4557622114",
+       "title": "I'm Cold But I'm Being Really Brave About It Sweatshirt, Funny Cozy Winter Graphic Tee, Winter Lover Gift",
+       "rating": "4.8",
+       "numberOfReviews": "757",
+       "shopName": "FinenessClothing",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "I&#39;m Cold But I&#39;m Being Really Brave About It Sweatshirt, Funny Cozy Winter Graphic Tee, Winter Lover Gift",
+       "imageUrl": "https://i.etsystatic.com/62607482/r/il/9aec88/8395314618/il_fullxfull.8395314618_6krs.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4557622114/im-cold-but-im-being-really-brave-about",
+       "shopUrl": "https://www.etsy.com/shop/FinenessClothing",
+       "price": {
+        "formattedPrice": "Rp 341,825",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      }
+     ]
+    },
+    "wowData": {
+     "value": 22.7,
+     "trendDirection": "up",
+     "displayText": "+22.7%",
+     "fromDate": "Nov 3",
+     "toDate": "Nov 9"
+    },
+    "competitivePriceData": {
+     "searchTermMedianPrice": {
+      "medianPriceLow": "US$15.30",
+      "medianPriceHigh": "US$18.70",
+      "medianPriceBarLow": "US$11",
+      "medianPriceBarLowFloat": 11.333333333333336,
+      "medianPriceBarHigh": "US$23",
+      "medianPriceBarHighFloat": 22.666666666666664,
+      "medianPriceBarPercent": 30
+     }
+    }
+   }
+  },
+  {
+   "url": "https://www.etsy.com/api/v3/ajax/bespoke/shop/12345678/marketplace-insights/chart-series-data",
+   "status": 200,
+   "body": {
+    "days": 30,
+    "granularity": "day",
+    "isLastBucketPartial": false,
+    "series": [
+     {
+      "key": "search_volume:1108044460272339842",
+      "label": "sweatshirt",
+      "seriesType": "search_volume",
+      "searchTerm": "sweatshirt",
+      "points": [
+       {
+        "timestamp": 1791676800,
+        "label": "Oct 11",
+        "value": 1194
+       },
+       {
+        "timestamp": 1791763200,
+        "label": "Oct 12",
+        "value": 1483
+       },
+       {
+        "timestamp": 1791849600,
+        "label": "Oct 13",
+        "value": 1444
+       },
+       {
+        "timestamp": 1791936000,
+        "label": "Oct 14",
+        "value": 1520
+       },
+       {
+        "timestamp": 1792022400,
+        "label": "Oct 15",
+        "value": 1495
+       },
+       {
+        "timestamp": 1792108800,
+        "label": "Oct 16",
+        "value": 1472
+       },
+       {
+        "timestamp": 1792195200,
+        "label": "Oct 17",
+        "value": 1368
+       },
+       {
+        "timestamp": 1792281600,
+        "label": "Oct 18",
+        "value": 1359
+       },
+       {
+        "timestamp": 1792368000,
+        "label": "Oct 19",
+        "value": 1583
+       },
+       {
+        "timestamp": 1792454400,
+        "label": "Oct 20",
+        "value": 1505
+       },
+       {
+        "timestamp": 1792540800,
+        "label": "Oct 21",
+        "value": 1647
+       },
+       {
+        "timestamp": 1792627200,
+        "label": "Oct 22",
+        "value": 1510
+       },
+       {
+        "timestamp": 1792713600,
+        "label": "Oct 23",
+        "value": 1361
+       },
+       {
+        "timestamp": 1792800000,
+        "label": "Oct 24",
+        "value": 1253
+       },
+       {
+        "timestamp": 1792886400,
+        "label": "Oct 25",
+        "value": 1302
+       },
+       {
+        "timestamp": 1792972800,
+        "label": "Oct 26",
+        "value": 1460
+       },
+       {
+        "timestamp": 1793059200,
+        "label": "Oct 27",
+        "value": 1592
+       },
+       {
+        "timestamp": 1793145600,
+        "label": "Oct 28",
+        "value": 1589
+       },
+       {
+        "timestamp": 1793232000,
+        "label": "Oct 29",
+        "value": 1419
+       },
+       {
+        "timestamp": 1793318400,
+        "label": "Oct 30",
+        "value": 1376
+       },
+       {
+        "timestamp": 1793404800,
+        "label": "Oct 31",
+        "value": 1165
+       },
+       {
+        "timestamp": 1793491200,
+        "label": "Nov 1",
+        "value": 1483
+       },
+       {
+        "timestamp": 1793577600,
+        "label": "Nov 2",
+        "value": 1864
+       },
+       {
+        "timestamp": 1793664000,
+        "label": "Nov 3",
+        "value": 1760
+       },
+       {
+        "timestamp": 1793750400,
+        "label": "Nov 4",
+        "value": 1906
+       },
+       {
+        "timestamp": 1793836800,
+        "label": "Nov 5",
+        "value": 1498
+       },
+       {
+        "timestamp": 1793923200,
+        "label": "Nov 6",
+        "value": 1979
+       },
+       {
+        "timestamp": 1794009600,
+        "label": "Nov 7",
+        "value": 2298
+       },
+       {
+        "timestamp": 1794096000,
+        "label": "Nov 8",
+        "value": 1482
+       },
+       {
+        "timestamp": 1794182400,
+        "label": "Nov 9",
+        "value": 1949
+       }
+      ]
+     },
+     {
+      "key": "trendline:1108044460272339842",
+      "label": "sweatshirt 7-day average",
+      "seriesType": "trendline",
+      "searchTerm": "sweatshirt",
+      "points": [
+       {
+        "timestamp": 1791676800,
+        "label": "Oct 11",
+        "value": 1296
+       },
+       {
+        "timestamp": 1791763200,
+        "label": "Oct 12",
+        "value": 1328
+       },
+       {
+        "timestamp": 1791849600,
+        "label": "Oct 13",
+        "value": 1348
+       },
+       {
+        "timestamp": 1791936000,
+        "label": "Oct 14",
+        "value": 1374
+       },
+       {
+        "timestamp": 1792022400,
+        "label": "Oct 15",
+        "value": 1396
+       },
+       {
+        "timestamp": 1792108800,
+        "label": "Oct 16",
+        "value": 1414
+       },
+       {
+        "timestamp": 1792195200,
+        "label": "Oct 17",
+        "value": 1425
+       },
+       {
+        "timestamp": 1792281600,
+        "label": "Oct 18",
+        "value": 1449
+       },
+       {
+        "timestamp": 1792368000,
+        "label": "Oct 19",
+        "value": 1463
+       },
+       {
+        "timestamp": 1792454400,
+        "label": "Oct 20",
+        "value": 1472
+       },
+       {
+        "timestamp": 1792540800,
+        "label": "Oct 21",
+        "value": 1490
+       },
+       {
+        "timestamp": 1792627200,
+        "label": "Oct 22",
+        "value": 1492
+       },
+       {
+        "timestamp": 1792713600,
+        "label": "Oct 23",
+        "value": 1476
+       },
+       {
+        "timestamp": 1792800000,
+        "label": "Oct 24",
+        "value": 1460
+       },
+       {
+        "timestamp": 1792886400,
+        "label": "Oct 25",
+        "value": 1452
+       },
+       {
+        "timestamp": 1792972800,
+        "label": "Oct 26",
+        "value": 1434
+       },
+       {
+        "timestamp": 1793059200,
+        "label": "Oct 27",
+        "value": 1446
+       },
+       {
+        "timestamp": 1793145600,
+        "label": "Oct 28",
+        "value": 1438
+       },
+       {
+        "timestamp": 1793232000,
+        "label": "Oct 29",
+        "value": 1425
+       },
+       {
+        "timestamp": 1793318400,
+        "label": "Oct 30",
+        "value": 1427
+       },
+       {
+        "timestamp": 1793404800,
+        "label": "Oct 31",
+        "value": 1415
+       },
+       {
+        "timestamp": 1793491200,
+        "label": "Nov 1",
+        "value": 1441
+       },
+       {
+        "timestamp": 1793577600,
+        "label": "Nov 2",
+        "value": 1498
+       },
+       {
+        "timestamp": 1793664000,
+        "label": "Nov 3",
+        "value": 1522
+       },
+       {
+        "timestamp": 1793750400,
+        "label": "Nov 4",
+        "value": 1568
+       },
+       {
+        "timestamp": 1793836800,
+        "label": "Nov 5",
+        "value": 1579
+       },
+       {
+        "timestamp": 1793923200,
+        "label": "Nov 6",
+        "value": 1665
+       },
+       {
+        "timestamp": 1794009600,
+        "label": "Nov 7",
+        "value": 1827
+       },
+       {
+        "timestamp": 1794096000,
+        "label": "Nov 8",
+        "value": 1827
+       },
+       {
+        "timestamp": 1794182400,
+        "label": "Nov 9",
+        "value": 1839
+       }
+      ]
+     }
+    ],
+    "termSummaries": [
+     {
+      "searchTerm": "sweatshirt",
+      "searchVolume": 46395,
+      "avgTotalListings": 1863632,
+      "wowData": {
+       "value": 22.7,
+       "trendDirection": "up",
+       "displayText": "+22.7%",
+       "fromDate": "Nov 3",
+       "toDate": "Nov 9"
+      }
+     }
+    ]
+   }
+  }
+ ],
+ "page_url": "https://www.etsy.com/your/shops/me/marketplace-insights/search?query=sweatshirt&search_trigger=results_search_bar"
+}

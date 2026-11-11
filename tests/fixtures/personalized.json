@@ -1,0 +1,1737 @@
+{
+ "keyword": "personalized",
+ "responses": [
+  {
+   "url": "https://www.etsy.com/api/v3/ajax/shop/12345678/manager/nav-badge-counts",
+   "status": 200,
+   "body": {
+    "counts": {
+     "orders": 0
+    }
+   }
+  },
+  {
+   "url": "https://www.etsy.com/api/v3/ajax/bespoke/shop/12345678/marketplace-insights/results-data?query=personalized&search_term_hash=&search_trigger=landing_search_bar",
+   "status": 200,
+   "body": {
+    "isSearchAllowed": true,
+    "isQuotaReached": false,
+    "searchTermId": "621818733672613332",
+    "stats": {
+     "searchTerm": "personalized",
+     "searchTermHash": "621818733672613332",
+     "searchVolume": 67930,
+     "avgTotalListings": 2583504,
+     "cvr": 0,
+     "queryCvr": 0.00035853162105745355
+    },
+    "dailyStats": {
+     "stats": [
+      {
+       "date": "Oct 11",
+       "searchVolume": 2117,
+       "wowRollingAverage": 2046
+      },
+      {
+       "date": "Oct 12",
+       "searchVolume": 2093,
+       "wowRollingAverage": 1985
+      },
+      {
+       "date": "Oct 13",
+       "searchVolume": 1950,
+       "wowRollingAverage": 1968
+      },
+      {
+       "date": "Oct 14",
+       "searchVolume": 1888,
+       "wowRollingAverage": 1962
+      },
+      {
+       "date": "Oct 15",
+       "searchVolume": 2275,
+       "wowRollingAverage": 2027
+      },
+      {
+       "date": "Oct 16",
+       "searchVolume": 1953,
+       "wowRollingAverage": 2048
+      },
+      {
+       "date": "Oct 17",
+       "searchVolume": 1929,
+       "wowRollingAverage": 2029
+      },
+      {
+       "date": "Oct 18",
+       "searchVolume": 2025,
+       "wowRollingAverage": 2016
+      },
+      {
+       "date": "Oct 19",
+       "searchVolume": 2415,
+       "wowRollingAverage": 2062
+      },
+      {
+       "date": "Oct 20",
+       "searchVolume": 2236,
+       "wowRollingAverage": 2103
+      },
+      {
+       "date": "Oct 21",
+       "searchVolume": 2476,
+       "wowRollingAverage": 2187
+      },
+      {
+       "date": "Oct 22",
+       "searchVolume": 2115,
+       "wowRollingAverage": 2164
+      },
+      {
+       "date": "Oct 23",
+       "searchVolume": 1885,
+       "wowRollingAverage": 2154
+      },
+      {
+       "date": "Oct 24",
+       "searchVolume": 1924,
+       "wowRollingAverage": 2154
+      },
+      {
+       "date": "Oct 25",
+       "searchVolume": 2087,
+       "wowRollingAverage": 2163
+      },
+      {
+       "date": "Oct 26",
+       "searchVolume": 2263,
+       "wowRollingAverage": 2141
+      },
+      {
+       "date": "Oct 27",
+       "searchVolume": 2016,
+       "wowRollingAverage": 2109
+      },
+      {
+       "date": "Oct 28",
+       "searchVolume": 2230,
+       "wowRollingAverage": 2074
+      },
+      {
+       "date": "Oct 29",
+       "searchVolume": 2108,
+       "wowRollingAverage": 2073
+      },
+      {
+       "date": "Oct 30",
+       "searchVolume": 1812,
+       "wowRollingAverage": 2063
+      },
+      {
+       "date": "Oct 31",
+       "searchVolume": 2238,
+       "wowRollingAverage": 2108
+      },
+      {
+       "date": "Nov 1",
+       "searchVolume": 2360,
+       "wowRollingAverage": 2147
+      },
+      {
+       "date": "Nov 2",
+       "searchVolume": 2459,
+       "wowRollingAverage": 2175
+      },
+      {
+       "date": "Nov 3",
+       "searchVolume": 2459,
+       "wowRollingAverage": 2238
+      },
+      {
+       "date": "Nov 4",
+       "searchVolume": 2230,
+       "wowRollingAverage": 2238
+      },
+      {
+       "date": "Nov 5",
+       "searchVolume": 2421,
+       "wowRollingAverage": 2283
+      },
+      {
+       "date": "Nov 6",
+       "searchVolume": 2795,
+       "wowRollingAverage": 2423
+      },
+      {
+       "date": "Nov 7",
+       "searchVolume": 2851,
+       "wowRollingAverage": 2511
+      },
+      {
+       "date": "Nov 8",
+       "searchVolume": 3079,
+       "wowRollingAverage": 2613
+      },
+      {
+       "date": "Nov 9",
+       "searchVolume": 3090,
+       "wowRollingAverage": 2704
+      }
+     ]
+    },
+    "quotaData": {
+     "totalQuota": 15,
+     "remainingQuota": 15,
+     "lowRemainingQuotaThreshold": 5
+    },
+    "similarSearchTerms": {
+     "totalResultsCount": 0,
+     "resultsPerPage": 0,
+     "maxViewablePages": null,
+     "lookupFailed": false,
+     "results": []
+    },
+    "competitiveResearchListingCards": {
+     "listingCards": [
+      {
+       "id": "4352004983",
+       "title": "Custom Toddler Backpack, Personalized Backpacks With Name Gift, Children's School Bag for Girls Boys Kids Preschool",
+       "rating": "4.9",
+       "numberOfReviews": "4515",
+       "shopName": "BabyShowerBasket",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Custom Toddler Backpack, Personalized Backpacks With Name Gift, Children&#39;s School Bag for Girls Boys Kids Preschool",
+       "imageUrl": "https://i.etsystatic.com/10092049/r/il/c0c394/7108249492/il_fullxfull.7108249492_5qyw.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4352004983/custom-toddler-backpack-personalized",
+       "shopUrl": "https://www.etsy.com/shop/BabyShowerBasket",
+       "price": {
+        "formattedPrice": "Rp 1,102,471",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4538741991",
+       "title": "Personalized Ceramic Pet Ring Dish, Hand-Carved Dog Jewelry Tray, Pet Memorial Gift",
+       "rating": "4.7",
+       "numberOfReviews": "610",
+       "shopName": "MuddyPawsGiftCo",
+       "badgeText": "Bestseller",
+       "isStarSeller": false,
+       "imageAlt": "Personalized Ceramic Pet Ring Dish, Hand-Carved Dog Jewelry Tray, Pet Memorial Gift",
+       "imageUrl": "https://i.etsystatic.com/26287050/r/il/ac6d67/8306624329/il_fullxfull.8306624329_4yus.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4538741991/personalized-ceramic-pet-ring-dish-hand",
+       "shopUrl": "https://www.etsy.com/shop/MuddyPawsGiftCo",
+       "price": {
+        "formattedPrice": "Rp 669,202",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "1167562350",
+       "title": "Personalized Bamboo Cutting Board, Engraved Wedding Charcuterie Board, Custom Christmas Gift, Gift for Her, Family Gift, Gifts for Parents",
+       "rating": "5.0",
+       "numberOfReviews": "43262",
+       "shopName": "GiftsToEngrave",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Personalized Bamboo Cutting Board, Engraved Wedding Charcuterie Board, Custom Christmas Gift, Gift for Her, Family Gift, Gifts for Parents",
+       "imageUrl": "https://i.etsystatic.com/34269816/r/il/640a11/8102188584/il_fullxfull.8102188584_5w3c.jpg",
+       "listingUrl": "https://www.etsy.com/listing/1167562350/personalized-bamboo-cutting-board",
+       "shopUrl": "https://www.etsy.com/shop/GiftsToEngrave",
+       "price": {
+        "formattedPrice": "Rp 987,833",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "1225990874",
+       "title": "14k Diamond Initial Ballerina Disc Necklace / Diamond Initial Necklace /  Personalized Jewelry / Name Necklace / Letter Necklace",
+       "rating": "4.9",
+       "numberOfReviews": "42885",
+       "shopName": "FerkosFineJewelry",
+       "badgeText": null,
+       "isStarSeller": true,
+       "imageAlt": "14k Diamond Initial Ballerina Disc Necklace / Diamond Initial Necklace /  Personalized Jewelry / Name Necklace / Letter Necklace",
+       "imageUrl": "https://i.etsystatic.com/14533306/r/il/75f548/7733732815/il_fullxfull.7733732815_1rra.jpg",
+       "listingUrl": "https://www.etsy.com/listing/1225990874/14k-diamond-initial-ballerina-disc",
+       "shopUrl": "https://www.etsy.com/shop/FerkosFineJewelry",
+       "price": {
+        "formattedPrice": "Rp 24,961,977",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "1903064379",
+       "title": "3.0 Carat Radiant Cut Lab Grown Diamond Three Stone Engagement Ring — Cadillac Side Stones | IGI Certified Diamond Ring in 10K/14K/18K Gold",
+       "rating": "4.9",
+       "numberOfReviews": "12",
+       "shopName": "RAGGEMSNY",
+       "badgeText": null,
+       "isStarSeller": true,
+       "imageAlt": "3.0 Carat Radiant Cut Lab Grown Diamond Three Stone Engagement Ring — Cadillac Side Stones | IGI Certified Diamond Ring in 10K/14K/18K Gold",
+       "imageUrl": "https://i.etsystatic.com/54270384/r/il/fed457/6791433664/il_fullxfull.6791433664_e50f.jpg",
+       "listingUrl": "https://www.etsy.com/listing/1903064379/30-carat-radiant-cut-lab-grown-diamond",
+       "shopUrl": "https://www.etsy.com/shop/RAGGEMSNY",
+       "price": {
+        "formattedPrice": "Rp 53,231,939",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "1864690497",
+       "title": "Monogrammed Seersucker Toiletry Bag: Custom Bridesmaid Makeup Bag",
+       "rating": "4.9",
+       "numberOfReviews": "8274",
+       "shopName": "KvYshopUS",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Monogrammed Seersucker Toiletry Bag: Custom Bridesmaid Makeup Bag",
+       "imageUrl": "https://i.etsystatic.com/52535302/r/il/1dd546/6629509874/il_fullxfull.6629509874_cv37.jpg",
+       "listingUrl": "https://www.etsy.com/listing/1864690497/monogrammed-seersucker-toiletry-bag",
+       "shopUrl": "https://www.etsy.com/shop/KvYshopUS",
+       "price": {
+        "formattedPrice": "Rp 142,776",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4354110623",
+       "title": "Custom Toddler Backpack, Personalized Mini Kids Nursery Baby Backpacks Name Birthday Gift, School Bag",
+       "rating": "4.9",
+       "numberOfReviews": "4515",
+       "shopName": "BabyShowerBasket",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Custom Toddler Backpack, Personalized Mini Kids Nursery Baby Backpacks Name Birthday Gift, School Bag",
+       "imageUrl": "https://i.etsystatic.com/10092049/r/il/025ead/7118610390/il_fullxfull.7118610390_6q8u.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4354110623/custom-toddler-backpack-personalized",
+       "shopUrl": "https://www.etsy.com/shop/BabyShowerBasket",
+       "price": {
+        "formattedPrice": "Rp 665,209",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4565893507",
+       "title": "Personalized Employee Tote Bag, Custom Name Work Tote, Embroidered Staff Tote, Employee Appreciation Gift, Corporate Team Gift, Office Gift",
+       "rating": "4.9",
+       "numberOfReviews": "298",
+       "shopName": "oOHelloWorld",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Personalized Employee Tote Bag, Custom Name Work Tote, Embroidered Staff Tote, Employee Appreciation Gift, Corporate Team Gift, Office Gift",
+       "imageUrl": "https://i.etsystatic.com/65953622/r/il/e51e25/8561066162/il_fullxfull.8561066162_4vyh.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4565893507/personalized-employee-tote-bag-custom",
+       "shopUrl": "https://www.etsy.com/shop/oOHelloWorld",
+       "price": {
+        "formattedPrice": "Rp 417,844",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4375781601",
+       "title": "Personalized Photo Flipbook Animation Box,Custom wooden Photo Book with Light,Custom Crank Photobox Picture Box ,Creative Anniversary gifts",
+       "rating": "4.7",
+       "numberOfReviews": "2223",
+       "shopName": "AlanArtGiftShop",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Personalized Photo Flipbook Animation Box,Custom wooden Photo Book with Light,Custom Crank Photobox Picture Box ,Creative Anniversary gifts",
+       "imageUrl": "https://i.etsystatic.com/58150735/r/il/592989/7277270649/il_fullxfull.7277270649_oqco.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4375781601/personalized-photo-flipbook-animation",
+       "shopUrl": "https://www.etsy.com/shop/AlanArtGiftShop",
+       "price": {
+        "formattedPrice": "Rp 997,000",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "1174953358",
+       "title": "1.49 CT 6.0 X 5.9 MM Natural Cushion Diamond, Salt and Pepper Cushion Shape Diamond, Full cut Cushion Diamond, For Cushion Ring R7991",
+       "rating": "4.8",
+       "numberOfReviews": "847",
+       "shopName": "DroomDiamond",
+       "badgeText": null,
+       "isStarSeller": false,
+       "imageAlt": "1.49 CT 6.0 X 5.9 MM Natural Cushion Diamond, Salt and Pepper Cushion Shape Diamond, Full cut Cushion Diamond, For Cushion Ring R7991",
+       "imageUrl": "https://i.etsystatic.com/19144698/r/il/fcb85e/3754517087/il_fullxfull.3754517087_ao3e.jpg",
+       "listingUrl": "https://www.etsy.com/listing/1174953358/149-ct-60-x-59-mm-natural-cushion",
+       "shopUrl": "https://www.etsy.com/shop/DroomDiamond",
+       "price": {
+        "formattedPrice": "Rp 19,197,719",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4564751013",
+       "title": "Custom embroidered sweatshirt with pet,personalized sweater with pet portrait,unique gift pet face,custom embroidery for animal lovers",
+       "rating": "4.8",
+       "numberOfReviews": "173",
+       "shopName": "LilyscreationsFinds",
+       "badgeText": "Bestseller",
+       "isStarSeller": false,
+       "imageAlt": "Custom embroidered sweatshirt with pet,personalized sweater with pet portrait,unique gift pet face,custom embroidery for animal lovers",
+       "imageUrl": "https://i.etsystatic.com/66687166/r/il/1ee4ef/8447257614/il_fullxfull.8447257614_e2az.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4564751013/custom-embroidered-sweatshirt-with",
+       "shopUrl": "https://www.etsy.com/shop/LilyscreationsFinds",
+       "price": {
+        "formattedPrice": "Rp 637,755",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4402089910",
+       "title": "Family Name Necklace with Heart, Multiple Hearts Necklace, Kids Names Jewelry for Mom",
+       "rating": "4.8",
+       "numberOfReviews": "2899",
+       "shopName": "SpecialArtJewelry",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Family Name Necklace with Heart, Multiple Hearts Necklace, Kids Names Jewelry for Mom",
+       "imageUrl": "https://i.etsystatic.com/54384097/r/il/b99836/7378393978/il_fullxfull.7378393978_odm6.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4402089910/family-name-necklace-with-heart-multiple",
+       "shopUrl": "https://www.etsy.com/shop/SpecialArtJewelry",
+       "price": {
+        "formattedPrice": "Rp 812,738",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4503053102",
+       "title": "Custom Family Portrait Illustration, Cartoon Portrait, Personalized Digital Drawing From Photo, Memorial Gift for Mom, Gift for her",
+       "rating": "4.9",
+       "numberOfReviews": "5749",
+       "shopName": "EditingStudio",
+       "badgeText": "Bestseller",
+       "isStarSeller": false,
+       "imageAlt": "Custom Family Portrait Illustration, Cartoon Portrait, Personalized Digital Drawing From Photo, Memorial Gift for Mom, Gift for her",
+       "imageUrl": "https://i.etsystatic.com/19470267/r/il/912c06/8007095196/il_fullxfull.8007095196_baxe.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4503053102/custom-family-portrait-illustration",
+       "shopUrl": "https://www.etsy.com/shop/EditingStudio",
+       "price": {
+        "formattedPrice": "Rp 350,380",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4528291055",
+       "title": "Personalized Birth Month Flower LED Compact Mirror, Custom Bridesmaid Proposal Mirror Box, Wedding Gift For Besties, Birthday Gift For Her",
+       "rating": "4.7",
+       "numberOfReviews": "223",
+       "shopName": "ForWhenYouMiss",
+       "badgeText": "Bestseller",
+       "isStarSeller": false,
+       "imageAlt": "Personalized Birth Month Flower LED Compact Mirror, Custom Bridesmaid Proposal Mirror Box, Wedding Gift For Besties, Birthday Gift For Her",
+       "imageUrl": "https://i.etsystatic.com/65584261/r/il/9e6446/8341306788/il_fullxfull.8341306788_gxo2.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4528291055/personalized-birth-month-flower-led",
+       "shopUrl": "https://www.etsy.com/shop/ForWhenYouMiss",
+       "price": {
+        "formattedPrice": "Rp 189,163",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "1890679624",
+       "title": "Personalized Wooden Name Puzzle with Shapes & Numbers • Custom Toddler Puzzle Gift • Montessori Learning Toy • Baby Keepsake",
+       "rating": "4.9",
+       "numberOfReviews": "30521",
+       "shopName": "Tyucustomgifts",
+       "badgeText": "Bestseller",
+       "isStarSeller": false,
+       "imageAlt": "Personalized Wooden Name Puzzle with Shapes & Numbers • Custom Toddler Puzzle Gift • Montessori Learning Toy • Baby Keepsake",
+       "imageUrl": "https://i.etsystatic.com/15428306/r/il/5e4aa5/8314171551/il_fullxfull.8314171551_ppo1.jpg",
+       "listingUrl": "https://www.etsy.com/listing/1890679624/personalized-wooden-name-puzzle-with",
+       "shopUrl": "https://www.etsy.com/shop/Tyucustomgifts",
+       "price": {
+        "formattedPrice": "Rp 969,582",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4541336864",
+       "title": "Personalized Engraved Makeup Mirror, Bridesmaid Compact mirror, Wedding Favours",
+       "rating": "4.8",
+       "numberOfReviews": "10890",
+       "shopName": "YogetGift",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Personalized Engraved Makeup Mirror, Bridesmaid Compact mirror, Wedding Favours",
+       "imageUrl": "https://i.etsystatic.com/10408927/r/il/cb45f8/8278302152/il_fullxfull.8278302152_4slg.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4541336864/personalized-engraved-makeup-mirror",
+       "shopUrl": "https://www.etsy.com/shop/YogetGift",
+       "price": {
+        "formattedPrice": "Rp 249,620",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "1558596395",
+       "title": "14K Diamond Bangle Bracelet, Heart Diamond Stacking Bracelet, Diamond and Gold Bracelet, Round Pave Diamond Bracelet Bangle, Birthday Gift",
+       "rating": "4.9",
+       "numberOfReviews": "42885",
+       "shopName": "FerkosFineJewelry",
+       "badgeText": null,
+       "isStarSeller": true,
+       "imageAlt": "14K Diamond Bangle Bracelet, Heart Diamond Stacking Bracelet, Diamond and Gold Bracelet, Round Pave Diamond Bracelet Bangle, Birthday Gift",
+       "imageUrl": "https://i.etsystatic.com/14533306/r/il/373bea/5474330600/il_fullxfull.5474330600_h6ay.jpg",
+       "listingUrl": "https://www.etsy.com/listing/1558596395/14k-diamond-bangle-bracelet-heart",
+       "shopUrl": "https://www.etsy.com/shop/FerkosFineJewelry",
+       "price": {
+        "formattedPrice": "Rp 75,760,456",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "4531495952",
+       "title": "Custom 14K Gold Name Necklace, Personalised Dainty Name Jewellery, Minimalist Necklace, Birthday Gift, Gift for Mom, Christmas Gift for Her",
+       "rating": "4.9",
+       "numberOfReviews": "292",
+       "shopName": "NikkiMinimalCo",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Custom 14K Gold Name Necklace, Personalised Dainty Name Jewellery, Minimalist Necklace, Birthday Gift, Gift for Mom, Christmas Gift for Her",
+       "imageUrl": "https://i.etsystatic.com/56244635/r/il/57d9c2/8251863689/il_fullxfull.8251863689_pbgj.jpg",
+       "listingUrl": "https://www.etsy.com/listing/4531495952/custom-14k-gold-name-necklace",
+       "shopUrl": "https://www.etsy.com/shop/NikkiMinimalCo",
+       "price": {
+        "formattedPrice": "Rp 458,163",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "1473401038",
+       "title": "Personalized Turkish Cotton Beach Towel: Striped Bachelorette Gift",
+       "rating": "4.9",
+       "numberOfReviews": "7534",
+       "shopName": "WeddingGiftTowels",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Personalized Turkish Cotton Beach Towel: Striped Bachelorette Gift",
+       "imageUrl": "https://i.etsystatic.com/43525486/r/il/ac185c/8428540464/il_fullxfull.8428540464_fn36.jpg",
+       "listingUrl": "https://www.etsy.com/listing/1473401038/personalized-turkish-cotton-beach-towel",
+       "shopUrl": "https://www.etsy.com/shop/WeddingGiftTowels",
+       "price": {
+        "formattedPrice": "Rp 190,114",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      },
+      {
+       "id": "1413455244",
+       "title": "Custom Name Necklace, 18K Gold Plated Name Necklace, Personalized Name Necklace, Cursive Name Jewelry, Birthday Gift, Christmas Gift for Her",
+       "rating": "4.9",
+       "numberOfReviews": "60155",
+       "shopName": "AnyaShopStudio",
+       "badgeText": "Bestseller",
+       "isStarSeller": true,
+       "imageAlt": "Custom Name Necklace, 18K Gold Plated Name Necklace, Personalized Name Necklace, Cursive Name Jewelry, Birthday Gift, Christmas Gift for Her",
+       "imageUrl": "https://i.etsystatic.com/34379934/r/il/628644/4796937795/il_fullxfull.4796937795_qnr6.jpg",
+       "listingUrl": "https://www.etsy.com/listing/1413455244/custom-name-necklace-18k-gold-plated",
+       "shopUrl": "https://www.etsy.com/shop/AnyaShopStudio",
+       "price": {
+        "formattedPrice": "Rp 509,694",
+        "formattedOriginalPrice": null,
+        "formattedDiscountText": null,
+        "isDiscounted": false
+       }
+      }
+     ]
+    },
+    "wowData": {
+     "value": 24.3,
+     "trendDirection": "up",
+     "displayText": "+24.3%",
+     "fromDate": "Nov 3",
+     "toDate": "Nov 9"
+    },
+    "competitivePriceData": {
+     "searchTermMedianPrice": {
+      "medianPriceLow": "US$7.20",
+      "medianPriceHigh": "US$8.80",
+      "medianPriceBarLow": "US$5",
+      "medianPriceBarLowFloat": 5.333333333333332,
+      "medianPriceBarHigh": "US$11",
+      "medianPriceBarHighFloat": 10.666666666666668,
+      "medianPriceBarPercent": 30
+     }
+    }
+   }
+  },
+  {
+   "url": "https://www.etsy.com/api/v3/ajax/shop/12345678/marketplace-insights/llm-exploratory-keywords/search/enqueue",
+   "status": 200,
+   "body": {
+    "runId": null,
+    "threadId": null,
+    "cachedData": {
+     "totalResultsCount": 130,
+     "resultsPerPage": 9,
+     "maxViewablePages": null,
+     "lookupFailed": false,
+     "results": [
+      {
+       "searchTerm": "personalized gifts",
+       "searchVolume": 113851,
+       "avgTotalListings": 1816694,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "personalized ornaments",
+       "searchVolume": 63484,
+       "avgTotalListings": 518821,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom ornament",
+       "searchVolume": 46908,
+       "avgTotalListings": 749728,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom pet portrait",
+       "searchVolume": 36578,
+       "avgTotalListings": 318400,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "personalized jewelry",
+       "searchVolume": 35291,
+       "avgTotalListings": 682677,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom mug",
+       "searchVolume": 20437,
+       "avgTotalListings": 557278,
+       "cvr": 3
+      },
+      {
+       "searchTerm": "personalized cutting board",
+       "searchVolume": 19951,
+       "avgTotalListings": 42740,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom keychain",
+       "searchVolume": 18188,
+       "avgTotalListings": 495601,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "personalized christmas gifts",
+       "searchVolume": 17337,
+       "avgTotalListings": 1922782,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "personalized christmas",
+       "searchVolume": 15826,
+       "avgTotalListings": 1201903,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "personalized home decor",
+       "searchVolume": 13943,
+       "avgTotalListings": 753525,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom name necklace",
+       "searchVolume": 12396,
+       "avgTotalListings": 192113,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom jewelry",
+       "searchVolume": 12145,
+       "avgTotalListings": 980238,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom cutting board",
+       "searchVolume": 12083,
+       "avgTotalListings": 55987,
+       "cvr": 3
+      },
+      {
+       "searchTerm": "custom baby blanket",
+       "searchVolume": 11815,
+       "avgTotalListings": 189534,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "personalized wedding gifts",
+       "searchVolume": 11286,
+       "avgTotalListings": 1728098,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom tote bag",
+       "searchVolume": 11044,
+       "avgTotalListings": 216876,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "personalized gifts for men",
+       "searchVolume": 9633,
+       "avgTotalListings": 1129630,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized stationery",
+       "searchVolume": 9515,
+       "avgTotalListings": 490749,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom ornaments",
+       "searchVolume": 9272,
+       "avgTotalListings": 1464613,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom baby gift",
+       "searchVolume": 8733,
+       "avgTotalListings": 1321599,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom pet gifts",
+       "searchVolume": 8599,
+       "avgTotalListings": 1543206,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom phone case",
+       "searchVolume": 8017,
+       "avgTotalListings": 255874,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom bobblehead",
+       "searchVolume": 7343,
+       "avgTotalListings": 27440,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom notebook",
+       "searchVolume": 7254,
+       "avgTotalListings": 140016,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom journal",
+       "searchVolume": 7157,
+       "avgTotalListings": 318292,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom baby gifts",
+       "searchVolume": 7027,
+       "avgTotalListings": 2049885,
+       "cvr": 3
+      },
+      {
+       "searchTerm": "personalized mugs",
+       "searchVolume": 6735,
+       "avgTotalListings": 498522,
+       "cvr": 3
+      },
+      {
+       "searchTerm": "custom dog tag",
+       "searchVolume": 6721,
+       "avgTotalListings": 133708,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "monogrammed gifts",
+       "searchVolume": 6013,
+       "avgTotalListings": 967240,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "engraved gifts",
+       "searchVolume": 6009,
+       "avgTotalListings": 2266261,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized clothing",
+       "searchVolume": 5506,
+       "avgTotalListings": 295974,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom wall art",
+       "searchVolume": 5171,
+       "avgTotalListings": 1191386,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom family portrait",
+       "searchVolume": 5065,
+       "avgTotalListings": 123079,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "engraved cutting board",
+       "searchVolume": 5043,
+       "avgTotalListings": 56880,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom star map",
+       "searchVolume": 4867,
+       "avgTotalListings": 19591,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized gifts for her",
+       "searchVolume": 4558,
+       "avgTotalListings": 1297340,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "personalized wall art",
+       "searchVolume": 4044,
+       "avgTotalListings": 650615,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom address stamp",
+       "searchVolume": 4025,
+       "avgTotalListings": 14186,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "custom doormat",
+       "searchVolume": 4001,
+       "avgTotalListings": 66829,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom baby onesie",
+       "searchVolume": 3841,
+       "avgTotalListings": 118395,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "custom photo album",
+       "searchVolume": 3831,
+       "avgTotalListings": 57546,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "personalized wedding",
+       "searchVolume": 3820,
+       "avgTotalListings": 1092659,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized water bottle",
+       "searchVolume": 3785,
+       "avgTotalListings": 145676,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "personalized decor",
+       "searchVolume": 3770,
+       "avgTotalListings": 1150533,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom name",
+       "searchVolume": 3632,
+       "avgTotalListings": 1373915,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom wedding sign",
+       "searchVolume": 3614,
+       "avgTotalListings": 355652,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom keychains",
+       "searchVolume": 3458,
+       "avgTotalListings": 594483,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom water bottle",
+       "searchVolume": 3447,
+       "avgTotalListings": 308772,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "personalized anniversary gift",
+       "searchVolume": 3442,
+       "avgTotalListings": 720137,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom photo gifts",
+       "searchVolume": 3243,
+       "avgTotalListings": 1415557,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom gifts for him",
+       "searchVolume": 2974,
+       "avgTotalListings": 983158,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom home decor",
+       "searchVolume": 2838,
+       "avgTotalListings": 1201370,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized gift box",
+       "searchVolume": 2686,
+       "avgTotalListings": 285669,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "engraved jewelry",
+       "searchVolume": 2623,
+       "avgTotalListings": 875395,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom anniversary gift",
+       "searchVolume": 2561,
+       "avgTotalListings": 999103,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "personalized photo frame",
+       "searchVolume": 2524,
+       "avgTotalListings": 95240,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom teacher gift",
+       "searchVolume": 2456,
+       "avgTotalListings": 273196,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom wedding gifts",
+       "searchVolume": 2437,
+       "avgTotalListings": 2086622,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom birthday",
+       "searchVolume": 2344,
+       "avgTotalListings": 1646636,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom wedding",
+       "searchVolume": 2257,
+       "avgTotalListings": 1563218,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "engraved coasters",
+       "searchVolume": 2240,
+       "avgTotalListings": 40791,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized keychains",
+       "searchVolume": 2004,
+       "avgTotalListings": 298194,
+       "cvr": 3
+      },
+      {
+       "searchTerm": "custom birthday gift",
+       "searchVolume": 1923,
+       "avgTotalListings": 1569084,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom engraved",
+       "searchVolume": 1806,
+       "avgTotalListings": 1569516,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom baby name",
+       "searchVolume": 1803,
+       "avgTotalListings": 633443,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "personalized wedding favors",
+       "searchVolume": 1793,
+       "avgTotalListings": 275074,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized journals",
+       "searchVolume": 1786,
+       "avgTotalListings": 241551,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "engraved watch",
+       "searchVolume": 1574,
+       "avgTotalListings": 37862,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "engraved wine glass",
+       "searchVolume": 1448,
+       "avgTotalListings": 44783,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "custom stationery",
+       "searchVolume": 1381,
+       "avgTotalListings": 1196290,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom bridesmaid gift",
+       "searchVolume": 1351,
+       "avgTotalListings": 203512,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "engraved gifts for men",
+       "searchVolume": 1311,
+       "avgTotalListings": 393315,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom gifts for her",
+       "searchVolume": 1250,
+       "avgTotalListings": 2206227,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom artwork",
+       "searchVolume": 1200,
+       "avgTotalListings": 1070830,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom keepsake box",
+       "searchVolume": 1100,
+       "avgTotalListings": 120017,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "engraved pens",
+       "searchVolume": 1040,
+       "avgTotalListings": 39593,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "personalized birthday",
+       "searchVolume": 1019,
+       "avgTotalListings": 2268296,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom keepsake",
+       "searchVolume": 973,
+       "avgTotalListings": 1036619,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "monogrammed blanket",
+       "searchVolume": 967,
+       "avgTotalListings": 64314,
+       "cvr": 3
+      },
+      {
+       "searchTerm": "custom leather goods",
+       "searchVolume": 926,
+       "avgTotalListings": 10795,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom apparel",
+       "searchVolume": 909,
+       "avgTotalListings": 1435452,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "monogrammed tote bag",
+       "searchVolume": 856,
+       "avgTotalListings": 54051,
+       "cvr": 3
+      },
+      {
+       "searchTerm": "personalized gifts for couples",
+       "searchVolume": 807,
+       "avgTotalListings": 665604,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom anniversary",
+       "searchVolume": 792,
+       "avgTotalListings": 1294509,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom made",
+       "searchVolume": 739,
+       "avgTotalListings": 868687,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "engraved wine glasses",
+       "searchVolume": 659,
+       "avgTotalListings": 45427,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "engraved flask",
+       "searchVolume": 658,
+       "avgTotalListings": 22342,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "custom holiday gift",
+       "searchVolume": 626,
+       "avgTotalListings": 1122798,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom nameplate",
+       "searchVolume": 572,
+       "avgTotalListings": 72931,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom gift ideas",
+       "searchVolume": 546,
+       "avgTotalListings": 1967349,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom phone cases",
+       "searchVolume": 538,
+       "avgTotalListings": 251656,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom baby shower gift",
+       "searchVolume": 527,
+       "avgTotalListings": 711723,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "monogrammed gifts for women",
+       "searchVolume": 518,
+       "avgTotalListings": 227796,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom housewarming gift",
+       "searchVolume": 515,
+       "avgTotalListings": 597846,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "monogrammed bags",
+       "searchVolume": 495,
+       "avgTotalListings": 156261,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "custom gift boxes",
+       "searchVolume": 473,
+       "avgTotalListings": 555528,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "engraved keepsake",
+       "searchVolume": 472,
+       "avgTotalListings": 466167,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom baby shower",
+       "searchVolume": 439,
+       "avgTotalListings": 1054899,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized accessories",
+       "searchVolume": 421,
+       "avgTotalListings": 1282760,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "engraved gifts for women",
+       "searchVolume": 401,
+       "avgTotalListings": 800423,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom graduation gift",
+       "searchVolume": 367,
+       "avgTotalListings": 340223,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized anniversary",
+       "searchVolume": 348,
+       "avgTotalListings": 579917,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom message",
+       "searchVolume": 323,
+       "avgTotalListings": 418667,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom soundwave art",
+       "searchVolume": 288,
+       "avgTotalListings": 6797,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "engraved bottle opener",
+       "searchVolume": 278,
+       "avgTotalListings": 19918,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "custom housewarming",
+       "searchVolume": 258,
+       "avgTotalListings": 1025316,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized baby shower",
+       "searchVolume": 250,
+       "avgTotalListings": 556764,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "engraved wedding",
+       "searchVolume": 189,
+       "avgTotalListings": 765201,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "engraved gifts for him",
+       "searchVolume": 180,
+       "avgTotalListings": 366598,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "custom baby shoes",
+       "searchVolume": 174,
+       "avgTotalListings": 22544,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized nameplate",
+       "searchVolume": 173,
+       "avgTotalListings": 70699,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "bespoke jewelry",
+       "searchVolume": 166,
+       "avgTotalListings": 48220,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "customized home decor",
+       "searchVolume": 162,
+       "avgTotalListings": 1796658,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "monogrammed stationery",
+       "searchVolume": 149,
+       "avgTotalListings": 84476,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "engraved watches",
+       "searchVolume": 132,
+       "avgTotalListings": 22049,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "bespoke gifts",
+       "searchVolume": 124,
+       "avgTotalListings": 185394,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom silhouette",
+       "searchVolume": 119,
+       "avgTotalListings": 575536,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "monogrammed items",
+       "searchVolume": 114,
+       "avgTotalListings": 14732,
+       "cvr": 1
+      },
+      {
+       "searchTerm": "engraved keepsakes",
+       "searchVolume": 52,
+       "avgTotalListings": 568232,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "personalized desk name",
+       "searchVolume": 42,
+       "avgTotalListings": 67035,
+       "cvr": 3
+      },
+      {
+       "searchTerm": "monogrammed clutch",
+       "searchVolume": 38,
+       "avgTotalListings": 12147,
+       "cvr": 3
+      },
+      {
+       "searchTerm": "engraved accessories",
+       "searchVolume": 33,
+       "avgTotalListings": 580944,
+       "cvr": 3
+      },
+      {
+       "searchTerm": "custom valentine",
+       "searchVolume": 25,
+       "avgTotalListings": 363475,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom groomsman gift",
+       "searchVolume": 22,
+       "avgTotalListings": 49378,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "customizable decor",
+       "searchVolume": 22,
+       "avgTotalListings": 1740115,
+       "cvr": 2
+      },
+      {
+       "searchTerm": "unique personalized",
+       "searchVolume": 11,
+       "avgTotalListings": 2169061,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "bespoke creations",
+       "searchVolume": 8,
+       "avgTotalListings": 7424,
+       "cvr": 0
+      },
+      {
+       "searchTerm": "custom return address label",
+       "searchVolume": 7,
+       "avgTotalListings": 24641,
+       "cvr": 4
+      },
+      {
+       "searchTerm": "custom coordinates jewelry",
+       "searchVolume": 6,
+       "avgTotalListings": 12079,
+       "cvr": 0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://www.etsy.com/api/v3/ajax/bespoke/shop/12345678/marketplace-insights/chart-series-data",
+   "status": 200,
+   "body": {
+    "days": 30,
+    "granularity": "day",
+    "isLastBucketPartial": false,
+    "series": [
+     {
+      "key": "search_volume:621818733672613332",
+      "label": "personalized",
+      "seriesType": "search_volume",
+      "searchTerm": "personalized",
+      "points": [
+       {
+        "timestamp": 1791676800,
+        "label": "Oct 11",
+        "value": 2117
+       },
+       {
+        "timestamp": 1791763200,
+        "label": "Oct 12",
+        "value": 2093
+       },
+       {
+        "timestamp": 1791849600,
+        "label": "Oct 13",
+        "value": 1950
+       },
+       {
+        "timestamp": 1791936000,
+        "label": "Oct 14",
+        "value": 1888
+       },
+       {
+        "timestamp": 1792022400,
+        "label": "Oct 15",
+        "value": 2275
+       },
+       {
+        "timestamp": 1792108800,
+        "label": "Oct 16",
+        "value": 1953
+       },
+       {
+        "timestamp": 1792195200,
+        "label": "Oct 17",
+        "value": 1929
+       },
+       {
+        "timestamp": 1792281600,
+        "label": "Oct 18",
+        "value": 2025
+       },
+       {
+        "timestamp": 1792368000,
+        "label": "Oct 19",
+        "value": 2415
+       },
+       {
+        "timestamp": 1792454400,
+        "label": "Oct 20",
+        "value": 2236
+       },
+       {
+        "timestamp": 1792540800,
+        "label": "Oct 21",
+        "value": 2476
+       },
+       {
+        "timestamp": 1792627200,
+        "label": "Oct 22",
+        "value": 2115
+       },
+       {
+        "timestamp": 1792713600,
+        "label": "Oct 23",
+        "value": 1885
+       },
+       {
+        "timestamp": 1792800000,
+        "label": "Oct 24",
+        "value": 1924
+       },
+       {
+        "timestamp": 1792886400,
+        "label": "Oct 25",
+        "value": 2087
+       },
+       {
+        "timestamp": 1792972800,
+        "label": "Oct 26",
+        "value": 2263
+       },
+       {
+        "timestamp": 1793059200,
+        "label": "Oct 27",
+        "value": 2016
+       },
+       {
+        "timestamp": 1793145600,
+        "label": "Oct 28",
+        "value": 2230
+       },
+       {
+        "timestamp": 1793232000,
+        "label": "Oct 29",
+        "value": 2108
+       },
+       {
+        "timestamp": 1793318400,
+        "label": "Oct 30",
+        "value": 1812
+       },
+       {
+        "timestamp": 1793404800,
+        "label": "Oct 31",
+        "value": 2238
+       },
+       {
+        "timestamp": 1793491200,
+        "label": "Nov 1",
+        "value": 2360
+       },
+       {
+        "timestamp": 1793577600,
+        "label": "Nov 2",
+        "value": 2459
+       },
+       {
+        "timestamp": 1793664000,
+        "label": "Nov 3",
+        "value": 2459
+       },
+       {
+        "timestamp": 1793750400,
+        "label": "Nov 4",
+        "value": 2230
+       },
+       {
+        "timestamp": 1793836800,
+        "label": "Nov 5",
+        "value": 2421
+       },
+       {
+        "timestamp": 1793923200,
+        "label": "Nov 6",
+        "value": 2795
+       },
+       {
+        "timestamp": 1794009600,
+        "label": "Nov 7",
+        "value": 2851
+       },
+       {
+        "timestamp": 1794096000,
+        "label": "Nov 8",
+        "value": 3079
+       },
+       {
+        "timestamp": 1794182400,
+        "label": "Nov 9",
+        "value": 3090
+       }
+      ]
+     },
+     {
+      "key": "trendline:621818733672613332",
+      "label": "personalized 7-day average",
+      "seriesType": "trendline",
+      "searchTerm": "personalized",
+      "points": [
+       {
+        "timestamp": 1791676800,
+        "label": "Oct 11",
+        "value": 2046
+       },
+       {
+        "timestamp": 1791763200,
+        "label": "Oct 12",
+        "value": 1985
+       },
+       {
+        "timestamp": 1791849600,
+        "label": "Oct 13",
+        "value": 1968
+       },
+       {
+        "timestamp": 1791936000,
+        "label": "Oct 14",
+        "value": 1962
+       },
+       {
+        "timestamp": 1792022400,
+        "label": "Oct 15",
+        "value": 2027
+       },
+       {
+        "timestamp": 1792108800,
+        "label": "Oct 16",
+        "value": 2048
+       },
+       {
+        "timestamp": 1792195200,
+        "label": "Oct 17",
+        "value": 2029
+       },
+       {
+        "timestamp": 1792281600,
+        "label": "Oct 18",
+        "value": 2016
+       },
+       {
+        "timestamp": 1792368000,
+        "label": "Oct 19",
+        "value": 2062
+       },
+       {
+        "timestamp": 1792454400,
+        "label": "Oct 20",
+        "value": 2103
+       },
+       {
+        "timestamp": 1792540800,
+        "label": "Oct 21",
+        "value": 2187
+       },
+       {
+        "timestamp": 1792627200,
+        "label": "Oct 22",
+        "value": 2164
+       },
+       {
+        "timestamp": 1792713600,
+        "label": "Oct 23",
+        "value": 2154
+       },
+       {
+        "timestamp": 1792800000,
+        "label": "Oct 24",
+        "value": 2154
+       },
+       {
+        "timestamp": 1792886400,
+        "label": "Oct 25",
+        "value": 2163
+       },
+       {
+        "timestamp": 1792972800,
+        "label": "Oct 26",
+        "value": 2141
+       },
+       {
+        "timestamp": 1793059200,
+        "label": "Oct 27",
+        "value": 2109
+       },
+       {
+        "timestamp": 1793145600,
+        "label": "Oct 28",
+        "value": 2074
+       },
+       {
+        "timestamp": 1793232000,
+        "label": "Oct 29",
+        "value": 2073
+       },
+       {
+        "timestamp": 1793318400,
+        "label": "Oct 30",
+        "value": 2063
+       },
+       {
+        "timestamp": 1793404800,
+        "label": "Oct 31",
+        "value": 2108
+       },
+       {
+        "timestamp": 1793491200,
+        "label": "Nov 1",
+        "value": 2147
+       },
+       {
+        "timestamp": 1793577600,
+        "label": "Nov 2",
+        "value": 2175
+       },
+       {
+        "timestamp": 1793664000,
+        "label": "Nov 3",
+        "value": 2238
+       },
+       {
+        "timestamp": 1793750400,
+        "label": "Nov 4",
+        "value": 2238
+       },
+       {
+        "timestamp": 1793836800,
+        "label": "Nov 5",
+        "value": 2283
+       },
+       {
+        "timestamp": 1793923200,
+        "label": "Nov 6",
+        "value": 2423
+       },
+       {
+        "timestamp": 1794009600,
+        "label": "Nov 7",
+        "value": 2511
+       },
+       {
+        "timestamp": 1794096000,
+        "label": "Nov 8",
+        "value": 2613
+       },
+       {
+        "timestamp": 1794182400,
+        "label": "Nov 9",
+        "value": 2704
+       }
+      ]
+     }
+    ],
+    "termSummaries": [
+     {
+      "searchTerm": "personalized",
+      "searchVolume": 67930,
+      "avgTotalListings": 2583504,
+      "wowData": {
+       "value": 24.3,
+       "trendDirection": "up",
+       "displayText": "+24.3%",
+       "fromDate": "Nov 3",
+       "toDate": "Nov 9"
+      }
+     }
+    ]
+   }
+  }
+ ],
+ "page_url": "https://www.etsy.com/your/shops/me/marketplace-insights/search?query=personalized&search_trigger=results_search_bar"
+}
