@@ -30,6 +30,10 @@ catalog.read) -> Sync now. Aplikasi hanya membaca dari Printify.
 
 Catalog: semua produk Printify per kategori, dengan tombol Research (memakai kuota harian biasa).
 
+Advisor (opsional): saran produk, tema, dan keyword dari Claude. Butuh API key dari
+console.anthropic.com (bayar sesuai pemakaian, sekitar US$0,40-0,80 per analisis; batas bulanan
+di Settings). Keyword usulan baru masuk antrean setelah Anda klik Add.
+
 Keluar: Settings -> Quit Etsy Insights (lakukan ini juga sebelum mengganti aplikasi).
 Data aplikasi: ~/Library/Application Support/Etsy Insights
 File Excel: Documents/Etsy Insights

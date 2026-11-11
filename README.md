@@ -140,7 +140,49 @@ pencarian dan filter (*Researched*, *Not researched yet*, *In my products*) untu
 Setelah itu, keyword di kategori itu mendapat kolom Product dan Margin di Opportunities. Data provider
 dan ongkir disimpan 30 hari, jadi membuka produk yang sama tidak meminta ke Printify lagi.
 
-## 5. Kalau sesi berhenti
+## 5. AI Advisor: saran produk, tema, dan keyword
+
+Menu **Advisor** meminta Claude (AI dari Anthropic) membaca data riset Anda dan katalog Printify, lalu
+memberi:
+
+- **Rekomendasi** produk dan tema. Rekomendasi yang didukung data diberi label *Backed by data*,
+  sedangkan yang hanya berupa ide diberi label *Idea*.
+- **Keyword ideas**: keyword baru yang layak diriset. Setiap usulan pasti mengandung jenis produk yang
+  ada di katalog Printify, dan belum pernah Anda riset atau antrekan.
+
+Angka di laporan (volume, konversi, kompetisi, margin) selalu diambil dari database aplikasi, bukan
+dari teks AI. AI tidak pernah membuka Chrome atau Etsy, dan tidak ada keyword yang masuk antrean tanpa
+klik **Add** atau **Add selected to queue** dari Anda. Setiap keyword yang ditambahkan memakai kuota
+harian biasa.
+
+**Menghubungkan Claude (sekali saja)**
+1. Buka **console.anthropic.com**, masuk ke **Settings → API Keys**, lalu buat key baru.
+2. Isi saldo di **Billing**. Pembayarannya sesuai pemakaian.
+3. Di Etsy Insights, buka **Advisor**, tempel key-nya, lalu klik **Save and test**. Pengujian ini
+   gratis. Key hanya disimpan di Mac ini (file `anthropic-key`) dan tidak pernah ditampilkan lagi.
+
+**Biaya**
+- Setiap **Get advice** memakai model Claude Opus 5.5 dan perkiraan biayanya US$0,40–0,80. Dari jumlah
+  itu, 5 pencarian web hanya sekitar US$0,05. Biaya sebenarnya tercatat di setiap laporan.
+- **Batas bulanan** ada di Settings → *Advisor monthly limit (USD)*, bawaannya US$10 (0 berarti tanpa
+  batas). Kalau batas tercapai, tombol Get advice terkunci sampai bulan berikutnya.
+- Sebagai pengaman kedua, pasang juga batas belanja di console Anthropic (Settings → Limits).
+- Membuka laporan lama di *Earlier reports* gratis.
+
+**Cara kerjanya (1–3 menit)**
+1. **Cek tren di web.** Claude melakukan paling banyak 5 pencarian web untuk momen belanja AS dalam
+   90 hari ke depan dan tema yang sedang naik. Yang dikirim ke langkah ini hanya tanggal, nama kategori
+   Printify, dan 20 keyword terbaik Anda. Sumbernya tampil di bagian *What's trending*.
+2. **Analisis.** Claude membaca ringkasan data riset Anda bersama catatan tren, lalu menulis laporan.
+
+**Data yang dikirim ke Anthropic:** keyword dan angkanya (volume, konversi, kompetisi, skor, tren),
+ringkasan selera pembeli (kisaran harga, kata yang sering muncul), kategori katalog Printify beserta
+biaya dan margin, serta daftar keyword yang sudah diriset atau sedang antre.
+
+**Yang tidak pernah dikirim:** token Printify, login atau cookie Etsy, nama toko pesaing, tautan
+listing, dan isi rekaman.
+
+## 6. Kalau sesi berhenti
 
 | Pesan | Artinya | Yang perlu dilakukan |
 |---|---|---|
@@ -155,15 +197,15 @@ dan ongkir disimpan 30 hari, jadi membuka produk yang sama tidak meminta ke Prin
 Cooldown **bisa** dilewati lewat tautan *Ignore cooldown* (Anda harus mengetik `YES`), tetapi
 itu **tidak disarankan**.
 
-## 6. Letak data
+## 7. Letak data
 
 - **Data aplikasi:** `~/Library/Application Support/Etsy Insights/` (database, `keywords.txt`,
-  `config.toml`, log, rekaman).
+  `config.toml`, log, rekaman, API key Anthropic).
 - **Memperbarui aplikasi:** klik **Quit Etsy Insights** di Settings dulu, lalu ganti file .app-nya.
   Data tetap aman.
 - **File Excel:** *Documents → Etsy Insights* (`opportunities-TANGGAL.xlsx`).
 
-## 7. Cadangan lewat Terminal
+## 8. Cadangan lewat Terminal
 
 Perintah Terminal tetap ada lewat aplikasinya. Perintah ini memakai data yang sama dengan aplikasi
 (bukan data di folder lama):
@@ -174,7 +216,7 @@ Perintah Terminal tetap ada lewat aplikasinya. Perintah ini memakai data yang sa
 
 Perintah lain: `--cli run`, `--cli status`, `--cli export`, `--cli kenali` (mode rekam).
 
-## 8. Risiko yang perlu Anda ketahui
+## 9. Risiko yang perlu Anda ketahui
 
 - **Ketentuan Etsy melarang akses otomatis.** Desain alat ini menekan risikonya: pelan, volume kecil,
   Chrome asli dari IP Anda sendiri, dan langsung berhenti saat ada tanda bahaya. Tetapi risikonya
