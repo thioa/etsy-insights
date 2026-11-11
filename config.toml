@@ -1,0 +1,47 @@
+# Pengaturan Etsy Insights. Hapus sebuah baris untuk memakai nilai default.
+# Angka yang melewati batas keras otomatis dikoreksi (dan diberi peringatan).
+
+# Jumlah keyword yang dicek per hari (tanggal Mac). Batas keras: maks 100.
+kuota_harian = 50
+
+# Lama maksimal satu sesi, termasuk jeda dan istirahat. Batas keras: maks 60.
+durasi_sesi_menit = 45
+
+# Jeda acak antar-keyword dalam detik [min, maks]. Batas keras: min tidak di bawah 15.
+jeda_antar_keyword_detik = [20, 60]
+
+# Setelah sekian keyword [min, maks], ambil istirahat panjang.
+istirahat_setiap = [8, 12]
+
+# Lama istirahat panjang dalam detik [min, maks].
+istirahat_detik = [120, 300]
+
+# Jeda antar-huruf saat mengetik dalam milidetik [min, maks]. Batas keras: min tidak di bawah 40.
+kecepatan_ketik_ms = [60, 180]
+
+# Lama "membaca" hasil dalam detik [min, maks]. Batas keras: min tidak di bawah 3.
+waktu_baca_detik = [5, 15]
+
+# Berapa keyword terkait yang dimasukkan ke antrean dari setiap keyword.
+keyword_terkait_maks = 10
+
+# Seberapa jauh menelusuri keyword terkait dari keyword Anda. Batas keras: maks 3.
+kedalaman_maks = 2
+
+# Keyword yang sudah dicek baru dicek ulang setelah sekian hari. Batas keras: min 7.
+cek_ulang_setelah_hari = 30
+
+# Lama berhenti setelah CAPTCHA/verifikasi/403/429, dalam jam. Batas keras: min 12.
+pendinginan_jam = 24
+
+# Keyword dengan volume pencarian di bawah angka ini tidak masuk ranking.
+volume_minimum = 100
+
+# Port koneksi ke Chrome "Etsy Riset". Ubah hanya jika port ini dipakai program lain.
+port_debug = 9222
+
+# Bobot skor peluang. Otomatis dinormalisasi sehingga totalnya 1.
+[bobot]
+volume = 0.40
+conversion = 0.35
+kompetisi = 0.25
