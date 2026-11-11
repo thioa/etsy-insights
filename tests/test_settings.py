@@ -27,3 +27,14 @@ def test_save_rejects_out_of_range_without_writing(tmp_path):
     assert cfg is None and not (tmp_path / "config.toml").exists()
     assert set(errors) == {"kuota_harian", "jeda_min", "jeda_max", "durasi_sesi_menit", "bobot_volume"}
     assert "1 to 30" in errors["kuota_harian"]
+
+
+def test_selling_fields_saved_and_validated(tmp_path):
+    form = settings_form(Config()) | {"fee_etsy_persen": "6.5", "fee_etsy_tetap_usd": "0.25", "margin_minimum_usd": "4"}
+    cfg, errors = save_settings(tmp_path, form)
+    assert errors == {} and (cfg.fee_etsy_persen, cfg.fee_etsy_tetap_usd, cfg.margin_minimum_usd) == (6.5, 0.25, 4.0)
+    bad = form | {"fee_etsy_persen": "31", "fee_etsy_tetap_usd": "x", "margin_minimum_usd": "101"}
+    cfg, errors = save_settings(tmp_path, bad)
+    assert cfg is None and errors == {"fee_etsy_persen": "Enter a percentage from 0 to 30.",
+                                      "fee_etsy_tetap_usd": "Enter an amount from 0 to 5.",
+                                      "margin_minimum_usd": "Enter an amount from 0 to 100."}

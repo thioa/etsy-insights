@@ -30,6 +30,9 @@ class Config:
     bobot: tuple[float, float, float] = (0.40, 0.35, 0.25)  # volume, conversion, kompetisi
     port_debug: int = 9222
     port_web: int = 8765
+    fee_etsy_persen: float = 9.5  # % dari harga jual
+    fee_etsy_tetap_usd: float = 0.45  # per penjualan
+    margin_minimum_usd: float = 5.0  # batas Ready to sell
 
 
 # Batas keras: (minimum, maksimum). Untuk rentang, minimum berlaku pada batas bawah.
@@ -47,7 +50,9 @@ HARD_LIMITS: dict[str, tuple[float | None, float | None]] = {
 _INT_KEYS = {"kuota_harian", "durasi_sesi_menit", "keyword_terkait_maks", "kedalaman_maks",
              "cek_ulang_setelah_hari", "pendinginan_jam", "volume_minimum", "port_debug", "port_web"}
 # Nilai di luar rentang ini tidak dibatasi, tetapi diganti default (port yang salah tidak bisa "dibulatkan").
-_RANGE_OR_DEFAULT = {"port_web": (1024, 65535)}
+_RANGE_OR_DEFAULT = {"port_web": (1024, 65535), "fee_etsy_persen": (0, 30), "fee_etsy_tetap_usd": (0, 5),
+                     "margin_minimum_usd": (0, 100)}
+_FLOAT_KEYS = {"fee_etsy_persen", "fee_etsy_tetap_usd", "margin_minimum_usd"}
 _RANGE_KEYS = {"jeda_antar_keyword_detik", "istirahat_setiap", "istirahat_detik",
                "kecepatan_ketik_ms", "waktu_baca_detik"}
 _INT_RANGE_KEYS = {"istirahat_setiap"}
@@ -60,13 +65,16 @@ def _is_number(value: Any) -> bool:
 
 def _parse_scalar(key: str, value: Any, default: int, warnings: list[str]) -> int:
     if not _is_number(value) or value < 0 or (key in _INT_KEYS and value != int(value)):
-        warnings.append(f"{key}: value '{value}' is not valid (must be a whole number of 0 or more), using default {default}.")
+        kind = "a whole number" if key in _INT_KEYS else "a number"
+        warnings.append(f"{key}: value '{value}' is not valid (must be {kind} of 0 or more), using default {default}.")
         return default
     if key in _RANGE_OR_DEFAULT:
         low, high = _RANGE_OR_DEFAULT[key]
         if not low <= value <= high:
             warnings.append(f"{key}: {value} must be from {low} to {high}, using default {default}.")
             return default
+    if key in _FLOAT_KEYS:
+        return float(value)
     lo, hi = HARD_LIMITS.get(key, (None, None))
     result = int(value)
     if hi is not None and result > hi:

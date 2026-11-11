@@ -9,7 +9,14 @@ from pathlib import Path
 from .config import Config, load_config
 
 FORM_FIELDS = ("kuota_harian", "jeda_min", "jeda_max", "durasi_sesi_menit",
-               "bobot_volume", "bobot_conversion", "bobot_kompetisi")
+               "bobot_volume", "bobot_conversion", "bobot_kompetisi",
+               "fee_etsy_persen", "fee_etsy_tetap_usd", "margin_minimum_usd")
+# (batas bawah, batas atas, pesan error) untuk isian "Selling on Etsy"
+SELLING_FIELDS = {
+    "fee_etsy_persen": (0, 30, "Enter a percentage from 0 to 30."),
+    "fee_etsy_tetap_usd": (0, 5, "Enter an amount from 0 to 5."),
+    "margin_minimum_usd": (0, 100, "Enter an amount from 0 to 100."),
+}
 FILE_NAME = "config.toml"
 MAX_PAUSE = 600
 
@@ -72,6 +79,15 @@ port_debug = {cfg.port_debug}
 # Port for the Etsy Insights app in your browser (http://127.0.0.1:PORT).
 port_web = {cfg.port_web}
 
+# Etsy fees as a percentage of the sale price (transaction + payment processing). Check your Shop Manager.
+fee_etsy_persen = {_num(cfg.fee_etsy_persen)}
+
+# Fixed Etsy fees per sale in US$ (payment processing + listing fee).
+fee_etsy_tetap_usd = {_num(cfg.fee_etsy_tetap_usd)}
+
+# A keyword is "Ready to sell" when the estimated margin per sale is at least this many US$.
+margin_minimum_usd = {_num(cfg.margin_minimum_usd)}
+
 # Score weights. They are normalized automatically so they add up to 1.
 [bobot]
 volume = {_num(volume)}
@@ -90,6 +106,9 @@ def settings_form(cfg: Config) -> dict[str, str]:
         "bobot_volume": _num(volume),
         "bobot_conversion": _num(conversion),
         "bobot_kompetisi": _num(competition),
+        "fee_etsy_persen": _num(cfg.fee_etsy_persen),
+        "fee_etsy_tetap_usd": _num(cfg.fee_etsy_tetap_usd),
+        "margin_minimum_usd": _num(cfg.margin_minimum_usd),
     }
 
 
@@ -132,6 +151,14 @@ def save_settings(home: Path, form: Mapping[str, str]) -> tuple[Config | None, d
         weights.append(weight)
     if "bobot_volume" not in errors and all(w is not None and w >= 0 for w in weights) and sum(weights) <= 0:
         errors["bobot_volume"] = "At least one weight must be above 0."
+    selling = {}
+    for name, (low, high, message) in SELLING_FIELDS.items():
+        if name not in form:  # formulir lama tanpa bagian "Selling on Etsy": nilai sekarang tetap
+            continue
+        value = _number(form.get(name))
+        if value is None or not low <= value <= high:
+            errors[name] = message
+        selling[name] = value
     if errors:
         return None, errors
 
@@ -139,7 +166,7 @@ def save_settings(home: Path, form: Mapping[str, str]) -> tuple[Config | None, d
     current, _ = load_config(path)
     total = sum(weights)
     updated = replace(current, kuota_harian=quota, jeda_antar_keyword_detik=(pause_min, pause_max),
-                      durasi_sesi_menit=duration, bobot=tuple(w / total for w in weights))
+                      durasi_sesi_menit=duration, bobot=tuple(w / total for w in weights), **selling)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(render_config(updated), encoding="utf-8")
     saved, _ = load_config(path)

@@ -43,6 +43,15 @@ port_debug = 9222
 # Port for the Etsy Insights app in your browser (http://127.0.0.1:PORT).
 port_web = 8765
 
+# Etsy fees as a percentage of the sale price (transaction + payment processing). Check your Shop Manager.
+fee_etsy_persen = 9.5
+
+# Fixed Etsy fees per sale in US$ (payment processing + listing fee).
+fee_etsy_tetap_usd = 0.45
+
+# A keyword is "Ready to sell" when the estimated margin per sale is at least this many US$.
+margin_minimum_usd = 5
+
 # Score weights. They are normalized automatically so they add up to 1.
 [bobot]
 volume = 0.4

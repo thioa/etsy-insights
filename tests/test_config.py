@@ -105,3 +105,13 @@ def test_port_web_default_and_limits(tmp_path):
     assert Config().port_web == 8765
     cfg, warnings = load_config(write(tmp_path, "port_web = 80\n"))
     assert cfg.port_web == 8765 and any("port_web" in w for w in warnings)
+
+
+def test_selling_defaults_and_limits(tmp_path):
+    cfg = Config()
+    assert (cfg.fee_etsy_persen, cfg.fee_etsy_tetap_usd, cfg.margin_minimum_usd) == (9.5, 0.45, 5.0)
+    path = tmp_path / "config.toml"
+    path.write_text("fee_etsy_persen = 45\nfee_etsy_tetap_usd = 0.3\nmargin_minimum_usd = 7.5\n")
+    cfg, warnings = load_config(path)
+    assert (cfg.fee_etsy_persen, cfg.fee_etsy_tetap_usd, cfg.margin_minimum_usd) == (9.5, 0.3, 7.5)
+    assert any("fee_etsy_persen" in w for w in warnings)
