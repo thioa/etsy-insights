@@ -209,3 +209,30 @@ def test_failed_harvested_keyword_returns_to_harvested():
     clock, store, page = setup("a", outcomes={"x": "parse_error"}, related={"a": (("x", 5000, 50, 4),)})
     run_session(make_deps(store, page, clock), max_keywords=2)
     assert (store.get("x").status, store.get("x").fail_count) == ("harvested", 1)
+
+
+def test_unreadable_danger_check_stops_with_cooldown():
+    clock, store, page = setup("a", "b", outcomes={"a": "check_error"})
+    s = run_session(make_deps(store, page, clock))
+    assert s.stop_reason is StopReason.DANGER and s.cooldown_until is not None
+    assert (store.get("a").status, store.get("a").fail_count) == ("pending", 0)
+
+
+def test_browser_closed_during_dwell():
+    clock, store, page = setup("a", "b", outcomes={"a": "closed_on_dwell"})
+    s = run_session(make_deps(store, page, clock))
+    assert s.stop_reason is StopReason.BROWSER_CLOSED and store.get("a").status == "done"
+
+
+def test_browser_closed_during_post_open_check():
+    clock, store, page = setup("a", close_on_open_check=True)
+    s = run_session(make_deps(store, page, clock))
+    assert s.stop_reason is StopReason.BROWSER_CLOSED and s.checked == 0
+
+
+def test_etsy_quota_without_stats_returns_keyword_and_blocks_day():
+    clock, store, page = setup("a", "b", outcomes={"a": "quota_blocked"})
+    s = run_session(make_deps(store, page, clock))
+    assert s.stop_reason is StopReason.ETSY_QUOTA
+    assert (store.get("a").status, store.get("a").fail_count) == ("pending", 0)
+    assert run_session(make_deps(store, FakePage(clock), clock)).stop_reason is StopReason.ETSY_QUOTA

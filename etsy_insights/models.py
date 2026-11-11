@@ -114,6 +114,14 @@ class ParseError(Exception):
     """Data halaman tidak bisa dibaca."""
 
 
+class EtsyQuotaReached(Exception):
+    """Etsy menandai kuota Marketplace Insights habis (respons tanpa data utama)."""
+
+    def __init__(self, quota: EtsyQuota) -> None:
+        super().__init__("Kuota Marketplace Insights habis")
+        self.quota = quota
+
+
 class InsightsPage(Protocol):
     def open(self) -> None: ...  # bisa raise NotLoggedIn
 

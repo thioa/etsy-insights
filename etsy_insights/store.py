@@ -114,6 +114,8 @@ class Store:
         for name, ddl in _MIGRATIONS:
             if name not in existing:
                 self._db.execute(f"ALTER TABLE results ADD COLUMN {name} {ddl}")
+        # Tanpa indeks ini, "hasil terbaru per keyword" memindai seluruh tabel untuk setiap baris.
+        self._db.execute("CREATE INDEX IF NOT EXISTS idx_results_keyword ON results(keyword_id, checked_at, id)")
 
     def close(self) -> None:
         self._db.close()
@@ -270,7 +272,9 @@ class Store:
                          checked_at=_dt(row["checked_at"]), metrics=metrics, kind=row["kind"])
 
     _RESULT_SELECT = """
-        SELECT r.*, k.keyword, k.source, k.depth, k.status, p.keyword AS parent_keyword
+        SELECT r.id, r.keyword_id, r.checked_at, r.has_data, r.search_volume, r.conversion_rate,
+               r.competition_value, r.competition_kind, r.trend_json, r.related_json, r.kind,
+               r.conversion_level, r.wow_pct, k.keyword, k.source, k.depth, k.status, p.keyword AS parent_keyword
         FROM results r JOIN keywords k ON r.keyword_id = k.id LEFT JOIN keywords p ON k.parent_id = p.id
     """
 

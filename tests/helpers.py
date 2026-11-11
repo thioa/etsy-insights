@@ -43,7 +43,8 @@ import random  # noqa: E402
 
 from etsy_insights.config import Config  # noqa: E402
 from etsy_insights.models import (  # noqa: E402
-    BrowserClosed, CapturedResponse, DangerSignal, EtsyQuota, PageLoadTimeout, ParsedSearch, ParseError)
+    BrowserClosed, CapturedResponse, DangerSignal, EtsyQuota, EtsyQuotaReached, PageLoadTimeout, ParsedSearch,
+    ParseError)
 
 
 class FakeClock:
@@ -66,7 +67,9 @@ class FakeClock:
 
 
 class FakePage:
-    def __init__(self, clock, outcomes=None, related=None, danger_on_open=None, open_error=None):
+    def __init__(self, clock, outcomes=None, related=None, danger_on_open=None, open_error=None,
+                 close_on_open_check=False):
+        self.close_on_open_check = close_on_open_check
         self.clock = clock
         self.outcomes = outcomes or {}
         self.related = related or {}
@@ -103,11 +106,17 @@ class FakePage:
         return RawResult(keyword, INSIGHTS, (CapturedResponse("https://www.etsy.com/x", 200, body),), "")
 
     def check_danger(self):
+        if not self.searched and self.close_on_open_check:
+            raise BrowserClosed()
         if self.searched and self.outcomes.get(self.searched[-1]) == "closed_on_check":
             raise BrowserClosed()
+        if self.searched and self.outcomes.get(self.searched[-1]) == "check_error":
+            raise PageLoadTimeout("Execution context was destroyed")
         return self._danger
 
     def dwell(self, seconds, scroll):
+        if self.searched and self.outcomes.get(self.searched[-1]) == "closed_on_dwell":
+            raise BrowserClosed()
         self.dwells.append((seconds, scroll))
         self.clock.advance(seconds)
 
@@ -119,6 +128,8 @@ def fake_parse(raw):
         raise ParseError("tidak terbaca")
     if outcome == "parse_crash":
         return {}["field_hilang"]
+    if outcome == "quota_blocked":
+        raise EtsyQuotaReached(EtsyQuota(15, 0, 5, True, False))
     related = tuple(RelatedKeyword(*t) for t in body["related"])
     main = KeywordMetrics(has_data=False) if outcome == "no_data" else \
         make_metrics(related=[r.keyword for r in related])

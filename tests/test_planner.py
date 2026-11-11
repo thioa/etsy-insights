@@ -40,3 +40,17 @@ def test_upcoming_lists_user_then_ranked_harvested():
     s.sync_user_keywords(["b", "c"], T0)
     assert [q.keyword for q in upcoming(s, Config())] == ["b", "c", "x", "y"]
     assert [q.keyword for q in upcoming(s, Config(), limit=3)] == ["b", "c", "x"]
+
+
+def test_select_next_scales_with_many_harvested_rows():
+    import time
+    s = Store(":memory:")
+    users = [f"u{i}" for i in range(40)]
+    s.sync_user_keywords(users, T0)
+    for i, user in enumerate(users):
+        s.save_result(s.get(user).id, make_metrics(), make_raw(user), T0, "t")
+        s.save_harvest(s.get(user).id, [make_related(f"k{i}-{j}", 100 + j, 1000 + j, j % 5) for j in range(200)],
+                       200, 2, T0)
+    started = time.perf_counter()
+    assert select_next(s, Config(), T0) is not None
+    assert time.perf_counter() - started < 1.0

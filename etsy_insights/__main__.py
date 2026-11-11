@@ -40,6 +40,8 @@ def _open_store(base: Path, now: datetime) -> Store:
 def _reason_text(code: str | None) -> str:
     if code is None:
         return "belum selesai"
+    if code == "error":
+        return "Sesi berhenti karena kesalahan tak terduga. Lihat log di folder logs/."
     try:
         return REASON_TEXT[StopReason(code)]
     except ValueError:
@@ -79,7 +81,11 @@ def interrupt_on_signals() -> Iterator[None]:
 def _open_insights(cfg: Config, pacer: Pacer, rng: random.Random, log) -> Iterator[InsightsPage]:
     endpoint = ensure_chrome(cfg.port_debug)
     with connected_browser(endpoint) as context:
-        yield EtsyInsightsPage(context, pacer, rng, log=log)
+        page = EtsyInsightsPage(context, pacer, rng, log=log)
+        try:
+            yield page
+        finally:
+            page.close()
 
 
 def _status(base: Path, cfg: Config, now: datetime) -> int:

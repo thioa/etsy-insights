@@ -5,8 +5,8 @@ from collections.abc import Sequence
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
-from .models import (CapturedResponse, EtsyQuota, KeywordMetrics, ParsedSearch, ParseError, RawResult,
-                     RelatedKeyword)
+from .models import (CapturedResponse, EtsyQuota, EtsyQuotaReached, KeywordMetrics, ParsedSearch, ParseError,
+                     RawResult, RelatedKeyword)
 from .store import normalize_keyword
 
 PARSER_VERSION = "1"
@@ -30,13 +30,25 @@ def _int(value: Any) -> int | None:
     return int(number) if number is not None else None
 
 
-def is_results_for(resp: CapturedResponse, keyword: str) -> bool:
-    if not _path(resp.url).endswith(RESULTS_PATH) or resp.status != 200:
-        return False
-    if not isinstance(resp.body, dict) or not isinstance(resp.body.get("stats"), dict):
+def _is_results_response(resp: CapturedResponse, keyword: str) -> bool:
+    if not _path(resp.url).endswith(RESULTS_PATH) or resp.status != 200 or not isinstance(resp.body, dict):
         return False
     query = parse_qs(urlparse(resp.url).query).get("query", [""])[0]
     return normalize_keyword(query) == normalize_keyword(keyword)
+
+
+def is_results_for(resp: CapturedResponse, keyword: str) -> bool:
+    return _is_results_response(resp, keyword) and isinstance(resp.body.get("stats"), dict)
+
+
+def blocked_quota(responses: Sequence[CapturedResponse], keyword: str) -> EtsyQuota | None:
+    """Kuota habis yang dilaporkan Etsy di respons results-data tanpa data utama."""
+    for resp in reversed(responses):
+        if _is_results_response(resp, keyword) and not isinstance(resp.body.get("stats"), dict):
+            quota = _quota(resp.body)
+            if quota is not None and quota.exhausted:
+                return quota
+    return None
 
 
 def related_rows_for(responses: Sequence[CapturedResponse], keyword: str) -> list[dict] | None:
@@ -80,6 +92,9 @@ def _quota(body: dict) -> EtsyQuota | None:
 def parse_search(raw: RawResult) -> ParsedSearch:
     results = [r for r in raw.responses if is_results_for(r, raw.keyword)]
     if not results:
+        quota = blocked_quota(raw.responses, raw.keyword)
+        if quota is not None:
+            raise EtsyQuotaReached(quota)
         raise ParseError(f"Data utama untuk '{raw.keyword}' tidak ditemukan.")
     body = results[-1].body
     stats = body["stats"]

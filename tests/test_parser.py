@@ -75,3 +75,16 @@ def test_missing_or_other_keyword_raises_parse_error():
 
 def test_related_rows_none_without_lists():
     assert related_rows_for((), "x") is None
+
+
+def test_quota_flags_without_stats_raise_quota_reached():
+    from etsy_insights.models import EtsyQuotaReached
+    from etsy_insights.parser import blocked_quota
+    url = ("https://www.etsy.com/api/v3/ajax/bespoke/shop/12345678/marketplace-insights/results-data"
+           "?query=mug&search_term_hash=&search_trigger=results_search_bar")
+    body = {"isQuotaReached": True, "isSearchAllowed": False,
+            "quotaData": {"totalQuota": 15, "remainingQuota": 0, "lowRemainingQuotaThreshold": 5}}
+    raw = RawResult("mug", "https://www.etsy.com/x", (CapturedResponse(url, 200, body),), "")
+    assert blocked_quota(raw.responses, "mug").reached and blocked_quota(raw.responses, "cup") is None
+    with pytest.raises(EtsyQuotaReached):
+        parse_search(raw)

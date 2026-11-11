@@ -10,7 +10,10 @@ volume, jumlah pesaing, dan level konversinya. Karena itu cukup 15 pencarian per
 ## 1. Pemasangan (sekali saja)
 
 1. Unzip, lalu pindahkan folder `etsy-insights` ke tempat yang mudah ditemukan.
-   Kalau sudah punya folder versi lama, timpa saja file-filenya. Data di `data/` tetap aman.
+   **Kalau sudah punya folder versi lama:** salin dulu `keywords.txt`, `config.toml`, folder `data/`,
+   dan folder `rekaman/` dari folder lama ke folder baru. Setelah itu folder lama boleh dihapus.
+   Jangan menimpa folder lama dengan isi zip, karena `keywords.txt` dan `config.toml` Anda akan
+   kembali ke isi bawaan.
 2. Buka **Terminal**, lalu masuk ke folder itu, misalnya:
    ```bash
    cd ~/Downloads/etsy-insights

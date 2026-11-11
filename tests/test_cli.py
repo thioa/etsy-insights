@@ -146,3 +146,14 @@ def test_cli_export_includes_selera(tmp_path, capsys):
     assert main(["export"], base_dir=base, now=lambda: T0) == 0
     sel = load_workbook(tmp_path / "hasil" / "peluang-2026-11-11.xlsx")["Selera"]
     assert sel.cell(3, 1).value == "sweatshirt"
+
+
+def test_cli_status_error_reason_is_readable(tmp_path, capsys):
+    from etsy_insights.store import Store
+    base = project(tmp_path)
+    s = Store(base / "data" / "etsy.db")
+    sid = s.start_session(T0)
+    s.end_session(sid, T0, "error", None)
+    s.close()
+    assert main(["status"], base_dir=base, now=lambda: T0) == 0
+    assert "kesalahan tak terduga" in capsys.readouterr().out

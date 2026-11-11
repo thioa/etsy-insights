@@ -16,7 +16,7 @@ from playwright.sync_api import TimeoutError as PlaywrightTimeout
 
 from .models import BrowserClosed, CapturedResponse, DangerSignal, NotLoggedIn, PageLoadTimeout, RawResult
 from .pacer import Pacer
-from .parser import is_results_for, related_rows_for
+from .parser import blocked_quota, is_results_for, related_rows_for
 
 DASHBOARD_URL = "https://www.etsy.com/your/shops/me/dashboard"
 INSIGHTS_URL = "https://www.etsy.com/your/shops/me/marketplace-insights"
@@ -28,15 +28,26 @@ VERIFY_TEXTS = ("verify you are a human", "verify you're a human", "unusual acti
                 "press & hold")
 _DANGER_RESOURCE_TYPES = ("document", "xhr", "fetch")
 _POLL_MS = 250
+_CHECK_ATTEMPTS = 3
+
+
+def _without_query(url: str) -> str:
+    """Host + path saja: query berisi keyword (mis. "book signing") dan tidak boleh memicu tanda bahaya."""
+    parts = urlparse(url)
+    return f"{parts.netloc}{parts.path}".lower()
+
+
+def is_login_url(url: str) -> bool:
+    path = urlparse(url).path.lower()
+    return "/signin" in path or "/login" in path
 
 
 def detect_danger(url: str, frame_urls: Sequence[str], body_text: str,
                   http_statuses: Sequence[int]) -> DangerSignal | None:
-    lowered_url = url.lower()
-    if "/signin" in lowered_url or "/login" in lowered_url:
+    if is_login_url(url):
         return DangerSignal("login", url)
     for candidate in (url, *frame_urls):
-        if any(marker in candidate.lower() for marker in CAPTCHA_MARKERS):
+        if any(marker in _without_query(candidate) for marker in CAPTCHA_MARKERS):
             return DangerSignal("captcha", candidate)
     text = body_text.lower()
     for phrase in VERIFY_TEXTS:
@@ -115,14 +126,30 @@ class EtsyInsightsPage:
         except Exception:  # respons yang sudah hilang diabaikan
             pass
 
+    def close(self) -> None:
+        """Lepas pendengar respons dari context (Chrome tetap terbuka)."""
+        try:
+            self._context.remove_listener("response", self._on_response)
+        except Exception:
+            pass
+
     # --- InsightsPage ----------------------------------------------------------
+    def _blocked_now(self) -> bool:
+        """Tanda bahaya yang sudah terlihat tanpa membaca isi halaman (status HTTP / URL)."""
+        page = self._page
+        frame_urls = [frame.url for frame in page.frames]
+        return bool(self._http_statuses) or detect_danger(page.url, frame_urls, "", ()) is not None
+
     def open(self) -> None:
         self._http_statuses.clear()
         with _translate_errors():
             page = self._page = self._context.new_page()
             page.goto(self._dashboard_url, wait_until="domcontentloaded")
-            if "signin" in page.url:
+            if is_login_url(page.url):
                 raise NotLoggedIn("Chrome 'Etsy Riset' belum login ke Etsy.")
+            if self._blocked_now():
+                self._log("Etsy menampilkan tanda bahaya di dashboard; tidak melanjutkan.")
+                return
             page.wait_for_timeout(self._rng.uniform(*self._settle) * 1000)
             nav = page.locator(NAV_SELECTOR).first
             try:
@@ -133,7 +160,7 @@ class EtsyInsightsPage:
             else:
                 with page.expect_navigation(wait_until="domcontentloaded", timeout=30_000):
                     nav.click()
-            if "signin" in page.url:
+            if is_login_url(page.url):
                 raise NotLoggedIn("Chrome 'Etsy Riset' belum login ke Etsy.")
 
     def _find_search_box(self):
@@ -151,8 +178,10 @@ class EtsyInsightsPage:
     def search(self, keyword: str) -> RawResult:
         page = self._page
         mark = len(self._captured)
-        self._http_statuses.clear()
         with _translate_errors():
+            page.wait_for_timeout(_POLL_MS)  # proses respons yang datang selama jeda (mis. 429 terlambat)
+            if self._blocked_now():
+                return RawResult(keyword, page.url, (), "")  # jangan mengetik apa pun; sesi akan berhenti
             box = self._find_search_box()
             size = box.bounding_box() or {"width": 200, "height": 30}
             box.click(position={"x": size["width"] * self._rng.uniform(0.2, 0.8),
@@ -166,8 +195,8 @@ class EtsyInsightsPage:
 
             deadline = time.monotonic() + self._results_timeout
             while not has_results_for(self._captured[mark:], keyword):
-                if self._http_statuses or "signin" in page.url:
-                    break  # tanda bahaya: biarkan sesi memeriksa dan berhenti
+                if self._http_statuses or is_login_url(page.url) or blocked_quota(self._captured[mark:], keyword):
+                    break  # tanda bahaya / kuota Etsy: biarkan sesi memeriksa dan berhenti
                 if time.monotonic() > deadline:
                     raise PageLoadTimeout(f"Data untuk '{keyword}' tidak datang dalam {self._results_timeout:.0f} detik.")
                 page.wait_for_timeout(_POLL_MS)
@@ -181,10 +210,21 @@ class EtsyInsightsPage:
         page = self._page
         if page is None:
             return None
+        snapshot = {"text": "", "iframes": []}
+        for attempt in range(_CHECK_ATTEMPTS):
+            try:
+                snapshot = page.evaluate(
+                    "() => ({text: document.body ? document.body.innerText.slice(0, 20000) : '',"
+                    " iframes: Array.from(document.querySelectorAll('iframe')).map(f => f.src || '')})")
+                break
+            except PlaywrightError as exc:
+                if "closed" in str(exc).lower():
+                    raise BrowserClosed(str(exc).splitlines()[0]) from exc
+                # Halaman sedang berpindah (mis. dialihkan ke login/captcha): tunggu lalu coba lagi.
+                if attempt < _CHECK_ATTEMPTS - 1:
+                    with _translate_errors():
+                        page.wait_for_timeout(1000)
         with _translate_errors():
-            snapshot = page.evaluate(
-                "() => ({text: document.body ? document.body.innerText.slice(0, 20000) : '',"
-                " iframes: Array.from(document.querySelectorAll('iframe')).map(f => f.src || '')})")
             frame_urls = [frame.url for frame in page.frames] + list(snapshot["iframes"])
             return detect_danger(page.url, frame_urls, snapshot["text"], self._http_statuses)
 

@@ -175,6 +175,8 @@ def test_migrates_old_database(tmp_path):
     s.sync_user_keywords(["a"], T0)
     s.save_result(s.get("a").id, make_metrics(level=1), make_raw("a"), T0, "t")
     assert s.latest_results()[0].metrics.conversion_level == 1
+    con = sqlite3.connect(db)
+    assert "idx_results_keyword" in {row[1] for row in con.execute("PRAGMA index_list(results)")}
 
 
 def test_sync_promotes_harvested_to_user():

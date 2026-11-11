@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 from enum import Enum
 
 from .config import Config
-from .models import (BrowserClosed, DangerSignal, InsightsPage, NotLoggedIn, PageLoadTimeout, ParsedSearch,
-                     RawResult)
+from .models import (BrowserClosed, DangerSignal, EtsyQuotaReached, InsightsPage, NotLoggedIn, PageLoadTimeout,
+                     ParsedSearch, RawResult)
 from .pacer import Pacer, cooldown_end, remaining_quota
 from .planner import select_next, upcoming
 from .store import Store
@@ -105,18 +105,30 @@ def _stop_for_danger(deps: SessionDeps, state: _State, danger: DangerSignal) -> 
     deps.log(f"Tanda bahaya: {danger.kind} ({danger.detail}). Berhenti.")
 
 
-def _danger_or_closed(deps: SessionDeps, state: _State, keyword_id: int) -> bool:
-    """Periksa tanda bahaya. True berarti sesi harus berhenti (keyword sudah dikembalikan ke antrean)."""
+def _check_page(deps: SessionDeps, state: _State) -> bool:
+    """Periksa tanda bahaya. True berarti sesi harus berhenti (alasan sudah diisi).
+
+    Halaman yang tidak bisa diperiksa diperlakukan sebagai tanda bahaya (arah yang aman).
+    """
     try:
         danger = deps.page.check_danger()
     except BrowserClosed:
-        danger, state.reason = None, StopReason.BROWSER_CLOSED
-    if danger is None and state.reason is None:
+        state.reason = StopReason.BROWSER_CLOSED
+        return True
+    except Exception as exc:
+        danger = DangerSignal("verifikasi", f"Halaman tidak bisa diperiksa: {exc}")
+    if danger is None:
+        return False
+    _stop_for_danger(deps, state, danger)
+    return True
+
+
+def _danger_or_closed(deps: SessionDeps, state: _State, keyword_id: int) -> bool:
+    """Seperti _check_page, dan bila berhenti, keyword dikembalikan ke antrean."""
+    if not _check_page(deps, state):
         return False
     deps.store.return_to_queue(keyword_id)
     state.current_id = None
-    if danger is not None:
-        _stop_for_danger(deps, state, danger)
     return True
 
 
@@ -186,6 +198,12 @@ def _loop(deps: SessionDeps, state: _State, limit: int, start: datetime, prev_en
                 return
             try:
                 parsed = deps.parse(raw)
+            except EtsyQuotaReached as exc:
+                store.return_to_queue(item.id)
+                state.current_id = None
+                state.reason = StopReason.ETSY_QUOTA
+                deps.log(f"  kuota Etsy habis: sisa {exc.quota.remaining} dari {exc.quota.total}")
+                return
             except Exception as exc:  # ParseError, atau parser crash karena data Etsy berubah
                 store.record_failure(item.id)
                 state.current_id = None
@@ -210,7 +228,11 @@ def _loop(deps: SessionDeps, state: _State, limit: int, start: datetime, prev_en
                     state.reason = StopReason.ETSY_QUOTA
                     deps.log(f"  kuota Etsy: sisa {parsed.quota.remaining} dari {parsed.quota.total}")
                     return
-                page.dwell(pacer.dwell_seconds(), pacer.should_scroll())
+                try:
+                    page.dwell(pacer.dwell_seconds(), pacer.should_scroll())
+                except BrowserClosed:
+                    state.reason = StopReason.BROWSER_CLOSED
+                    return
 
         if streak >= MAX_CONSECUTIVE_FAILURES:
             state.reason = StopReason.FAILURES
@@ -252,10 +274,7 @@ def run_session(deps: SessionDeps, max_keywords: int | None = None,
         except BrowserClosed:
             state.reason = StopReason.BROWSER_CLOSED
         else:
-            danger = deps.page.check_danger()
-            if danger is not None:
-                _stop_for_danger(deps, state, danger)
-            else:
+            if not _check_page(deps, state):
                 _loop(deps, state, limit, now, prev_end)
     except KeyboardInterrupt:
         state.reason = StopReason.INTERRUPTED
