@@ -1,0 +1,5 @@
+# Daftar keyword Anda, satu per baris. Baris yang diawali # diabaikan.
+# Huruf besar/kecil dan spasi berlebih tidak masalah; duplikat otomatis dibuang.
+# Contoh (hapus tanda # untuk memakainya):
+# boho wall art
+# personalized necklace
