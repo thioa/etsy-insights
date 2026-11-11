@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import http.client
 import json
+import logging
 import socket
+import ssl
 import time
 import urllib.error
 import urllib.request
@@ -46,6 +48,14 @@ class PrintifyUnreachable(PrintifyError):
     message = "Could not reach Printify. Check your internet connection and try again."
 
 
+class CertificateProblem(PrintifyError):
+    def __init__(self, detail: str) -> None:
+        self.detail = detail
+        super().__init__("Etsy Insights could not verify Printify's security certificate on this Mac, so it did "
+                         f"not connect. Quit Etsy Insights and open it again. If this keeps happening, send this "
+                         f"message to Claude. Details: {detail}")
+
+
 class UnexpectedResponse(PrintifyError):
     message = "Printify sent data in an unexpected format."
 
@@ -53,6 +63,35 @@ class UnexpectedResponse(PrintifyError):
         self.path = path
         self.body = body
         super().__init__()
+
+
+log = logging.getLogger(__name__)
+
+
+def default_ssl_context() -> ssl.SSLContext:
+    """Sertifikat dari Keychain macOS (truststore), lalu certifi, lalu bawaan Python.
+
+    Python dari python.org di Mac tidak membawa daftar sertifikat sendiri, jadi tanpa ini semua koneksi
+    HTTPS lewat urllib gagal ("certificate verify failed").
+    """
+    try:
+        import truststore
+        return truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    except Exception:  # noqa: BLE001 - coba cadangan berikutnya
+        pass
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:  # noqa: BLE001
+        return ssl.create_default_context()
+
+
+def _certificate_error(exc: BaseException) -> ssl.SSLCertVerificationError | None:
+    reason = getattr(exc, "reason", None)
+    for candidate in (exc, reason):
+        if isinstance(candidate, ssl.SSLCertVerificationError):
+            return candidate
+    return None
 
 
 def scope_for(path: str) -> str:
@@ -80,14 +119,16 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
 
 class PrintifyClient:
     def __init__(self, token: str, *, base_url: str = BASE_URL, min_interval: float = 1.0, timeout: float = 30,
-                 clock=time.monotonic, sleep=time.sleep, no_proxy: bool = False) -> None:
+                 clock=time.monotonic, sleep=time.sleep, no_proxy: bool = False,
+                 ssl_context: ssl.SSLContext | None = None) -> None:
         self._token = token
         self._base = base_url.rstrip("/")
         self._min_interval = min_interval
         self._timeout = timeout
         self._clock = clock
         self._sleep = sleep
-        handlers = [_NoRedirect] + ([urllib.request.ProxyHandler({})] if no_proxy else [])
+        handlers = [_NoRedirect, urllib.request.HTTPSHandler(context=ssl_context or default_ssl_context())]
+        handlers += [urllib.request.ProxyHandler({})] if no_proxy else []
         self._opener = urllib.request.build_opener(*handlers)
         self._last: float | None = None
 
@@ -117,7 +158,12 @@ class PrintifyClient:
             try:
                 status, body, headers = self._once(url)
             except (urllib.error.URLError, socket.timeout, TimeoutError, ConnectionError, OSError,
-                    http.client.HTTPException):
+                    http.client.HTTPException) as exc:
+                certificate = _certificate_error(exc)
+                if certificate is not None:  # coba ulang tidak akan membantu
+                    log.warning("Printify %s: certificate problem: %s", path, certificate)
+                    raise CertificateProblem(certificate.verify_message or str(certificate)) from None
+                log.warning("Printify %s: connection problem: %s: %s", path, type(exc).__name__, exc)
                 status, body, headers = None, "", {}
             if status == 429:
                 if rate_retries >= MAX_RATE_RETRIES:

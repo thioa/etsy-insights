@@ -35,9 +35,14 @@
       event.preventDefault();
       var body = {};
       new FormData(form).forEach(function (value, key) { body[key] = value; });
+      // Show that something is happening (a Printify check can take a while).
+      var submit = form.querySelector('button[type="submit"]');
+      var label = submit ? submit.textContent : "";
+      if (submit) { submit.disabled = true; submit.textContent = "Working…"; }
+      var done = function () { if (submit) { submit.disabled = false; submit.textContent = label; } };
       post(form.getAttribute("data-api"), body).then(function (r) {
-        if (r.ok) { location.reload(); } else { showErrors(form, r.data); }
-      });
+        if (r.ok) { location.reload(); } else { done(); showErrors(form, r.data); }
+      }, function () { done(); showErrors(form, { error: "Etsy Insights is not responding. Try again." }); });
     });
   });
 

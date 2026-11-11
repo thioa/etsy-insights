@@ -61,3 +61,32 @@ def test_printify_end_to_end(tmp_path, monkeypatch):
         finally:
             server.shutdown()
         assert outside == []
+
+
+def test_token_form_shows_progress_while_waiting(tmp_path, monkeypatch):
+    from playwright.sync_api import sync_playwright
+
+    from tests.printify_fake import SLOW
+    monkeypatch.setenv("HOME", str(tmp_path))
+    home = seeded_home(tmp_path / "home")
+    port = free_port()
+    with FakePrintify() as fake:
+        fake.load_default()
+        fake.queue("/v1/shops.json", (200, SLOW, None))  # Printify menjawab lambat
+        app, _ = printify_app(home, fake, spawn=lambda f: None, port=port)
+        server = make_server("127.0.0.1", port, app, threaded=True)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(executable_path=os.environ["CHROME_SMOKE_PATH"])
+                page = browser.new_page()
+                page.goto(f"http://127.0.0.1:{port}/printify")
+                page.fill("#printify-token", "secret-tok-9876")
+                button = page.locator("button", has_text="Test and save")
+                button.click()
+                waiting = page.locator("form[data-api] button[type=submit]")
+                assert waiting.is_disabled() and waiting.inner_text() == "Working…"
+                page.wait_for_selector("text=Sync now", timeout=10_000)
+                browser.close()
+        finally:
+            server.shutdown()

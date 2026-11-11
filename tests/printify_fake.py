@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import ssl
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -14,7 +15,7 @@ TRUNCATE = "__truncate__"
 
 
 class FakePrintify:
-    def __init__(self) -> None:
+    def __init__(self, tls: tuple | None = None) -> None:
         self.routes: dict[str, tuple[int, object, dict]] = {}
         self.queues: dict[str, list[tuple[int, object, dict]]] = {}
         self.requests: list[tuple[str, str, dict, dict]] = []
@@ -57,11 +58,17 @@ class FakePrintify:
             do_POST = _answer
 
         self._server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        self._scheme = "http"
+        if tls:  # HTTPS dengan sertifikat sendiri (cert, key)
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            context.load_cert_chain(str(tls[0]), str(tls[1]))
+            self._server.socket = context.wrap_socket(self._server.socket, server_side=True)
+            self._scheme = "https"
         self._thread = threading.Thread(target=self._server.serve_forever, kwargs={"poll_interval": 0.05}, daemon=True)
 
     @property
     def url(self) -> str:
-        return f"http://127.0.0.1:{self._server.server_address[1]}"
+        return f"{self._scheme}://127.0.0.1:{self._server.server_address[1]}"
 
     def set(self, path: str, body, status: int = 200, headers: dict | None = None) -> None:
         self.routes[path] = (status, body, headers or {})
