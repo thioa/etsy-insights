@@ -409,3 +409,24 @@ JSON yang dimuat halaman itu sendiri:
 - Kunci agar tidak ada dua sesi yang berjalan bersamaan.
 - `mulai.command`.
 - Perekam kenali juga menyensor token berbentuk JWT di mana pun.
+
+### 16.8 Profil selera (disetujui pengguna, masuk Tahap 2)
+
+Untuk setiap keyword yang **dicari langsung**, profil selera diambil dari data yang sudah dimuat
+di respons `results-data`, yaitu `competitiveResearchListingCards.listingCards` (±20 listing
+teratas) dan `competitivePriceData.searchTermMedianPrice`. Tidak ada pencarian atau unduhan
+tambahan. Keyword hasil panen tidak punya profil.
+
+- **Tema populer:** kata dan frasa dua kata yang muncul di ≥ 2 judul listing teratas, dihitung per judul. Kata umum dan kata dari keyword itu sendiri dibuang. Maksimal 10.
+- **Harga dibayar pembeli:** `medianPriceLow`–`medianPriceHigh`. **Harga listing teratas:** harga termurah–termahal di kartu listing.
+- **Kekuatan pemain teratas:** median ulasan, % Bestseller, % Star Seller, jumlah toko berbeda.
+- **Kesulitan masuk:**
+  - **Sulit:** median ulasan ≥ 2.000, atau (Bestseller ≥ 80% dan median ulasan ≥ 1.000).
+  - **Mudah:** median ulasan < 300 dan Bestseller < 50%.
+  - **Sedang:** selain itu.
+  - Hanya ditampilkan, tidak memengaruhi skor.
+- **5 contoh listing teratas:** judul, harga, ulasan, dan link.
+- **Excel:**
+  - sheet baru **"Selera"**, satu baris per keyword yang dicari;
+  - kolom tambahan *Harga pasar* dan *Kesulitan masuk* di sheet Peluang.
+- **Di luar cakupan:** analisis gambar dan ringkasan yang ditulis AI.

@@ -360,13 +360,13 @@ Format setiap file: `{"keyword": <kw>, "page_url": "https://www.etsy.com/your/sh
 
 Pembersihan:
 - `68976357` diganti `12345678` di URL.
-- Body `results-data` hanya menyimpan kunci `searchTermId, isSearchAllowed, isQuotaReached, quotaData, stats, dailyStats, wowData, similarSearchTerms`.
+- Body `results-data` hanya menyimpan kunci `searchTermId, isSearchAllowed, isQuotaReached, quotaData, stats, dailyStats, wowData, similarSearchTerms, competitiveResearchListingCards`, ditambah `competitivePriceData` yang hanya berisi `searchTermMedianPrice` (`listingPriceRange` berisi harga toko Anda sendiri, jadi dibuang).
 - Body `nav-badge-counts` (#10) diganti `{"counts": {"orders": 0}}` sebagai respons pengganggu.
 
 Lalu pastikan:
 
-Run: `grep -c "68976357\|eyJ\|@" tests/fixtures/*.json`
-Expected: semua `0`.
+Run: `grep -c "68976357\|eyJ" tests/fixtures/*.json`
+Expected: semua `0`. (Tanda `@` bisa muncul di judul listing pesaing, jadi tidak dicek.)
 
 - [ ] **Step 2: Tulis test yang gagal di `tests/test_parser.py`**
 
@@ -869,10 +869,165 @@ Tambahkan juga `"mulai.command"` ke daftar di `test_command_scripts_are_valid_an
 Run: `.venv/bin/pytest -q && CHROME_SMOKE_PATH=/opt/pw-browsers/chromium-1243/chrome-linux64/chrome .venv/bin/pytest -q -m smoke`
 Expected: semua PASS.
 
-- [ ] **Step 5: Commit, lalu buat paket**
+- [ ] **Step 5: Commit**
 
 ```bash
 git add -A && git commit -m "feat: run command with lock, logs, signal handling; mulai.command and README"
+```
+
+---
+
+### Task 9: Profil selera (spec §16.8) + paket
+
+**Files:**
+- Create: `etsy_insights/taste.py`, `tests/test_taste.py`
+- Modify: `etsy_insights/store.py`, `etsy_insights/export.py`, `etsy_insights/__main__.py`, `README.md`, `tests/test_store.py`, `tests/test_export.py`, `tests/test_cli.py`
+
+**Interfaces:**
+- Consumes: `is_results_for` (Task 4), `RawResult`/`CapturedResponse` (Tahap 1), fixture `tests/fixtures/*.json` dan `load_raw` (Task 4), `export_excel` (Task 5), CLI `export` (Task 8).
+- Produces (`taste.py`):
+  ```python
+  @dataclass(frozen=True)
+  class ListingCard: title: str; price_text: str; price_value: float | None; reviews: int | None
+                     bestseller: bool; star_seller: bool; shop: str; url: str
+  @dataclass(frozen=True)
+  class TasteProfile:
+      keyword: str; listing_count: int; top_terms: tuple[tuple[str, int], ...]
+      paid_price_low: str | None; paid_price_high: str | None
+      listing_price_low: str | None; listing_price_high: str | None
+      median_reviews: int | None; bestseller_share: float; star_seller_share: float; unique_shops: int
+      difficulty: str          # "Mudah" | "Sedang" | "Sulit" | "Tidak diketahui"
+      examples: tuple[ListingCard, ...]   # 5 kartu pertama
+  def parse_price(text: str | None) -> float | None    # "Rp 712,738" -> 712738.0 ; "US$15.30" -> 15.3 ; ""/None -> None
+  def top_terms(titles: Sequence[str], keyword: str, limit: int = 10) -> list[tuple[str, int]]
+  def difficulty(median_reviews: int | None, bestseller_share: float, star_seller_share: float) -> str
+  def build_profile(raw: RawResult) -> TasteProfile | None   # None bila tidak ada results-data atau kartu
+  def build_profiles(store: Store) -> dict[str, TasteProfile]
+  ```
+- Produces (`store.py`): `latest_search_raws(self) -> dict[int, RawResult]`, yaitu keyword_id → `RawResult` dari baris `kind='search'` terbaru yang punya `raw_json` (direkonstruksi dari JSON).
+- Produces (`export.py`):
+  - `SELERA_HEADERS = ["Keyword", "Skor", "Label", "Harga dibayar pembeli", "Harga listing teratas", "Kesulitan masuk", "Median ulasan teratas", "% Bestseller", "% Star Seller", "Toko berbeda", "Tema populer", "Contoh 1", "Contoh 2", "Contoh 3", "Contoh 4", "Contoh 5"]`.
+  - `PELUANG_HEADERS` ditambah `"Harga pasar"` dan `"Kesulitan masuk"` di akhir.
+  - `export_excel(..., profiles: Mapping[str, TasteProfile] | None = None)` (keyword arg).
+- Aturan:
+  - **`top_terms`**:
+    - Token = `[a-z]+` dari judul berhuruf kecil, minimal 3 huruf.
+    - Buang `STOPWORDS = {"and", "are", "for", "from", "the", "this", "with", "you", "your", "our", "its", "gift", "gifts", "custom", "personalized", "personalised", "handmade"}`, dan buang kata dari keyword beserta bentuk `+s`. Kata penerima (mom, dog, kids, her, …) sengaja **tidak** dibuang karena menunjukkan selera.
+    - Hitung frekuensi dokumen untuk unigram dan bigram (pasangan token berurutan setelah penyaringan). Ambil yang df ≥ 2.
+    - Urutkan: df menurun, bigram lebih dulu, lalu alfabet.
+    - Buang unigram yang menjadi bagian dari bigram terpilih dengan df yang sama. Potong ke `limit`.
+  - **`difficulty`**:
+    - `None` → `"Tidak diketahui"`;
+    - `median ≥ 2000` atau (`bestseller ≥ 0.8` dan `median ≥ 1000`) → `"Sulit"`;
+    - `median < 300` dan `bestseller < 0.5` → `"Mudah"`;
+    - selain itu `"Sedang"`.
+  - **`build_profile`** memakai respons `is_results_for` terakhir. Median ulasan dihitung dari kartu yang `numberOfReviews`-nya berupa angka.
+  - **Excel:**
+    - Urutan sheet: `Peluang`, `Selera`, `Semua data`, `Antrean`.
+    - Sheet Selera berisi satu baris per profil, diurutkan sama seperti Peluang (keyword layak menurut skor, lalu sisanya menurut abjad). Baris info: `f"Profil selera untuk {n} keyword yang sudah dicari (±20 listing teratas di Marketplace Insights)."`.
+    - Kolom **Tema populer** = `"christmas (7), vintage (6), …"`. Kolom **%** memakai format `0%`.
+    - Kolom **Contoh i** = `f"{judul[:80]} | {harga} | {ulasan} ulasan"` dengan `cell.hyperlink = url`.
+    - Kolom **Harga pasar** di Peluang = `f"{low} – {high}"` kalau ada, dan **Kesulitan masuk** = `difficulty`; keduanya `""` kalau tidak ada profil.
+    - CLI `export` memanggil `build_profiles(store)`.
+
+- [ ] **Step 1: Tulis test yang gagal**
+
+`tests/test_taste.py`:
+```python
+import pytest
+from etsy_insights.taste import build_profile, difficulty, parse_price, top_terms
+from tests.test_parser import load_raw
+
+def test_parse_price():
+    assert parse_price("Rp 712,738") == 712738.0 and parse_price("US$15.30") == 15.3
+    assert parse_price("") is None and parse_price(None) is None
+
+def test_top_terms_prefers_phrases():
+    titles = ["Retro Christmas Sweater Gift", "Retro Christmas Mug", "Vintage Retro Tee"]
+    assert top_terms(titles, "sweater") == [("retro", 3), ("retro christmas", 2)]
+
+def test_difficulty_rules():
+    assert difficulty(2500, 0.1, 0.1) == "Sulit" and difficulty(1200, 0.85, 0.0) == "Sulit"
+    assert difficulty(250, 0.3, 0.9) == "Mudah" and difficulty(650, 1.0, 0.5) == "Sedang"
+    assert difficulty(None, 0.0, 0.0) == "Tidak diketahui"
+
+def test_profile_sweatshirt():
+    p = build_profile(load_raw("sweatshirt"))
+    assert (p.listing_count, p.paid_price_low, p.paid_price_high) == (19, "US$15.30", "US$18.70")
+    assert (p.median_reviews, p.unique_shops, p.difficulty) == (2362, 18, "Sulit")
+    assert p.bestseller_share == pytest.approx(16 / 19) and p.star_seller_share == pytest.approx(16 / 19)
+    terms = [t for t, _ in p.top_terms]
+    assert "christmas" in terms[:3] and not any("sweatshirt" in t for t in terms)
+    assert len(p.examples) == 5 and p.examples[0].title.startswith("Oh What Fun Christmas Sweatshirt")
+    assert p.examples[0].url.startswith("https://www.etsy.com/listing/")
+
+def test_profile_custom_and_personalized_difficulty():
+    assert build_profile(load_raw("custom")).difficulty == "Sedang"
+    assert build_profile(load_raw("personalized")).difficulty == "Sulit"
+
+def test_profile_none_without_cards():
+    assert build_profile(load_raw("swearshirt")) is None
+```
+
+`tests/test_store.py`:
+```python
+def test_latest_search_raws_roundtrip():
+    from tests.test_parser import load_raw
+    s = new_store("sweatshirt"); kid = s.get("sweatshirt").id
+    raw = load_raw("sweatshirt")
+    s.save_result(kid, make_metrics(), raw, T0, "t")
+    back = s.latest_search_raws()[kid]
+    assert back.keyword == "sweatshirt" and back.responses == raw.responses
+```
+
+`tests/test_export.py`:
+- Ganti harapan `PELUANG_HEADERS` (otomatis lewat konstanta).
+- Tambah:
+```python
+from etsy_insights.export import SELERA_HEADERS
+from etsy_insights.taste import build_profile
+from tests.test_parser import load_raw
+
+def test_export_selera_sheet(tmp_path):
+    rows = [make_row("sweatshirt", 46395, 0, 1863632), make_row("mug", 900, 2, 500)]
+    profiles = {"sweatshirt": build_profile(load_raw("sweatshirt"))}
+    wb = load_workbook(export_excel(score_all(rows, Config()), rows, [], tmp_path, T0.date(), profiles=profiles))
+    assert wb.sheetnames == ["Peluang", "Selera", "Semua data", "Antrean"]
+    sel = wb["Selera"]
+    assert [c.value for c in sel[2]] == SELERA_HEADERS and sel.max_row == 3
+    row = {h: sel.cell(3, i + 1) for i, h in enumerate(SELERA_HEADERS)}
+    assert row["Keyword"].value == "sweatshirt" and row["Harga dibayar pembeli"].value == "US$15.30 – US$18.70"
+    assert row["Kesulitan masuk"].value == "Sulit" and row["Contoh 1"].hyperlink.target.startswith("https://www.etsy.com/listing/")
+    pel = wb["Peluang"]
+    by_kw = {pel.cell(r, 1).value: [c.value for c in pel[r]] for r in range(3, pel.max_row + 1)}
+    assert by_kw["sweatshirt"][-2:] == ["US$15.30 – US$18.70", "Sulit"] and by_kw["mug"][-2:] == [None, None]
+```
+
+`tests/test_cli.py`:
+```python
+def test_cli_export_includes_selera(tmp_path, capsys):
+    from etsy_insights.store import Store
+    from tests.test_parser import load_raw
+    from tests.helpers import make_metrics
+    base = project(tmp_path, keywords="sweatshirt\n")
+    s = Store(base / "data" / "etsy.db"); s.sync_user_keywords(["sweatshirt"], T0)
+    s.save_result(s.get("sweatshirt").id, make_metrics(volume=46395, level=0, comp=1863632), load_raw("sweatshirt"), T0, "t"); s.close()
+    assert main(["export"], base_dir=base, now=lambda: T0) == 0
+    sel = load_workbook(tmp_path / "hasil" / "peluang-2026-11-11.xlsx")["Selera"]
+    assert sel.cell(3, 1).value == "sweatshirt"
+```
+
+- [ ] **Step 2: Jalankan, pastikan gagal.** Run: `.venv/bin/pytest tests/test_taste.py tests/test_store.py tests/test_export.py tests/test_cli.py -q`. Expected: FAIL (`etsy_insights.taste` belum ada).
+- [ ] **Step 3: Implementasi** `taste.py`, `Store.latest_search_raws`, perubahan `export.py`, dan CLI `export`. README: tambah penjelasan singkat sheet "Selera" dan arti "Kesulitan masuk".
+- [ ] **Step 4: Jalankan semua test + smoke**
+
+Run: `.venv/bin/pytest -q && CHROME_SMOKE_PATH=/opt/pw-browsers/chromium-1243/chrome-linux64/chrome .venv/bin/pytest -q -m smoke`
+Expected: semua PASS.
+
+- [ ] **Step 5: Commit, lalu buat paket**
+
+```bash
+git add -A && git commit -m "feat: buyer-taste profile from top listings (Selera sheet)"
 ```
 
 Run: `git archive --format=zip --prefix=etsy-insights/ -o /home/user/etsy-insights-tahap2.zip HEAD && zipinfo /home/user/etsy-insights-tahap2.zip | grep -E "\.command$"`
