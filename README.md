@@ -15,9 +15,16 @@ Tampilan aplikasinya berbahasa Inggris; README ini berbahasa Indonesia.
 2. **Pastikan Google Chrome** ada di folder Applications.
 3. **Unzip `Etsy-Insights.zip`**, lalu seret **Etsy Insights.app** ke folder **Applications**.
    Kalau mau, seret juga ke Dock.
-4. **Pembukaan pertama:** klik kanan **Etsy Insights** → **Open** → **Open**. Ini perlu karena
-   aplikasinya tidak ditandatangani Apple. Di macOS terbaru, kalau tetap ditolak:
-   *System Settings → Privacy & Security → Open Anyway*.
+4. **Pembukaan pertama.** Aplikasinya tidak ditandatangani Apple, jadi macOS akan menolaknya dengan
+   pesan *"Etsy Insights" Not Opened*. Klik **Done** (jangan *Move to Trash*), lalu pilih salah satu:
+   - *System Settings → Privacy & Security* → scroll ke bagian **Security** → **Open Anyway** →
+     masukkan password → **Open Anyway** lagi. Kalau tombolnya tidak ada, buka aplikasinya sekali
+     lagi, lalu kembali ke halaman itu.
+   - Atau satu perintah di Terminal:
+     `xattr -dr com.apple.quarantine "/Applications/Etsy Insights.app"`
+
+   Ini cukup sekali. Di macOS 15 (Sequoia) ke atas, klik kanan → Open sudah tidak bisa melewati
+   penolakan ini.
 5. **Saat pertama dibuka**, aplikasi akan:
    - **menyiapkan dirinya sendiri** (sekali, 1–2 menit; muncul notifikasi "Setting up Etsy Insights…");
    - **menawarkan impor data lama.** Klik **Choose folder…**, lalu pilih folder `etsy-insights`

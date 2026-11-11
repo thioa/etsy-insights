@@ -6,9 +6,13 @@ Etsy Insights — cara memasang
 
 2. Seret "Etsy Insights.app" ke folder Applications.
 
-3. Pembukaan pertama: klik kanan "Etsy Insights" -> Open -> Open.
-   (Di macOS terbaru, kalau tetap ditolak: System Settings -> Privacy & Security
-   -> klik "Open Anyway".)
+3. Pembukaan pertama: macOS menolak dengan pesan "Etsy Insights" Not Opened.
+   Klik Done (JANGAN Move to Trash), lalu:
+   System Settings -> Privacy & Security -> scroll ke bagian Security
+   -> klik "Open Anyway" -> masukkan password -> "Open Anyway" lagi.
+   Atau satu perintah di Terminal:
+     xattr -dr com.apple.quarantine "/Applications/Etsy Insights.app"
+   Cukup sekali.
 
 4. Pembukaan pertama juga akan:
    - menyiapkan aplikasi (sekali, 1-2 menit; muncul notifikasi),
