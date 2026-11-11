@@ -27,6 +27,10 @@
     <div class="field"><label for="fee_etsy_tetap_usd">Fixed fee per sale (US$) <span class="muted">(0–5)</span></label><input id="fee_etsy_tetap_usd" name="fee_etsy_tetap_usd" type="number" step="any" min="0" max="5" value="{{ form.fee_etsy_tetap_usd }}"><p class="error" data-error-for="fee_etsy_tetap_usd"></p></div>
     <div class="field"><label for="margin_minimum_usd">Minimum margin (US$) <span class="muted">(0–100, for "Ready to sell")</span></label><input id="margin_minimum_usd" name="margin_minimum_usd" type="number" step="any" min="0" max="100" value="{{ form.margin_minimum_usd }}"><p class="error" data-error-for="margin_minimum_usd"></p></div>
   </fieldset>
+  <fieldset><legend>Advisor</legend>
+    <p class="muted small">0 means no limit. Each run costs about US$0.40–0.80.</p>
+    <div class="field"><label for="advisor_batas_bulanan_usd">Advisor monthly limit (USD) <span class="muted">(0–1000)</span></label><input id="advisor_batas_bulanan_usd" name="advisor_batas_bulanan_usd" type="number" step="any" min="0" max="1000" value="{{ form.advisor_batas_bulanan_usd }}"><p class="error" data-error-for="advisor_batas_bulanan_usd"></p></div>
+  </fieldset>
   <p class="error" data-error></p>
   <button class="btn btn--primary" type="submit">Save settings</button>
 </form>

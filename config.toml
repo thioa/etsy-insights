@@ -52,6 +52,9 @@ fee_etsy_tetap_usd = 0.45
 # A keyword is "Ready to sell" when the estimated margin per sale is at least this many US$.
 margin_minimum_usd = 5
 
+# AI Advisor: stop new runs when this month's estimated cost reaches this many US$. 0 means no limit.
+advisor_batas_bulanan_usd = 10
+
 # Score weights. They are normalized automatically so they add up to 1.
 [bobot]
 volume = 0.4

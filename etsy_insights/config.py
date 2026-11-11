@@ -33,6 +33,7 @@ class Config:
     fee_etsy_persen: float = 9.5  # % dari harga jual
     fee_etsy_tetap_usd: float = 0.45  # per penjualan
     margin_minimum_usd: float = 5.0  # batas Ready to sell
+    advisor_batas_bulanan_usd: float = 10.0  # 0 = tanpa batas
 
 
 # Batas keras: (minimum, maksimum). Untuk rentang, minimum berlaku pada batas bawah.
@@ -51,8 +52,8 @@ _INT_KEYS = {"kuota_harian", "durasi_sesi_menit", "keyword_terkait_maks", "kedal
              "cek_ulang_setelah_hari", "pendinginan_jam", "volume_minimum", "port_debug", "port_web"}
 # Nilai di luar rentang ini tidak dibatasi, tetapi diganti default (port yang salah tidak bisa "dibulatkan").
 _RANGE_OR_DEFAULT = {"port_web": (1024, 65535), "fee_etsy_persen": (0, 30), "fee_etsy_tetap_usd": (0, 5),
-                     "margin_minimum_usd": (0, 100)}
-_FLOAT_KEYS = {"fee_etsy_persen", "fee_etsy_tetap_usd", "margin_minimum_usd"}
+                     "margin_minimum_usd": (0, 100), "advisor_batas_bulanan_usd": (0, 1000)}
+_FLOAT_KEYS = {"fee_etsy_persen", "fee_etsy_tetap_usd", "margin_minimum_usd", "advisor_batas_bulanan_usd"}
 _RANGE_KEYS = {"jeda_antar_keyword_detik", "istirahat_setiap", "istirahat_detik",
                "kecepatan_ketik_ms", "waktu_baca_detik"}
 _INT_RANGE_KEYS = {"istirahat_setiap"}

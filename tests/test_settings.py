@@ -38,3 +38,23 @@ def test_selling_fields_saved_and_validated(tmp_path):
     assert cfg is None and errors == {"fee_etsy_persen": "Enter a percentage from 0 to 30.",
                                       "fee_etsy_tetap_usd": "Enter an amount from 0 to 5.",
                                       "margin_minimum_usd": "Enter an amount from 0 to 100."}
+
+
+def test_advisor_limit_saved_and_validated(tmp_path):
+    cfg, errors = save_settings(tmp_path, settings_form(Config()) | {"advisor_batas_bulanan_usd": "25"})
+    assert errors == {} and cfg.advisor_batas_bulanan_usd == 25.0
+    assert "advisor_batas_bulanan_usd = 25" in (tmp_path / "config.toml").read_text(encoding="utf-8")
+    cfg, errors = save_settings(tmp_path, settings_form(Config()) | {"advisor_batas_bulanan_usd": "abc"})
+    assert cfg is None and errors == {"advisor_batas_bulanan_usd": "Enter an amount from 0 to 1000."}
+    cfg, errors = save_settings(tmp_path, VALID)  # formulir lama tanpa field ini: nilai sekarang tetap
+    assert errors == {} and cfg.advisor_batas_bulanan_usd == 25.0
+
+
+def test_settings_page_has_advisor_section(tmp_path):
+    from tests.web_helpers import FakeRunner, TOKEN, client, seeded_home
+    from etsy_insights.web import create_app
+    app = create_app(seeded_home(tmp_path / "home"), token=TOKEN, runner=FakeRunner())
+    html = client(app).get("/settings").get_data(as_text=True)
+    assert "<legend>Advisor</legend>" in html and "Advisor monthly limit (USD)" in html
+    assert "0 means no limit. Each run costs about US$0.40–0.80." in html
+    assert 'name="advisor_batas_bulanan_usd"' in html

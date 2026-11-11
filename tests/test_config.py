@@ -115,3 +115,12 @@ def test_selling_defaults_and_limits(tmp_path):
     cfg, warnings = load_config(path)
     assert (cfg.fee_etsy_persen, cfg.fee_etsy_tetap_usd, cfg.margin_minimum_usd) == (9.5, 0.3, 7.5)
     assert any("fee_etsy_persen" in w for w in warnings)
+
+
+def test_advisor_limit_default_and_range(tmp_path):
+    assert Config().advisor_batas_bulanan_usd == 10.0
+    for bad in ("2000", "-1"):
+        cfg, warnings = load_config(write(tmp_path, f"advisor_batas_bulanan_usd = {bad}\n"))
+        assert cfg.advisor_batas_bulanan_usd == 10.0 and any("advisor_batas_bulanan_usd" in w for w in warnings)
+    cfg, warnings = load_config(write(tmp_path, "advisor_batas_bulanan_usd = 0\n"))
+    assert cfg.advisor_batas_bulanan_usd == 0.0 and warnings == []

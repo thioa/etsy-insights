@@ -10,12 +10,13 @@ from .config import Config, load_config
 
 FORM_FIELDS = ("kuota_harian", "jeda_min", "jeda_max", "durasi_sesi_menit",
                "bobot_volume", "bobot_conversion", "bobot_kompetisi",
-               "fee_etsy_persen", "fee_etsy_tetap_usd", "margin_minimum_usd")
-# (batas bawah, batas atas, pesan error) untuk isian "Selling on Etsy"
+               "fee_etsy_persen", "fee_etsy_tetap_usd", "margin_minimum_usd", "advisor_batas_bulanan_usd")
+# (batas bawah, batas atas, pesan error) untuk isian angka "Selling on Etsy" dan "Advisor"
 SELLING_FIELDS = {
     "fee_etsy_persen": (0, 30, "Enter a percentage from 0 to 30."),
     "fee_etsy_tetap_usd": (0, 5, "Enter an amount from 0 to 5."),
     "margin_minimum_usd": (0, 100, "Enter an amount from 0 to 100."),
+    "advisor_batas_bulanan_usd": (0, 1000, "Enter an amount from 0 to 1000."),
 }
 FILE_NAME = "config.toml"
 MAX_PAUSE = 600
@@ -88,6 +89,9 @@ fee_etsy_tetap_usd = {_num(cfg.fee_etsy_tetap_usd)}
 # A keyword is "Ready to sell" when the estimated margin per sale is at least this many US$.
 margin_minimum_usd = {_num(cfg.margin_minimum_usd)}
 
+# AI Advisor: stop new runs when this month's estimated cost reaches this many US$. 0 means no limit.
+advisor_batas_bulanan_usd = {_num(cfg.advisor_batas_bulanan_usd)}
+
 # Score weights. They are normalized automatically so they add up to 1.
 [bobot]
 volume = {_num(volume)}
@@ -109,6 +113,7 @@ def settings_form(cfg: Config) -> dict[str, str]:
         "fee_etsy_persen": _num(cfg.fee_etsy_persen),
         "fee_etsy_tetap_usd": _num(cfg.fee_etsy_tetap_usd),
         "margin_minimum_usd": _num(cfg.margin_minimum_usd),
+        "advisor_batas_bulanan_usd": _num(cfg.advisor_batas_bulanan_usd),
     }
 
 
@@ -153,7 +158,7 @@ def save_settings(home: Path, form: Mapping[str, str]) -> tuple[Config | None, d
         errors["bobot_volume"] = "At least one weight must be above 0."
     selling = {}
     for name, (low, high, message) in SELLING_FIELDS.items():
-        if name not in form:  # formulir lama tanpa bagian "Selling on Etsy": nilai sekarang tetap
+        if name not in form:  # formulir lama tanpa bagian ini: nilai sekarang tetap
             continue
         value = _number(form.get(name))
         if value is None or not low <= value <= high:
