@@ -1,7 +1,7 @@
 # Etsy Marketplace Insights — Pencari Peluang Keyword
 
 **Tanggal:** 2026-11-11
-**Status:** Desain disetujui per bagian, menunggu review spec
+**Status:** Disetujui. **Revisi 1 (§16)** disetujui setelah rekaman kenali; §16 menggantikan bagian lain bila bertentangan.
 
 ## 1. Tujuan
 
@@ -19,8 +19,9 @@ diakses setelah login sebagai seller dan tidak tersedia lewat Etsy Open API.
 
 **Kriteria sukses**
 
-1. Setiap hari, dengan satu klik, tool mengecek hingga 50 keyword tanpa
-   memicu CAPTCHA/verifikasi pada kondisi normal.
+1. Setiap hari, dengan satu klik, tool menjalankan hingga 15 pencarian
+   (masing-masing memanen ±130–180 keyword terkait, lihat §16) tanpa memicu
+   CAPTCHA/verifikasi pada kondisi normal.
 2. Anda mendapat file Excel berisi keyword yang diurutkan menurut skor
    peluang, dengan label Emas / Potensial / Lewati.
 3. Akun seller tidak pernah diakses dengan cara selain browser Chrome asli
@@ -37,6 +38,7 @@ diakses setelah login sebagai seller dan tidak tersedia lewat Etsy Open API.
 | Cara menjalankan | **Manual**: Anda klik dua kali `mulai.command` saat sedang di depan Mac |
 | Penyimpanan | SQLite lokal, semua data tetap di Mac Anda |
 | Hasil | File Excel |
+| Strategi data | **Panen** (Revisi 1, §16): satu pencarian menyimpan keyword utama + semua keyword terkaitnya |
 
 **Sengaja tidak dilakukan:** proxy atau rotasi IP, penyamaran fingerprint,
 penembusan CAPTCHA, pemanggilan API internal Etsy secara langsung, dan sesi
@@ -129,8 +131,7 @@ dan `pytest` untuk tes.
    5. "Membaca" hasil selama 5–15 detik, dengan peluang 50% scroll pelan.
    6. Simpan hasil, termasuk **data mentah**, supaya bisa diurai ulang kalau
       parser diperbaiki tanpa mengecek ulang ke Etsy.
-   7. Masukkan keyword terkait ke antrean (maksimal 10 per keyword, kedalaman
-      maksimal 2).
+   7. Simpan hasil panen keyword terkait (lihat §16.2), kedalaman maksimal 2.
    8. Jeda 20–60 detik. Setiap 8–12 keyword, istirahat 2–5 menit.
 4. **Berhenti** saat salah satu terjadi: kuota tercapai, durasi sesi habis,
    ada tanda bahaya, 3 kegagalan berturut-turut, Ctrl+C, atau Chrome ditutup.
@@ -145,14 +146,14 @@ nyata pertama.
 
 | Pengaturan (`config.toml`) | Default | Batas keras (tidak bisa dilewati) |
 |---|---|---|
-| `kuota_harian` | 50 | maks 100 |
+| `kuota_harian` | 15 pencarian | maks 30 |
 | `durasi_sesi_menit` | 45 | maks 60 |
 | `jeda_antar_keyword_detik` | 20–60 | batas bawah min 15 |
 | `istirahat_setiap` | 8–12 keyword | — |
 | `istirahat_detik` | 120–300 | — |
 | `kecepatan_ketik_ms` | 60–180 | batas bawah min 40 |
 | `waktu_baca_detik` | 5–15 | batas bawah min 3 |
-| `keyword_terkait_maks` | 10 | — |
+| `keyword_terkait_maks` | 200 (per pencarian) | — |
 | `kedalaman_maks` | 2 | maks 3 |
 | `cek_ulang_setelah_hari` | 30 | min 7 |
 | `pendinginan_jam` | 24 | min 12 |
@@ -332,3 +333,79 @@ Anda lebih suka).
 - Modul Etsy Open API untuk jumlah listing pesaing. Hanya dibuat kalau di
   Tahap 2 terbukti Insights tidak menyediakannya.
 - Dashboard web, multi-akun, multi-toko, Windows, dan browser selain Chrome.
+
+## 16. Revisi 1: setelah rekaman kenali (2026-11-11)
+
+Disetujui pengguna. Bagian ini **menggantikan** isi bagian lain bila bertentangan.
+
+### 16.1 Temuan dari rekaman
+
+Satu pencarian di Marketplace Insights memuat data berikut, semuanya lewat respons
+JSON yang dimuat halaman itu sendiri:
+
+| Respons (path berakhiran) | Isi yang dipakai |
+|---|---|
+| `/marketplace-insights/results-data?query=<kw>` | `stats.searchVolume` (pencarian 30 hari), `stats.avgTotalListings` (jumlah listing pesaing, di layar disebut "Search results"), `stats.cvr` (level konversi 0–4), `stats.queryCvr` (rasio konversi sebagai pecahan), `dailyStats.stats[].searchVolume` (30 titik harian), `wowData.value` (perubahan minggu-ke-minggu dalam %), `quotaData` (`totalQuota`, `remainingQuota`, `lowRemainingQuotaThreshold`), `isQuotaReached`, `isSearchAllowed` |
+| `/llm-exploratory-keywords/search/poll` (dengan `status = success`) atau `/search/enqueue` (dengan `cachedData`) | 130–180 keyword terkait. Setiap keyword berisi `searchTerm`, `searchVolume`, `avgTotalListings`, dan `cvr` (level 0–4). Daftar ini dibuat asinkron: enqueue, lalu poll berulang sampai `status = success` (±2–8 detik). |
+| `/chart-series-data` | Isinya sama dengan `dailyStats`, jadi tidak dipakai |
+
+- **Level konversi Etsy:** 0 = Very low, 1 = Low, 2 = Typical, 3 = High, 4 = Very high. Arti ini dicocokkan dengan screenshot.
+- **Keyword tanpa data** (misalnya salah ketik "swearshirt") berisi `searchVolume = 0` dan `cvr = null`, lalu dicatat sebagai `no_data`.
+- **Kotak pencarian** di halaman hasil: `input[aria-label="Input to search for keywords"]`.
+- **Menu Shop Manager:** `a[data-app-key="marketplace-insights"]`.
+- **URL hasil:** `/your/shops/me/marketplace-insights/search?query=<kw>…`.
+
+### 16.2 Strategi panen
+
+- Setiap pencarian menyimpan dua hal:
+  - **hasil cari** untuk keyword itu (data lengkap + tren), dan
+  - **hasil panen** untuk setiap keyword terkait (volume, pesaing, level konversi), maksimal `keyword_terkait_maks` (default 200) per pencarian.
+- Keyword hasil panen berstatus `harvested`. Datanya sudah ada, jadi ikut dirank tanpa perlu dicari satu per satu.
+- Panen hanya disimpan sampai kedalaman `kedalaman_maks`. Sebuah keyword hanya dicari kalau kedalamannya < `kedalaman_maks`.
+- Kalau keyword yang sama muncul lagi di daftar lain, data panennya memperbarui baris yang sama (tidak menumpuk). Hasil cari selalu ditambahkan sebagai riwayat.
+
+### 16.3 Urutan pencarian (menggantikan §7 "Urutan antrean")
+
+1. Keyword dari `keywords.txt` yang belum dicari, dari yang paling lama ditambahkan.
+2. Keyword `harvested` dengan skor peluang tertinggi, yang belum pernah dicari dan kedalamannya < `kedalaman_maks`.
+3. Keyword yang terakhir dicari lebih dari `cek_ulang_setelah_hari` lalu, yang paling lama lebih dulu. Ini hanya kalau nomor 1 dan 2 kosong.
+
+### 16.4 Kuota & tanda berhenti tambahan
+
+- `kuota_harian` default **15 pencarian**, dengan batas keras **30**.
+- **Kuota Etsy.** Tool berhenti seketika dengan alasan `kuota_etsy` (tanpa pendinginan) kalau:
+  - `isQuotaReached = true`, atau
+  - `isSearchAllowed = false`, atau
+  - `remainingQuota ≤ lowRemainingQuotaThreshold`.
+
+  Sesi berikutnya pada hari yang sama ditolak.
+- **Jeda antar-sesi.** Jeda minimum juga berlaku antar-sesi: kalau sesi sebelumnya berakhir belum lama, tool menunggu sisa jeda acak sebelum pencarian pertama.
+- **Timeout.** Pencarian dianggap gagal kalau `results-data` untuk keyword itu tidak datang dalam 30 detik. Daftar keyword terkait ditunggu paling lama 20 detik tambahan. Kalau tidak datang, hasil utama tetap disimpan.
+
+### 16.5 Skor (menggantikan sebagian §10)
+
+- `p_conversion` dihitung dari **level konversi 0–4**, karena level ini tersedia untuk semua keyword. `queryCvr` hanya disimpan dan ditampilkan.
+- Kompetisi selalu berupa jumlah listing (`count`), jadi "pencarian per listing" selalu tersedia.
+
+### 16.6 Excel (menambah §11)
+
+- **Kolom "Konversi"** menampilkan level dalam Bahasa Indonesia: Sangat rendah, Rendah, Biasa, Tinggi, Sangat tinggi.
+- **Kolom "Rasio konversi"** (persen) diisi kalau keyword itu pernah dicari langsung.
+- **Asal keyword:** "daftar Anda", "panen dari: X", atau "dicari".
+- **Kolom "Tren"** memakai perubahan minggu-ke-minggu dari Etsy (misalnya "+22.7%"), kalau ada.
+- **Sel teks** yang diawali `=`, `+`, `-`, atau `@` disimpan sebagai teks (bukan rumus), dan karakter kontrol dibuang.
+- **Status** di sheet "Semua data" ditulis dalam Bahasa Indonesia.
+
+### 16.7 Isi Tahap 2
+
+- `parser.py`.
+- `insights_page.py`: implementasi `InsightsPage` yang asli, termasuk deteksi bahaya.
+- `planner.py`: urutan pencarian sesuai §16.3.
+- Perubahan di `store`, `session`, `score`, dan `export`.
+- Perintah `run`:
+  - `--uji` menjalankan 3 pencarian;
+  - `--abaikan-pendinginan` meminta konfirmasi `YA`.
+- Log ke `logs/`.
+- Kunci agar tidak ada dua sesi yang berjalan bersamaan.
+- `mulai.command`.
+- Perekam kenali juga menyensor token berbentuk JWT di mana pun.
