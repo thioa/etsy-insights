@@ -91,7 +91,7 @@ def research(home: Path, store: Store, main: str, now: datetime) -> list[str]:
     return needed
 
 
-class _CategoryIndex:
+class CategoryIndex:
     """Satu indeks frasa untuk semua kategori: keyword → kategori yang kata-katanya ada di keyword itu."""
 
     def __init__(self, mains: Iterable[str]) -> None:
@@ -115,27 +115,32 @@ class _CategoryIndex:
 _CACHE: dict[str, tuple[tuple, dict[str, CategorySummary]]] = {}
 
 
-def summarize(store: Store, cfg: Config, categories: Mapping[str, CategoryInfo]) -> dict[str, CategorySummary]:
-    """Ringkasan per kategori. Disimpan sampai keyword, hasil, data Printify, atau pengaturan berubah."""
+def summarize(store: Store, cfg: Config, categories: Mapping[str, CategoryInfo],
+              scored: Sequence[ScoredKeyword] | None = None) -> dict[str, CategorySummary]:
+    """Ringkasan per kategori. Disimpan sampai keyword, hasil, data Printify, atau pengaturan berubah.
+
+    `scored` (hasil `score_all` yang sudah dihitung pemanggil) menghemat satu pembacaan semua hasil.
+    """
     printify = PrintifyStore(store)
     key = (store.change_stamp(), tuple(printify.types()), tuple(sorted(printify.links().items())), cfg,
            tuple(sorted(categories.items())))
     cached = _CACHE.get(store.path)
     if cached is not None and cached[0] == key:
         return cached[1]
-    summaries = _summarize(store, cfg, categories, printify)
+    summaries = _summarize(store, cfg, categories, printify, scored)
     _CACHE[store.path] = (key, summaries)
     return summaries
 
 
 def _summarize(store: Store, cfg: Config, categories: Mapping[str, CategoryInfo],
-               printify: PrintifyStore) -> dict[str, CategorySummary]:
+               printify: PrintifyStore, scored: Sequence[ScoredKeyword] | None = None) -> dict[str, CategorySummary]:
     statuses = store.keyword_statuses()
-    scored = score_all(store.latest_results(), cfg)
+    if scored is None:
+        scored = score_all(store.latest_results(), cfg)
     types = [t for t in printify.types() if t.available]
     mine = {category_for(t.title) for t in types}
     costed = {category_for(t.title) for t in types if t.cost_min_cents is not None}
-    index = _CategoryIndex(m for m in categories if m != OTHER)
+    index = CategoryIndex(m for m in categories if m != OTHER)
     members: dict[str, list[ScoredKeyword]] = {main: [] for main in categories}
     for item in scored:
         for main in index.categories(item.row.keyword):

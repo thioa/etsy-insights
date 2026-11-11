@@ -249,6 +249,13 @@ class Store:
         """keyword -> status (pending, in_progress, done, no_data, harvested, …)."""
         return {row[0]: row[1] for row in self._db.execute("SELECT keyword, status FROM keywords")}
 
+    def searched_or_queued(self, limit: int) -> list[str]:
+        """Keyword yang sudah dicari atau sedang antre (bukan hasil panen), terbaru dulu."""
+        rows = self._db.execute(
+            "SELECT keyword FROM keywords WHERE status IN ('pending', 'in_progress', 'done', 'no_data') "
+            "ORDER BY COALESCE(last_checked_at, added_at) DESC, id DESC LIMIT ?", (limit,)).fetchall()
+        return [row[0] for row in rows]
+
     def keyword_texts(self) -> set[str]:
         """Semua keyword di database (status apa pun)."""
         return {row[0] for row in self._db.execute("SELECT keyword FROM keywords")}
