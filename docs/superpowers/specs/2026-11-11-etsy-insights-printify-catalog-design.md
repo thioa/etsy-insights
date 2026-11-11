@@ -159,12 +159,16 @@ boleh masuk lebih dari satu kategori. Pencocokan memakai indeks frasa yang sama 
 (`models`), *Name*.
 
 **Research** (`research_seeds(main) = [main, f"custom {main}", f"personalized {main}"]`):
-- `POST /api/catalog/research {category}` menambahkan seed yang belum ada di database lewat
-  `keywords.add_keywords`. Keyword itu masuk sebagai keyword pengguna dan ditulis ke `keywords.txt`.
+- Seed **perlu diriset** kalau belum ada di database, atau ada tetapi berstatus `harvested` (hasil panen
+  yang belum pernah dicari langsung).
+- `POST /api/catalog/research {category}` mengirim seed yang perlu diriset ke `keywords.add_keywords`.
+  Keyword itu masuk sebagai keyword pengguna dan ditulis ke `keywords.txt`. Keyword hasil panen ikut
+  dipindah ke depan antrean, sama seperti tombol Prioritize.
 - **Status tombol:**
-  - *Research*: ada seed yang belum ada di database;
-  - *In queue: N keywords*: semua seed sudah ada, dan N di antaranya masih `pending`;
-  - *Researched*: semua seed sudah ada dan tidak ada yang `pending`. Tombol tidak bisa diklik.
+  - *Research*: ada seed yang perlu diriset;
+  - *In queue: N keywords*: tidak ada seed yang perlu diriset, dan N di antaranya masih `pending` atau
+    `in_progress`;
+  - *Researched*: semua seed sudah dicari langsung. Tombol tidak bisa diklik.
 - Research untuk *Other* tidak tersedia.
 - Catatan di dekat tombol: *"Uses up to 3 of your daily searches."*
 - Research tidak mengubah kuota, jeda, atau aturan sesi apa pun.
