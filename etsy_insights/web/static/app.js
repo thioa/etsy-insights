@@ -170,6 +170,101 @@
     });
   }
 
+  // Printify: sync progress (the page reloads when the sync has finished)
+  var printifyRoot = document.querySelector("[data-printify]");
+  function pollSync() {
+    fetch("/api/printify/status").then(function (res) { return res.json(); }).then(function (s) {
+      if (s.state !== "running") { location.reload(); return; }
+      var el = printifyRoot.querySelector("[data-sync-progress]");
+      if (el) el.textContent = "Syncing… " + s.step + (s.total ? " (" + s.done + " of " + s.total + ")" : "");
+      setTimeout(pollSync, 2000);
+    }).catch(function () { setTimeout(pollSync, 2000); });
+  }
+  if (printifyRoot && printifyRoot.getAttribute("data-state") === "running") setTimeout(pollSync, 2000);
+
+  // Printify: add a product type from the catalog
+  var catalog = document.querySelector("[data-catalog]");
+  var catalogQuery = catalog && catalog.querySelector("[data-catalog-q]");
+  if (catalogQuery) {
+    var results = catalog.querySelector("[data-catalog-results]");
+    var pick = catalog.querySelector("[data-catalog-pick]");
+    var providerSelect = catalog.querySelector("[data-catalog-provider]");
+    var catalogError = catalog.querySelector("[data-catalog-error]");
+    var chosenBlueprint = null;
+    var searchTimer = null;
+
+    var choose = function (item) {
+      chosenBlueprint = item.id;
+      catalog.querySelector("[data-catalog-title]").textContent = item.title;
+      catalogError.textContent = "";
+      providerSelect.innerHTML = "";
+      fetch("/api/printify/providers?blueprint_id=" + item.id).then(function (res) {
+        return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+      }).then(function (r) {
+        if (!r.ok) { catalogError.textContent = r.data.error || "Could not load print providers."; return; }
+        r.data.providers.forEach(function (p) {
+          var option = document.createElement("option");
+          option.value = p.id;
+          option.textContent = p.title;
+          providerSelect.appendChild(option);
+        });
+        pick.hidden = false;
+      });
+    };
+
+    var search = function () {
+      var q = catalogQuery.value.trim();
+      results.innerHTML = "";
+      if (!q) return;
+      fetch("/api/printify/catalog?q=" + encodeURIComponent(q)).then(function (res) { return res.json(); })
+        .then(function (data) {
+          (data.results || []).forEach(function (item) {
+            var li = document.createElement("li");
+            var button = document.createElement("button");
+            button.type = "button";
+            button.className = "linklike";
+            button.textContent = item.title + (item.brand ? " · " + item.brand + (item.model ? " " + item.model : "") : "");
+            button.addEventListener("click", function () { choose(item); });
+            li.appendChild(button);
+            results.appendChild(li);
+          });
+          if (!(data.results || []).length) {
+            var none = document.createElement("li");
+            none.className = "muted";
+            none.textContent = data.error || "No products found.";
+            results.appendChild(none);
+          }
+        });
+    };
+
+    catalogQuery.addEventListener("input", function () {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(search, 300);
+    });
+    catalog.querySelector("[data-catalog-add]").addEventListener("click", function () {
+      post("/api/printify/types/add", {
+        blueprint_id: chosenBlueprint, print_provider_id: providerSelect.value,
+        cost_usd: catalog.querySelector("[data-catalog-cost]").value
+      }).then(function (r) {
+        if (r.ok) { location.reload(); } else { catalogError.textContent = r.data.error || "Something went wrong."; }
+      });
+    });
+  }
+
+  // Printify: add the ticked suggested keywords to My keywords
+  var suggestions = document.querySelector("form[data-suggestions]");
+  if (suggestions) {
+    suggestions.addEventListener("submit", function (event) {
+      event.preventDefault();
+      var keywords = [];
+      suggestions.querySelectorAll('input[name="keywords"]:checked').forEach(function (box) { keywords.push(box.value); });
+      if (!keywords.length) { showErrors(suggestions, { error: "Choose at least one keyword." }); return; }
+      post("/api/printify/suggestions/add", { keywords: keywords }).then(function (r) {
+        if (r.ok) { location.reload(); } else { showErrors(suggestions, r.data); }
+      });
+    });
+  }
+
   // The next poll starts 2 s after the previous answer, so slow answers never pile up.
   function poll() { refresh().then(function () { setTimeout(poll, 2000); }); }
   if (root) setTimeout(poll, 2000);

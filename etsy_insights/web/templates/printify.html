@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Printify · Etsy Insights{% endblock %}
+{% block content %}
+<div class="page-head"><div>
+  <h1>Printify</h1>
+  <p class="muted">Etsy Insights only reads from Printify. It never changes anything in your Printify shop.</p>
+</div></div>
+
+<section class="panel" aria-label="Printify connection" data-printify data-state="{{ status.state }}">
+  {% if not connected %}
+  <h2>Connect Printify</h2>
+  <ol class="steps">
+    <li>In Printify, open <strong>My Profile → Connections</strong> and generate a personal access token.</li>
+    <li>Tick only these permissions: <code>shops.read</code>, <code>products.read</code> and <code>catalog.read</code>.</li>
+    <li>Copy the token and paste it below. It is stored only on this Mac.</li>
+  </ol>
+  <form class="form" data-api="/api/printify/token">
+    <div class="field"><label for="printify-token">Paste your Printify token</label>
+      <input id="printify-token" name="token" type="password" autocomplete="off" spellcheck="false"></div>
+    <p class="error" data-error></p>
+    <button class="btn btn--primary" type="submit">Test and save</button>
+  </form>
+  {% else %}
+  <h2>Connected</h2>
+  <p>Connected{% if shop_title %} · Shop: {{ shop_title }}{% endif %} · token ends {{ hint }} ·
+    {% if last_sync %}Last sync: {{ last_sync }}{% else %}Never synced{% endif %}</p>
+  <div class="actions">
+    <button type="button" class="btn btn--primary" data-api="/api/printify/sync" {{ 'disabled' if status.state == 'running' }}>Sync now</button>
+    <button type="button" class="btn" data-api="/api/printify/disconnect">Disconnect</button>
+  </div>
+  {% endif %}
+  {% if status.state == 'running' %}
+  <p class="notice" data-sync-progress>Syncing… {{ status.step }}{% if status.total %} ({{ status.done }} of {{ status.total }}){% endif %}</p>
+  {% endif %}
+  {% if status.state == 'choose_shop' %}
+  <p class="notice">{{ status.error }}</p>
+  <ul class="shops">{% for shop in status.shops %}
+    <li><strong>{{ shop.title }}</strong> <span class="muted">({{ shop.sales_channel }})</span>
+      <button type="button" class="btn btn--small" data-api="/api/printify/shop" data-body='{{ {"shop_id": shop.id} | tojson }}'>Use this shop</button></li>
+  {% endfor %}</ul>
+  {% endif %}
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+</section>
+
+<section class="panel" aria-label="Product types">
+  <h2>Product types ({{ rows | length }})</h2>
+  {% if rows %}
+  <p class="muted small">A keyword matches a product type when it contains one of its product words (separate words with commas).</p>
+  <div class="table-wrap"><table class="table table--edit">
+    <thead><tr><th scope="col">Product type</th><th scope="col">Source</th><th scope="col">Product words</th>
+      <th scope="col">Cost from</th><th scope="col">US shipping</th><th scope="col" class="right">Matches</th>
+      <th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+    <tbody>{% for r in rows %}<tr>
+      <td><strong>{{ r.title }}</strong>{% if r.provider %} · <span class="muted">{{ r.provider }}</span>{% endif %}
+        {% if not r.available %}<br><span class="badge badge--skip">No longer available</span>{% endif %}</td>
+      <td>{{ r.source_text }}</td>
+      <td><input class="input--wide" name="words" form="type-{{ r.id }}" value="{{ r.words }}" aria-label="Product words for {{ r.title }}">
+        {% if not r.words %}<span class="muted small">Add product words</span>{% endif %}</td>
+      <td>{% if r.source == 'picked' %}<input class="input--money" name="cost_usd" form="type-{{ r.id }}" inputmode="decimal" value="{{ r.cost_input }}" placeholder="Cost unknown" aria-label="Production cost in US$ for {{ r.title }}">{% else %}{{ r.cost }}{% endif %}</td>
+      <td>{{ r.shipping }}</td>
+      <td class="right">{{ r.matches }}</td>
+      <td class="right"><form id="type-{{ r.id }}" class="inline" data-api="/api/printify/types/update">
+          <input type="hidden" name="type_id" value="{{ r.id }}">
+          <button class="btn btn--small" type="submit">Save</button>
+          {% if r.source == 'picked' %}<button type="button" class="btn btn--small" data-api="/api/printify/types/remove" data-body='{{ {"type_id": r.id} | tojson }}'>Remove</button>{% endif %}
+          <p class="error" data-error></p></form></td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="muted">No product types yet. Connect Printify and run Sync.</p>{% endif %}
+</section>
+
+<section class="panel" aria-label="Add from catalog" data-catalog>
+  <h2>Add from catalog</h2>
+  {% if has_catalog %}
+  <p class="muted small">Add a Printify product you have not made yet. Printify does not share its cost, so enter it yourself.</p>
+  <div class="field"><label for="catalog-q">Search Printify products</label>
+    <input id="catalog-q" type="search" placeholder="mug, Gildan 18000, tote bag" autocomplete="off" data-catalog-q></div>
+  <ul class="catalog-results" data-catalog-results></ul>
+  <div data-catalog-pick hidden>
+    <p><strong data-catalog-title></strong></p>
+    <div class="field"><label for="catalog-provider">Print provider</label><select id="catalog-provider" data-catalog-provider></select></div>
+    <div class="field"><label for="catalog-cost">Production cost <span class="muted">(US$, optional)</span></label>
+      <input id="catalog-cost" class="input--money" inputmode="decimal" data-catalog-cost></div>
+    <p class="error" data-catalog-error></p>
+    <button type="button" class="btn btn--primary" data-catalog-add>Add</button>
+  </div>
+  {% else %}<p class="muted">Run Sync once to search the catalog.</p>{% endif %}
+</section>
+
+<section class="panel" aria-label="Suggested keywords">
+  <h2>Suggested keywords</h2>
+  {% if suggestions %}
+  <form data-suggestions>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th scope="col"><span class="sr-only">Add</span></th><th scope="col">Keyword</th><th scope="col">From</th></tr></thead>
+      <tbody>{% for s in suggestions %}<tr>
+        <td><input type="checkbox" name="keywords" value="{{ s.keyword }}" id="sg-{{ loop.index }}"></td>
+        <td><label for="sg-{{ loop.index }}">{{ s.keyword }}</label></td>
+        <td class="muted">{{ s.origin }}</td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    <p class="error" data-error></p>
+    <button class="btn btn--primary" type="submit">Add selected</button>
+  </form>
+  {% else %}<p class="muted">No suggestions yet. Sync your Printify products first.</p>{% endif %}
+</section>
+{% endblock %}

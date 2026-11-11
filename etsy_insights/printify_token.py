@@ -9,12 +9,13 @@ TOKEN_FILE = "printify-token"
 _BEARER = re.compile(r"^bearer(\s+|$)", re.IGNORECASE)
 
 
-def _clean(token: str) -> str:
+def clean_token(token: str) -> str:
+    """Buang spasi dan awalan \"Bearer \"."""
     return _BEARER.sub("", token.strip()).strip()
 
 
 def save_token(home: Path, token: str) -> str:
-    cleaned = _clean(token)
+    cleaned = clean_token(token)
     if not cleaned:
         raise ValueError("The token is empty.")
     home = Path(home)
@@ -34,7 +35,7 @@ def load_token(home: Path) -> str | None:
     path = Path(home) / TOKEN_FILE
     if not path.exists():
         return None
-    token = _clean(path.read_text(encoding="utf-8"))
+    token = clean_token(path.read_text(encoding="utf-8"))
     return token or None
 
 

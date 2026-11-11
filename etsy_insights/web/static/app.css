@@ -108,3 +108,14 @@ textarea { width: 100%; margin: 8px 0; }
 .start-error { border-left: 3px solid var(--danger); padding: 2px 0 2px 12px; margin-bottom: 12px; }
 .start-error__out, .log-file { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; white-space: pre-wrap; word-break: break-word; margin: 0; }
 .log-file { background: var(--surface); border: 1px solid #E4E4DE; border-radius: 8px; padding: 16px; max-height: 70vh; overflow: auto; }
+.steps { margin: 0 0 16px; padding-left: 20px; }
+.steps li { margin-bottom: 6px; }
+.shops { list-style: none; margin: 0; padding: 0; }
+.shops li { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #EFEFEA; }
+.catalog-results { list-style: none; margin: 0 0 12px; padding: 0; max-height: 240px; overflow: auto; }
+.catalog-results li { padding: 6px 0; border-bottom: 1px solid #EFEFEA; }
+.table--edit td { white-space: normal; vertical-align: top; }
+.input--wide { width: 100%; min-width: 180px; }
+.input--money { width: 110px; }
+form.inline { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; margin: 0; }
+form.inline .error { flex-basis: 100%; text-align: right; }

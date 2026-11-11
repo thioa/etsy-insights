@@ -294,6 +294,11 @@ class PrintifyStore:
     def has_blueprints(self) -> bool:
         return self._db.execute("SELECT 1 FROM printify_blueprints LIMIT 1").fetchone() is not None
 
+    def blueprint(self, blueprint_id: int) -> Blueprint | None:
+        row = self._db.execute("SELECT id, title, brand, model FROM printify_blueprints WHERE id = ?",
+                               (blueprint_id,)).fetchone()
+        return Blueprint(row[0], row[1], row[2] or "", row[3] or "") if row else None
+
     def search_blueprints(self, query: str, limit: int = 30) -> list[Blueprint]:
         pattern = f"%{' '.join(query.split())}%"
         rows = self._db.execute(
