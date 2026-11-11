@@ -10,7 +10,7 @@ from datetime import date, datetime, timedelta, timezone, tzinfo
 from pathlib import Path
 
 from .models import CapturedResponse, KeywordMetrics, QueueItem, RawResult, RelatedKeyword, ResultRow
-from .printify_store import PRINTIFY_SCHEMA
+from .printify_store import PRINTIFY_SCHEMA, migrate_printify
 
 MAX_FAILURES = 3
 
@@ -111,6 +111,7 @@ class Store:
             self._db.execute("PRAGMA journal_mode=WAL")
         self._db.executescript(_SCHEMA)
         self._db.executescript(PRINTIFY_SCHEMA)
+        migrate_printify(self._db)
         self._migrate()
 
     def _migrate(self) -> None:

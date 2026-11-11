@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
 
 from .product_words import words_for_title
@@ -17,7 +17,15 @@ CREATE TABLE IF NOT EXISTS printify_meta (
     key TEXT PRIMARY KEY, value TEXT
 );
 CREATE TABLE IF NOT EXISTS printify_blueprints (
-    id INTEGER PRIMARY KEY, title TEXT NOT NULL, brand TEXT, model TEXT
+    id INTEGER PRIMARY KEY, title TEXT NOT NULL, brand TEXT, model TEXT, image_url TEXT
+);
+CREATE TABLE IF NOT EXISTS printify_catalog_providers (
+    blueprint_id INTEGER NOT NULL, provider_id INTEGER NOT NULL, title TEXT NOT NULL,
+    fetched_at TEXT NOT NULL, PRIMARY KEY (blueprint_id, provider_id)
+);
+CREATE TABLE IF NOT EXISTS printify_catalog_shipping (
+    blueprint_id INTEGER NOT NULL, provider_id INTEGER NOT NULL, shipping_us_cents INTEGER,
+    handling_days INTEGER, fetched_at TEXT NOT NULL, PRIMARY KEY (blueprint_id, provider_id)
 );
 CREATE TABLE IF NOT EXISTS printify_types (
     id INTEGER PRIMARY KEY,
@@ -50,12 +58,29 @@ CREATE TABLE IF NOT EXISTS keyword_product_links (
 """
 
 
+CACHE_MAX_AGE = timedelta(days=30)  # provider dan ongkir katalog
+
+
+def migrate_printify(connection) -> None:
+    """Tambah kolom yang belum ada di database dari versi lama."""
+    columns = {row[1] for row in connection.execute("PRAGMA table_info(printify_blueprints)")}
+    if "image_url" not in columns:
+        connection.execute("ALTER TABLE printify_blueprints ADD COLUMN image_url TEXT")
+
+
 @dataclass(frozen=True)
 class Blueprint:
     id: int
     title: str
     brand: str
     model: str
+    image_url: str = ""
+
+
+@dataclass(frozen=True)
+class ShippingInfo:
+    shipping_us_cents: int | None
+    handling_days: int | None
 
 
 @dataclass(frozen=True)
@@ -271,8 +296,9 @@ class PrintifyStore:
                 db.execute("INSERT OR REPLACE INTO printify_products (id, type_id, title, tags_json, cost_min_cents) "
                            "VALUES (?, ?, ?, ?, ?)", (p.id, type_id, p.title, json.dumps(list(p.tags)), p.cost_min_cents))
             db.execute("DELETE FROM printify_blueprints")
-            db.executemany("INSERT OR REPLACE INTO printify_blueprints (id, title, brand, model) VALUES (?, ?, ?, ?)",
-                           [(b.id, b.title, b.brand, b.model) for b in result.blueprints])
+            db.executemany("INSERT OR REPLACE INTO printify_blueprints (id, title, brand, model, image_url) "
+                           "VALUES (?, ?, ?, ?, ?)",
+                           [(b.id, b.title, b.brand, b.model, b.image_url) for b in result.blueprints])
             self.set_meta("shop_id", str(result.shop_id))
             self.set_meta("shop_title", result.shop_title)
             self.set_meta("last_sync_at", _ts(now))
@@ -294,18 +320,54 @@ class PrintifyStore:
     def has_blueprints(self) -> bool:
         return self._db.execute("SELECT 1 FROM printify_blueprints LIMIT 1").fetchone() is not None
 
+    @staticmethod
+    def _blueprint(row) -> Blueprint:
+        return Blueprint(row[0], row[1], row[2] or "", row[3] or "", row[4] or "")
+
     def blueprint(self, blueprint_id: int) -> Blueprint | None:
-        row = self._db.execute("SELECT id, title, brand, model FROM printify_blueprints WHERE id = ?",
+        row = self._db.execute("SELECT id, title, brand, model, image_url FROM printify_blueprints WHERE id = ?",
                                (blueprint_id,)).fetchone()
-        return Blueprint(row[0], row[1], row[2] or "", row[3] or "") if row else None
+        return self._blueprint(row) if row else None
+
+    def blueprints(self) -> list[Blueprint]:
+        rows = self._db.execute("SELECT id, title, brand, model, image_url FROM printify_blueprints "
+                                "ORDER BY lower(title), id").fetchall()
+        return [self._blueprint(r) for r in rows]
+
+    # --- cache detail katalog (30 hari) ----------------------------------------
+    def cached_providers(self, blueprint_id: int, now: datetime) -> list[tuple[int, str]] | None:
+        rows = self._db.execute("SELECT provider_id, title, fetched_at FROM printify_catalog_providers "
+                                "WHERE blueprint_id = ? ORDER BY title, provider_id", (blueprint_id,)).fetchall()
+        if not rows or any(now - _dt(r[2]) > CACHE_MAX_AGE for r in rows):
+            return None
+        return [(r[0], r[1]) for r in rows]
+
+    def save_providers(self, blueprint_id: int, providers, now: datetime) -> None:
+        self._db.execute("DELETE FROM printify_catalog_providers WHERE blueprint_id = ?", (blueprint_id,))
+        self._db.executemany(
+            "INSERT OR REPLACE INTO printify_catalog_providers (blueprint_id, provider_id, title, fetched_at) "
+            "VALUES (?, ?, ?, ?)", [(blueprint_id, pid, title, _ts(now)) for pid, title in providers])
+
+    def cached_shipping(self, blueprint_id: int, provider_id: int, now: datetime) -> ShippingInfo | None:
+        row = self._db.execute("SELECT shipping_us_cents, handling_days, fetched_at FROM printify_catalog_shipping "
+                               "WHERE blueprint_id = ? AND provider_id = ?", (blueprint_id, provider_id)).fetchone()
+        if row is None or now - _dt(row[2]) > CACHE_MAX_AGE:
+            return None
+        return ShippingInfo(row[0], row[1])
+
+    def save_shipping(self, blueprint_id: int, provider_id: int, info: ShippingInfo, now: datetime) -> None:
+        self._db.execute(
+            "INSERT OR REPLACE INTO printify_catalog_shipping (blueprint_id, provider_id, shipping_us_cents, "
+            "handling_days, fetched_at) VALUES (?, ?, ?, ?, ?)",
+            (blueprint_id, provider_id, info.shipping_us_cents, info.handling_days, _ts(now)))
 
     def search_blueprints(self, query: str, limit: int = 30) -> list[Blueprint]:
         pattern = f"%{' '.join(query.split())}%"
         rows = self._db.execute(
-            "SELECT id, title, brand, model FROM printify_blueprints "
+            "SELECT id, title, brand, model, image_url FROM printify_blueprints "
             "WHERE title || ' ' || coalesce(brand, '') || ' ' || coalesce(model, '') LIKE ? "
             "ORDER BY lower(title), id LIMIT ?", (pattern, limit)).fetchall()
-        return [Blueprint(r[0], r[1], r[2] or "", r[3] or "") for r in rows]
+        return [self._blueprint(r) for r in rows]
 
     def link(self, keyword_id: int, type_id: int | None) -> None:
         if type_id is None:

@@ -173,3 +173,19 @@ def test_disabled_variants_need_no_cost(fake):
     result = build_result(client_for(fake)("tok"), data.SHOPS[0], [], lambda *a: None)
     sweat = next(p for p in result.products if p.id == "p-sweat")
     assert (sweat.cost_min_cents, sweat.cost_max_cents) == (1350, 1600)
+
+
+def test_image_url_from():
+    from etsy_insights.printify_sync import image_url_from
+    assert image_url_from(["http://x/a.png", "https://x/b.png"]) == "https://x/b.png"
+    for value in (None, [], [1, "javascript:x"], "https://x/c.png"):
+        assert image_url_from(value) == ""
+
+
+def test_build_result_keeps_images(fake):
+    blueprints = copy.deepcopy(data.BLUEPRINTS)
+    blueprints[0]["images"] = ["https://images.printify.com/sweat.png"]
+    fake.set("/v1/catalog/blueprints.json", blueprints)
+    result = build_result(client_for(fake)("tok"), data.SHOPS[0], [], lambda *a: None)
+    by_id = {b.id: b for b in result.blueprints}
+    assert by_id[6].image_url == "https://images.printify.com/sweat.png" and by_id[68].image_url == ""

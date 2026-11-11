@@ -123,3 +123,37 @@ def test_search_blueprints(tmp_path):
     assert [b.id for b in ps.search_blueprints("gildan")] == [6]
     assert [b.id for b in ps.search_blueprints("3001")] == [384]
     assert len(ps.search_blueprints("u", limit=2)) == 2
+
+
+def test_old_database_gets_image_column(tmp_path):
+    import sqlite3
+    path = tmp_path / "etsy.db"
+    db = sqlite3.connect(path)
+    db.execute("CREATE TABLE printify_blueprints (id INTEGER PRIMARY KEY, title TEXT NOT NULL, brand TEXT, model TEXT)")
+    db.execute("INSERT INTO printify_blueprints VALUES (6, 'Sweatshirt', 'Gildan', '18000')")
+    db.commit()
+    db.close()
+    store = Store(path)
+    assert PrintifyStore(store).blueprints()[0].image_url == ""
+    store.close()
+
+
+def test_blueprint_images_saved(tmp_path):
+    store, ps = open_store(tmp_path)
+    image = "https://images.printify.com/a.png"
+    ps.apply_sync(result([], blueprints=(Blueprint(6, SWEAT, "Gildan", "18000", image_url=image),)), NOW)
+    assert ps.blueprints()[0].image_url == image
+    assert ps.search_blueprints("sweat")[0].image_url == image and ps.blueprint(6).image_url == image
+
+
+def test_details_cache(tmp_path):
+    from datetime import timedelta
+
+    from etsy_insights.printify_store import ShippingInfo
+    store, ps = open_store(tmp_path)
+    ps.save_providers(6, [(99, "Monster Digital")], NOW)
+    assert ps.cached_providers(6, NOW + timedelta(days=29)) == [(99, "Monster Digital")]
+    assert ps.cached_providers(6, NOW + timedelta(days=31)) is None and ps.cached_providers(7, NOW) is None
+    ps.save_shipping(6, 99, ShippingInfo(None, 3), NOW)
+    assert ps.cached_shipping(6, 99, NOW) == ShippingInfo(None, 3)
+    assert ps.cached_shipping(6, 1, NOW) is None and ps.cached_shipping(6, 99, NOW + timedelta(days=31)) is None

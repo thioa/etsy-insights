@@ -43,6 +43,15 @@ def _int(value: Any) -> bool:
     return isinstance(value, int) and not isinstance(value, bool)
 
 
+def image_url_from(images: object) -> str:
+    """Alamat foto pertama yang aman (https), atau ""."""
+    if isinstance(images, list):
+        for url in images:
+            if isinstance(url, str) and url.startswith("https://"):
+                return url
+    return ""
+
+
 def choose_shop(shops: list[dict], saved_shop_id: int | None) -> dict:
     if saved_shop_id is not None:
         for shop in shops:
@@ -161,7 +170,7 @@ def build_result(client: PrintifyClient, shop: dict, picked: Sequence[tuple[int,
         if not isinstance(item, dict) or not _int(item.get("id")) or not isinstance(item.get("title"), str):
             raise _bad("/v1/catalog/blueprints.json", item)
         blueprints[item["id"]] = Blueprint(item["id"], item["title"], str(item.get("brand") or ""),
-                                           str(item.get("model") or ""))
+                                           str(item.get("model") or ""), image_url_from(item.get("images")))
 
     own_keys = list(dict.fromkeys((p.blueprint_id, p.print_provider_id) for p in products))
     picked_keys = [k for k in dict.fromkeys(picked) if k not in cheapest]
