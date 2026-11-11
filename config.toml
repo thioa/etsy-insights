@@ -40,6 +40,9 @@ volume_minimum = 100
 # Port for the 'Etsy Riset' Chrome connection. Change only if another program uses it.
 port_debug = 9222
 
+# Port for the Etsy Insights app in your browser (http://127.0.0.1:PORT).
+port_web = 8765
+
 # Score weights. They are normalized automatically so they add up to 1.
 [bobot]
 volume = 0.4

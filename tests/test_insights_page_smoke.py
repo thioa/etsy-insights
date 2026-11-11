@@ -181,3 +181,11 @@ def test_keyword_with_signin_text_works(context, state):
     page = make_page(context)
     page.open()
     assert parse_search(page.search("book signing")).main.search_volume == 46395
+
+
+def test_close_closes_its_tab(context, state):
+    page = make_page(context)
+    page.open()
+    before = len(context.pages)
+    page.close()
+    assert len(context.pages) == before - 1

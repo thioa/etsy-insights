@@ -242,3 +242,22 @@ def test_format_summary_test_run():
     clock, store, page = setup("a", "b", "c", "d")
     s = run_session(make_deps(store, page, clock), max_keywords=3)
     assert s.test_run and format_summary(s).startswith("Session finished: Test run finished (3 searches).")
+
+
+def test_precheck_queue_empty_does_not_open_chrome():
+    clock = FakeClock(T0)
+    store = Store(":memory:")
+    page = FakePage(clock)
+    s = run_session(make_deps(store, page, clock))
+    assert s.stop_reason is StopReason.QUEUE_EMPTY and page.opened == 0 and store.last_session() is None
+
+
+def test_precheck_reports_reasons():
+    from etsy_insights.session import precheck
+    store = Store(":memory:")
+    store.sync_user_keywords(["a"], T0)
+    assert precheck(store, Config(), T0) == (None, None)
+    sid = store.start_session(T0)
+    store.end_session(sid, T0, "tanda_bahaya", T0 + timedelta(hours=24))
+    assert precheck(store, Config(), T0) == (StopReason.COOLDOWN, T0 + timedelta(hours=24))
+    assert precheck(store, Config(), T0, ignore_cooldown=True) == (None, None)

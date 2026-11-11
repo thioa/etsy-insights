@@ -241,6 +241,22 @@ def _loop(deps: SessionDeps, state: _State, limit: int, start: datetime, prev_en
             return
 
 
+def precheck(store: Store, cfg: Config, now: datetime, max_keywords: int | None = None,
+             ignore_cooldown: bool = False) -> tuple[StopReason | None, datetime | None]:
+    """Alasan sesi tidak bisa dimulai, dicek SEBELUM Chrome dibuka. (None, None) = boleh mulai."""
+    if not ignore_cooldown:
+        cooldown = store.active_cooldown_until(now)
+        if cooldown is not None:
+            return StopReason.COOLDOWN, cooldown
+    if remaining_quota(cfg, store.checked_on(now.date(), now.tzinfo), max_keywords) == 0:
+        return StopReason.NO_QUOTA, None
+    if StopReason.ETSY_QUOTA.value in store.stop_reasons_on(now.date(), now.tzinfo):
+        return StopReason.ETSY_QUOTA, None
+    if select_next(store, cfg, now) is None:
+        return StopReason.QUEUE_EMPTY, None
+    return None, None
+
+
 def run_session(deps: SessionDeps, max_keywords: int | None = None,
                 ignore_cooldown: bool = False) -> SessionSummary:
     store, cfg = deps.store, deps.cfg
@@ -250,18 +266,11 @@ def run_session(deps: SessionDeps, max_keywords: int | None = None,
     if recovered:
         deps.log(f"{recovered} keywords from an interrupted session went back to the queue.")
 
-    if not ignore_cooldown:
-        cooldown = store.active_cooldown_until(now)
-        if cooldown is not None:
-            state.reason, state.cooldown_until = StopReason.COOLDOWN, cooldown
-            return _summary(deps, state)
+    reason, cooldown = precheck(store, cfg, now, max_keywords, ignore_cooldown)
+    if reason is not None:
+        state.reason, state.cooldown_until = reason, cooldown
+        return _summary(deps, state)
     limit = remaining_quota(cfg, store.checked_on(now.date(), now.tzinfo), max_keywords)
-    if limit == 0:
-        state.reason = StopReason.NO_QUOTA
-        return _summary(deps, state)
-    if StopReason.ETSY_QUOTA.value in store.stop_reasons_on(now.date(), now.tzinfo):
-        state.reason = StopReason.ETSY_QUOTA
-        return _summary(deps, state)
 
     prev = store.last_session()
     prev_end = (prev["ended_at"] or prev["started_at"]) if prev else None

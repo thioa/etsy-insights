@@ -127,11 +127,17 @@ class EtsyInsightsPage:
             pass
 
     def close(self) -> None:
-        """Lepas pendengar respons dari context (Chrome tetap terbuka)."""
+        """Lepas pendengar respons dan tutup tab yang dibuka sesi ini (Chrome tetap terbuka)."""
         try:
             self._context.remove_listener("response", self._on_response)
         except Exception:
             pass
+        if self._page is not None:
+            try:
+                self._page.close()
+            except Exception:
+                pass
+            self._page = None
 
     # --- InsightsPage ----------------------------------------------------------
     def _blocked_now(self) -> bool:

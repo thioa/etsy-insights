@@ -157,3 +157,21 @@ def test_cli_status_error_reason_is_readable(tmp_path, capsys):
     s.close()
     assert main(["status"], base_dir=base, now=lambda: T0) == 0
     assert "unexpected error" in capsys.readouterr().out
+
+
+def test_cli_run_log_file_and_yes(tmp_path, monkeypatch):
+    from etsy_insights.store import Store
+    page = FakePage(FakeClock(T0))
+    patch_page(monkeypatch, page)
+    base = project(tmp_path, keywords="a\n")
+    s = Store(base / "data" / "etsy.db")
+    sid = s.start_session(T0)
+    s.end_session(sid, T0, "tanda_bahaya", T0 + timedelta(hours=24))
+    s.close()
+    log = tmp_path / "x.log"
+
+    def no_input(prompt):
+        raise AssertionError("must not prompt")
+    assert main(["run", "--abaikan-pendinginan", "--yes", "--log-file", str(log)], base_dir=base,
+                now=lambda: T0, input_fn=no_input) == 0
+    assert "[1/" in log.read_text(encoding="utf-8")

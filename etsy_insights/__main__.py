@@ -19,6 +19,7 @@ from .export import export_excel
 from .insights_page import EtsyInsightsPage
 from .models import InsightsPage
 from .pacer import Pacer, remaining_quota
+from .paths import app_home, excel_dir
 from .parser import PARSER_VERSION, parse_search
 from .planner import upcoming
 from .recorder import run_kenali
@@ -27,7 +28,6 @@ from .session import REASON_TEXT, SessionDeps, StopReason, format_summary, run_s
 from .store import Store, read_keywords_file
 from .taste import build_profiles
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 UJI_SEARCHES = 3
 
 
@@ -110,7 +110,7 @@ def _status(base: Path, cfg: Config, now: datetime) -> int:
 def _export(base: Path, cfg: Config, now: datetime) -> int:
     store = _open_store(base, now)
     path = export_excel(score_all(store.latest_results(), cfg), store.all_results(), upcoming(store, cfg),
-                        base / "hasil", now.date(), profiles=build_profiles(store))
+                        excel_dir(base), now.date(), profiles=build_profiles(store))
     store.close()
     print(f"Excel file: {path}")
     return 0
@@ -123,10 +123,9 @@ def _kenali(base: Path, cfg: Config, now_fn: Callable[[], datetime]) -> int:
     return 0
 
 
-def _make_logger(base: Path, now: datetime) -> Callable[[str], None]:
-    logs = base / "logs"
-    logs.mkdir(parents=True, exist_ok=True)
-    path = logs / f"sesi-{now:%Y%m%d-%H%M%S}.log"
+def _make_logger(base: Path, now: datetime, log_file: Path | None = None) -> Callable[[str], None]:
+    path = Path(log_file) if log_file else base / "logs" / f"sesi-{now:%Y%m%d-%H%M%S}.log"
+    path.parent.mkdir(parents=True, exist_ok=True)
 
     def log(message: str) -> None:
         print(message)
@@ -136,7 +135,7 @@ def _make_logger(base: Path, now: datetime) -> Callable[[str], None]:
 
 
 def _run(base: Path, cfg: Config, now_fn: Callable[[], datetime], uji: bool, ignore_cooldown: bool,
-         input_fn: Callable[[str], str]) -> int:
+         input_fn: Callable[[str], str], *, assume_yes: bool = False, log_file: Path | None = None) -> int:
     store = _open_store(base, now_fn())
     try:
         with session_lock(base / "data" / "sesi.lock") as locked:
@@ -147,10 +146,10 @@ def _run(base: Path, cfg: Config, now_fn: Callable[[], datetime], uji: bool, ign
             if ignore_cooldown and cooldown is not None:
                 print(f"WARNING: cooldown is active until {cooldown.astimezone():%Y-%m-%d %H:%M}. "
                       "Etsy just showed a warning; continuing now adds risk to your account.")
-                if input_fn("Type YES to run anyway: ").strip() != "YES":
+                if not assume_yes and input_fn("Type YES to run anyway: ").strip() != "YES":
                     print("Cancelled.")
                     return 1
-            log = _make_logger(base, now_fn())
+            log = _make_logger(base, now_fn(), log_file)
             rng = random.Random()
             pacer = Pacer(cfg, rng)
             with interrupt_on_signals(), _open_insights(cfg, pacer, rng, log) as page:
@@ -173,19 +172,22 @@ def main(argv: list[str] | None = None, *, base_dir: Path | None = None,
     run.add_argument("--uji", action="store_true", help=f"Test run: only {UJI_SEARCHES} searches")
     run.add_argument("--abaikan-pendinginan", action="store_true",
                      help="Run even during cooldown (asks you to type YES)")
+    run.add_argument("--yes", action="store_true", help="Answer YES to the cooldown question (used by the app)")
+    run.add_argument("--log-file", type=Path, help="Write the session log to this file")
     sub.add_parser("status", help="Show the queue, today's searches and the last session")
     sub.add_parser("export", help="Create the latest Excel file")
     sub.add_parser("kenali", help="Recording mode: record Marketplace Insights data while you search by hand")
     args = parser.parse_args(argv)
 
-    base = Path(base_dir) if base_dir else PROJECT_ROOT
+    base = Path(base_dir) if base_dir else app_home()
     now_fn = now or (lambda: datetime.now().astimezone())
     try:
         cfg, warnings = load_config(base / "config.toml")
         for warning in warnings:
             print(f"Config warning: {warning}")
         if args.command == "run":
-            return _run(base, cfg, now_fn, args.uji, args.abaikan_pendinginan, input_fn)
+            return _run(base, cfg, now_fn, args.uji, args.abaikan_pendinginan, input_fn,
+                        assume_yes=args.yes, log_file=args.log_file)
         if args.command == "status":
             return _status(base, cfg, now_fn())
         if args.command == "export":

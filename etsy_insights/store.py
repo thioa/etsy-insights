@@ -103,8 +103,11 @@ class Store:
     def __init__(self, path: str | Path) -> None:
         if str(path) != ":memory:":
             Path(path).parent.mkdir(parents=True, exist_ok=True)
-        self._db = sqlite3.connect(str(path), isolation_level=None)
+        self._db = sqlite3.connect(str(path), timeout=10, isolation_level=None)
         self._db.row_factory = sqlite3.Row
+        if str(path) != ":memory:":
+            # WAL: server web bisa membaca sementara proses sesi menulis.
+            self._db.execute("PRAGMA journal_mode=WAL")
         self._db.executescript(_SCHEMA)
         self._migrate()
 

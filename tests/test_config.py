@@ -99,3 +99,9 @@ def test_etsy_quota_exhausted():
     assert EtsyQuota(15, 5, 5, False, True).exhausted
     assert EtsyQuota(15, 15, 5, True, True).exhausted and EtsyQuota(15, 15, 5, False, False).exhausted
     assert not EtsyQuota(None, None, None, False, True).exhausted
+
+
+def test_port_web_default_and_limits(tmp_path):
+    assert Config().port_web == 8765
+    cfg, warnings = load_config(write(tmp_path, "port_web = 80\n"))
+    assert cfg.port_web == 8765 and any("port_web" in w for w in warnings)

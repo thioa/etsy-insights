@@ -195,3 +195,20 @@ def test_latest_search_raws_roundtrip():
     s.save_result(kid, make_metrics(), raw, T0, "t")
     back = s.latest_search_raws()[kid]
     assert back.keyword == "sweatshirt" and back.responses == raw.responses
+
+
+def test_store_uses_wal(tmp_path):
+    s = Store(tmp_path / "x.db")
+    assert s._db.execute("PRAGMA journal_mode").fetchone()[0] == "wal"
+
+
+def test_store_reads_while_other_connection_writes(tmp_path):
+    s = Store(tmp_path / "x.db")
+    s.sync_user_keywords(["a"], T0)
+    other = sqlite3.connect(tmp_path / "x.db", isolation_level=None)
+    other.execute("BEGIN EXCLUSIVE")
+    other.execute("UPDATE keywords SET fail_count = 1")
+    s._db.execute("PRAGMA busy_timeout = 300")  # tanpa WAL, pembaca tertahan lalu "database is locked"
+    assert s.get("a").fail_count == 0
+    other.execute("COMMIT")
+    assert s.get("a").fail_count == 1
