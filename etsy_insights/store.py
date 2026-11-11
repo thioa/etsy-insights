@@ -142,41 +142,12 @@ class Store:
                     (keyword, _ts(now)))
                 changed += 1
             elif existing.source != "user":
+                status = "pending" if existing.status == "harvested" else existing.status
                 self._db.execute(
-                    "UPDATE keywords SET source = 'user', parent_id = NULL, depth = 0 WHERE id = ?", (existing.id,))
+                    "UPDATE keywords SET source = 'user', parent_id = NULL, depth = 0, status = ? WHERE id = ?",
+                    (status, existing.id))
                 changed += 1
         return changed
-
-    def add_related(self, parent_id: int, keywords: Iterable[str], max_count: int, max_depth: int,
-                    now: datetime) -> int:
-        parent = self._db.execute("SELECT depth FROM keywords WHERE id = ?", (parent_id,)).fetchone()
-        if parent is None or parent["depth"] + 1 > max_depth:
-            return 0
-        added = 0
-        for keyword in dict.fromkeys(normalize_keyword(k) for k in keywords):
-            if added >= max_count:
-                break
-            if not keyword or self.get(keyword) is not None:
-                continue
-            self._db.execute(
-                "INSERT INTO keywords (keyword, source, parent_id, depth, added_at) VALUES (?, 'related', ?, ?, ?)",
-                (keyword, parent_id, parent["depth"] + 1, _ts(now)))
-            added += 1
-        return added
-
-    def next_keyword(self, now: datetime, recheck_days: int,
-                     exclude_ids: Collection[int] = ()) -> QueueItem | None:
-        exclude = list(exclude_ids)
-        not_in = f"AND k.id NOT IN ({','.join('?' * len(exclude))})" if exclude else ""
-        base = f"SELECT {_KEYWORD_COLUMNS} FROM keywords k LEFT JOIN keywords p ON k.parent_id = p.id"
-        row = self._db.execute(
-            f"{base} WHERE k.status = 'pending' {not_in} ORDER BY {_QUEUE_ORDER} LIMIT 1", exclude).fetchone()
-        if row is None:
-            cutoff = _ts(now - timedelta(days=recheck_days))
-            row = self._db.execute(
-                f"{base} WHERE k.status IN ('done', 'no_data') AND k.last_checked_at < ? {not_in} "
-                "ORDER BY k.last_checked_at, k.id LIMIT 1", [cutoff, *exclude]).fetchone()
-        return self._queue_item(row) if row else None
 
     def pending_queue(self) -> list[QueueItem]:
         rows = self._db.execute(
@@ -186,9 +157,6 @@ class Store:
 
     def mark_in_progress(self, keyword_id: int) -> None:
         self._db.execute("UPDATE keywords SET status = 'in_progress' WHERE id = ?", (keyword_id,))
-
-    def return_to_pending(self, keyword_id: int) -> None:
-        self._db.execute("UPDATE keywords SET status = 'pending' WHERE id = ?", (keyword_id,))
 
     def return_to_queue(self, keyword_id: int) -> None:
         self._db.execute(f"UPDATE keywords SET status = {_QUEUE_STATUS} WHERE id = ?", (keyword_id,))

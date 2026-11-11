@@ -1,7 +1,9 @@
 from datetime import timedelta
 
+import pytest
+
 from etsy_insights.config import Config
-from etsy_insights.models import DangerSignal, NotLoggedIn
+from etsy_insights.models import DangerSignal, NotLoggedIn, PageLoadTimeout
 from etsy_insights.session import StopReason, format_summary, run_session
 from etsy_insights.store import Store
 from tests.helpers import T0, FakeClock, FakePage, make_deps
@@ -20,12 +22,6 @@ def test_stops_at_max_keywords_without_trailing_sleep():
     assert (s.stop_reason, s.checked, s.succeeded) == (StopReason.QUOTA, 3, 3)
     assert page.searched == ["a", "b", "c"] and clock.sleeps == [20, 20] and len(page.dwells) == 3
     assert store.status_counts() == {"done": 3, "pending": 2}
-
-
-def test_related_keywords_follow_user_keywords():
-    clock, store, page = setup("a", "b", related={"a": ("a1", "a2")})
-    s = run_session(make_deps(store, page, clock), max_keywords=4)
-    assert page.searched == ["a", "b", "a1", "a2"] and s.new_keywords == 2
 
 
 def test_queue_empty():
@@ -155,3 +151,61 @@ def test_parser_crash_counts_as_failure_and_session_continues():
     clock, store, page = setup("a", "b", outcomes={"a": "parse_crash"})
     s = run_session(make_deps(store, page, clock))
     assert (s.failed, s.succeeded, store.get("a").fail_count) == (1, 1, 1)
+
+
+def test_harvest_then_best_harvested_is_searched():
+    clock, store, page = setup("a", related={"a": (("x", 5000, 50, 4), ("y", 200, 900000, 0))})
+    s = run_session(make_deps(store, page, clock), max_keywords=2)
+    assert page.searched == ["a", "x"] and s.new_keywords == 2
+    assert (store.get("x").status, store.get("y").status, store.get("x").depth) == ("done", "harvested", 1)
+
+
+def test_harvest_respects_depth():
+    clock, store, page = setup("a", related={"a": (("x", 5000, 50, 4),), "x": (("z", 9000, 5, 4),)})
+    s = run_session(make_deps(store, page, clock), max_keywords=5)
+    assert page.searched == ["a", "x"] and store.get("z").depth == 2 and s.stop_reason is StopReason.QUEUE_EMPTY
+
+
+def test_no_data_still_harvests():
+    clock, store, page = setup("a", outcomes={"a": "no_data"}, related={"a": (("x", 5000, 50, 4),)})
+    s = run_session(make_deps(store, page, clock), max_keywords=1)
+    assert (s.no_data, s.failed, store.get("x").status) == (1, 0, "harvested")
+
+
+def test_etsy_quota_stops_and_blocks_rest_of_day():
+    clock, store, page = setup("a", "b", outcomes={"a": "quota"})
+    s = run_session(make_deps(store, page, clock))
+    assert (s.stop_reason, s.checked, s.cooldown_until, store.get("a").status) == \
+        (StopReason.ETSY_QUOTA, 1, None, "done")
+    page2 = FakePage(clock)
+    assert run_session(make_deps(store, page2, clock)).stop_reason is StopReason.ETSY_QUOTA and page2.opened == 0
+    clock.advance(86400)
+    assert run_session(make_deps(store, FakePage(clock), clock)).stop_reason is not StopReason.ETSY_QUOTA
+
+
+def test_inter_session_gap():
+    clock, store, page = setup("a")
+    sid = store.start_session(T0 - timedelta(seconds=60))
+    store.end_session(sid, T0 - timedelta(seconds=5), "antrean_kosong", None)
+    run_session(make_deps(store, page, clock, Config(jeda_antar_keyword_detik=(20, 20))))
+    assert clock.sleeps == [pytest.approx(15)]
+
+
+def test_browser_closed_during_danger_check():
+    clock, store, page = setup("a", outcomes={"a": "closed_on_check"})
+    s = run_session(make_deps(store, page, clock))
+    assert s.stop_reason is StopReason.BROWSER_CLOSED
+    assert (store.get("a").status, store.get("a").fail_count) == ("pending", 0)
+
+
+def test_open_timeout_stops_cleanly():
+    clock, store, page = setup("a", open_error=PageLoadTimeout("dashboard"))
+    s = run_session(make_deps(store, page, clock))
+    assert s.stop_reason is StopReason.PAGE_UNAVAILABLE
+    assert store.last_session()["stop_reason"] == "halaman_tidak_terbuka"
+
+
+def test_failed_harvested_keyword_returns_to_harvested():
+    clock, store, page = setup("a", outcomes={"x": "parse_error"}, related={"a": (("x", 5000, 50, 4),)})
+    run_session(make_deps(store, page, clock), max_keywords=2)
+    assert (store.get("x").status, store.get("x").fail_count) == ("harvested", 1)

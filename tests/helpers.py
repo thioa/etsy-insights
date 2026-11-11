@@ -43,7 +43,7 @@ import random  # noqa: E402
 
 from etsy_insights.config import Config  # noqa: E402
 from etsy_insights.models import (  # noqa: E402
-    BrowserClosed, CapturedResponse, DangerSignal, PageLoadTimeout, ParseError)
+    BrowserClosed, CapturedResponse, DangerSignal, EtsyQuota, PageLoadTimeout, ParsedSearch, ParseError)
 
 
 class FakeClock:
@@ -103,6 +103,8 @@ class FakePage:
         return RawResult(keyword, INSIGHTS, (CapturedResponse("https://www.etsy.com/x", 200, body),), "")
 
     def check_danger(self):
+        if self.searched and self.outcomes.get(self.searched[-1]) == "closed_on_check":
+            raise BrowserClosed()
         return self._danger
 
     def dwell(self, seconds, scroll):
@@ -112,13 +114,16 @@ class FakePage:
 
 def fake_parse(raw):
     body = raw.responses[0].body
-    if body["outcome"] == "parse_error":
+    outcome = body["outcome"]
+    if outcome == "parse_error":
         raise ParseError("tidak terbaca")
-    if body["outcome"] == "parse_crash":
+    if outcome == "parse_crash":
         return {}["field_hilang"]
-    if body["outcome"] == "no_data":
-        return KeywordMetrics(has_data=False)
-    return make_metrics(related=body["related"])
+    related = tuple(RelatedKeyword(*t) for t in body["related"])
+    main = KeywordMetrics(has_data=False) if outcome == "no_data" else \
+        make_metrics(related=[r.keyword for r in related])
+    quota = EtsyQuota(15, 5 if outcome == "quota" else 15, 5, False, True)
+    return ParsedSearch(main=main, related=related, quota=quota)
 
 
 def make_deps(store, page, clock, cfg=None, seed=1):
