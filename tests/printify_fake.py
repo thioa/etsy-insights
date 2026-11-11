@@ -3,15 +3,14 @@ from __future__ import annotations
 
 import json
 import threading
-import urllib.request
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlsplit
 
 from tests import printify_data as data
 
-
-def no_proxy_opener() -> urllib.request.OpenerDirector:
-    return urllib.request.build_opener(urllib.request.ProxyHandler({}))
+SLOW = "__slow__"
+TRUNCATE = "__truncate__"
 
 
 class FakePrintify:
@@ -36,6 +35,16 @@ class FakePrintify:
                 else:
                     status, body, headers = fake.routes.get(key) or fake.routes.get(
                         parts.path, (404, {"error": "not found"}, {}))
+                if body == SLOW:  # jawab setelah batas waktu klien habis
+                    time.sleep(0.6)
+                    body = data.SHOPS
+                if body == TRUNCATE:  # koneksi putus di tengah jawaban
+                    self.send_response(status)
+                    self.send_header("Content-Length", "1000")
+                    self.end_headers()
+                    self.wfile.write(b'[{"id": 1')
+                    self.close_connection = True
+                    return
                 payload = body.encode() if isinstance(body, str) else json.dumps(body).encode()
                 self.send_response(status)
                 for name, value in headers.items():

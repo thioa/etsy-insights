@@ -211,7 +211,7 @@
       catalog.querySelector("[data-catalog-title]").textContent = item.title;
       catalogError.textContent = "";
       providerSelect.innerHTML = "";
-      fetch("/api/printify/providers?blueprint_id=" + item.id).then(function (res) {
+      fetch("/api/printify/providers?blueprint_id=" + item.id, { headers: { "X-App-Token": token } }).then(function (res) {
         return res.json().then(function (data) { return { ok: res.ok, data: data }; });
       }).then(function (r) {
         if (!r.ok) { catalogError.textContent = r.data.error || "Could not load print providers."; return; }

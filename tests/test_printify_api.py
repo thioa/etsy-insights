@@ -5,7 +5,7 @@ import pytest
 from etsy_insights.printify_api import (MissingScope, PrintifyBusy, PrintifyClient, PrintifyUnreachable,
                                         TokenRejected, UnexpectedResponse)
 from tests import printify_data as data
-from tests.printify_fake import FakePrintify, no_proxy_opener
+from tests.printify_fake import FakePrintify
 
 
 @pytest.fixture
@@ -26,7 +26,7 @@ def timing():
 
 def make(fake_url, timing, token="tok"):
     t, sleeps, sleep = timing
-    return PrintifyClient(token, base_url=fake_url, clock=lambda: t[0], sleep=sleep, opener=no_proxy_opener())
+    return PrintifyClient(token, base_url=fake_url, clock=lambda: t[0], sleep=sleep, no_proxy=True)
 
 
 def retries(sleeps):
@@ -111,3 +111,27 @@ def test_connection_refused_is_unreachable(timing):
     with pytest.raises(PrintifyUnreachable):
         make(f"http://127.0.0.1:{port}", timing).shops()
     assert retries(timing[1]) == [5, 15, 45]
+
+
+def test_truncated_body_is_retried(fake, timing):
+    from tests.printify_fake import TRUNCATE
+    fake.queue("/v1/shops.json", (200, TRUNCATE, None), (200, data.SHOPS, None))
+    assert make(fake.url, timing).shops() == data.SHOPS
+    assert retries(timing[1]) == [5]
+
+
+def test_timeout_is_retried(fake, timing):
+    from tests.printify_fake import SLOW
+    t, sleeps, sleep = timing
+    client = PrintifyClient("tok", base_url=fake.url, timeout=0.2, clock=lambda: t[0], sleep=sleep, no_proxy=True)
+    fake.queue("/v1/shops.json", (200, SLOW, None), (200, data.SHOPS, None))
+    assert client.shops() == data.SHOPS
+    assert retries(sleeps) == [5]
+
+
+def test_redirect_never_forwards_the_token(fake, timing):
+    with FakePrintify() as other:
+        fake.set("/v1/shops.json", {}, status=302, headers={"Location": other.url + "/steal"})
+        with pytest.raises(UnexpectedResponse):
+            make(fake.url, timing, token="SECRET-TOKEN").shops()
+        assert other.requests == []

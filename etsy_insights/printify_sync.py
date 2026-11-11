@@ -100,10 +100,13 @@ def _product(item: Any, path: str) -> tuple[SyncedProduct, int] | None:
         raise _bad(path, item)
     enabled = []
     for v in variants:
-        if not isinstance(v, dict) or not _int(v.get("id")) or not _int(v.get("cost")):
+        if not isinstance(v, dict) or not _int(v.get("id")):
             raise _bad(path, item)
-        if v.get("is_enabled", True):
-            enabled.append(v)
+        if v.get("is_enabled") is False:  # hanya False yang berarti tidak aktif; tidak ada/null = aktif
+            continue
+        if not _int(v.get("cost")):
+            raise _bad(path, item)
+        enabled.append(v)
     if not enabled:
         return None
     tags = item.get("tags") or []

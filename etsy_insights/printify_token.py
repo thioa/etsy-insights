@@ -10,14 +10,19 @@ _BEARER = re.compile(r"^bearer(\s+|$)", re.IGNORECASE)
 
 
 def clean_token(token: str) -> str:
-    """Buang spasi dan awalan \"Bearer \"."""
-    return _BEARER.sub("", token.strip()).strip()
+    """Buang awalan "Bearer " dan semua spasi/baris baru (token yang terpotong saat ditempel)."""
+    return "".join(_BEARER.sub("", token.strip()).split())
+
+
+def looks_like_token(token: str) -> bool:
+    """Token Printify hanya berisi karakter ASCII yang terlihat."""
+    return bool(token) and all(33 <= ord(ch) <= 126 for ch in token)
 
 
 def save_token(home: Path, token: str) -> str:
     cleaned = clean_token(token)
-    if not cleaned:
-        raise ValueError("The token is empty.")
+    if not looks_like_token(cleaned):
+        raise ValueError("That does not look like a Printify token.")
     home = Path(home)
     home.mkdir(parents=True, exist_ok=True)
     temp = home / f".{TOKEN_FILE}.tmp"

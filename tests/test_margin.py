@@ -48,3 +48,8 @@ def test_negative_margin_and_ready():
     assert is_ready("Gold", ok, 500) and is_ready("Potential", ok, 954) and not is_ready("Potential", ok, 955)
     assert not is_ready("Skip", ok, 500) and not is_ready("Gold", loss, 0)
     assert not is_ready("Gold", compute(None, 1241, 475, FEES, 500), 0)
+
+
+def test_zero_or_numeric_price_never_crashes():
+    assert parse_usd_cents(15.3) is None and paid_price_cents(15.3, None) is None
+    assert compute(0, 1241, 475, FEES, 500).status == "no_price"

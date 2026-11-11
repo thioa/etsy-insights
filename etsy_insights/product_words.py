@@ -36,13 +36,21 @@ _SEPARATORS = re.compile(r"[-_/&]")
 _NOT_WORD = re.compile(r"[^\w\s]|_")
 
 
+# Kata tunggal yang berakhiran -s (bukan bentuk jamak): canvas, canvases → canvas.
+KEEP_S = frozenset({"canvas", "atlas", "bus", "lens", "iris"})
+
+
 def _base_form(word: str) -> str:
     if word.endswith("ies"):
         word = word[:-1]  # babies → babie, hoodies → hoodie
-    elif word.endswith(("ses", "xes", "ches", "shes")):
-        word = word[:-2]
+    elif word.endswith(("sses", "xes", "ches", "shes")):
+        word = word[:-2]  # glasses → glass, boxes → box
+    elif word.endswith("ses") and word[:-2] in KEEP_S:
+        word = word[:-2]  # canvases → canvas
+    elif word in KEEP_S:
+        pass
     elif word.endswith("s") and not word.endswith("ss") and len(word) > 1:
-        word = word[:-1]
+        word = word[:-1]  # cases → case, mugs → mug, tees → tee
     if len(word) > 1 and word[-1] == "y" and word[-2].isalpha() and word[-2] not in "aeiou":
         word = word[:-1] + "ie"  # baby → babie, hoody → hoodie
     return word
@@ -70,11 +78,24 @@ def matches(keyword: str, words: Sequence[str]) -> bool:
     return matches_tokens(normalize_words(keyword), words)
 
 
+def _last_match(tokens: Sequence[str], phrase: Sequence[str]) -> tuple[int, int] | None:
+    """(posisi akhir kecocokan terakhir, panjang frasa), atau None."""
+    size = len(phrase)
+    ends = [i + size for i in range(len(tokens) - size + 1) if size and tuple(tokens[i:i + size]) == tuple(phrase)]
+    return (max(ends), size) if ends else None
+
+
 def words_for_title(title: str) -> list[str]:
+    """Kata produk untuk judul blueprint: entri kamus untuk kata benda utamanya.
+
+    Kata benda utama = kecocokan yang berakhir paling belakang di judul; kalau sama, frasa terpanjang.
+    "Hooded Sweatshirt" → hoodie (bukan sweatshirt), "Cotton Canvas Tote Bag" → tote bag (bukan canvas).
+    """
     tokens = normalize_words(title)
-    words: list[str] = []
+    best: tuple[tuple[int, int], tuple[str, ...]] | None = None
     for main, synonyms in DICTIONARY:
         entry = (main, *synonyms)
-        if any(_contains(tokens, normalize_words(phrase)) for phrase in entry):
-            words.extend(word for word in entry if word not in words)
-    return words
+        hits = [m for m in (_last_match(tokens, normalize_words(phrase)) for phrase in entry) if m]
+        if hits and (best is None or max(hits) > best[0]):
+            best = (max(hits), entry)
+    return list(dict.fromkeys(best[1])) if best else []

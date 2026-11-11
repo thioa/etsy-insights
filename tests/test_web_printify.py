@@ -101,9 +101,10 @@ def test_choose_shop_flow(home, fake):
     c.post("/api/printify/sync", headers=H)
     html = c.get("/printify").get_data(as_text=True)
     assert "Use this shop" in html and "Second" in html
-    assert c.post("/api/printify/shop", json={"shop_id": 111}, headers=H).status_code == 200
-    c.post("/api/printify/sync", headers=H)
+    assert c.post("/api/printify/shop", json={"shop_id": 111}, headers=H).status_code == 202
     assert c.get("/api/printify/status").get_json()["state"] == "done"
+    html = c.get("/printify").get_data(as_text=True)
+    assert "Use this shop" not in html and "Shop: My Etsy Shop" in html
 
 
 def test_catalog_and_providers(home, fake):
@@ -113,7 +114,9 @@ def test_catalog_and_providers(home, fake):
     assert r.status_code == 409 and r.get_json()["error"] == "Run Sync once to search the catalog."
     c.post("/api/printify/sync", headers=H)
     assert [b["id"] for b in c.get("/api/printify/catalog?q=mug").get_json()["results"]] == [68]
-    assert c.get("/api/printify/providers?blueprint_id=6").get_json()["providers"] == [{"id": 99, "title": "Monster Digital"}]
+    assert c.get("/api/printify/providers?blueprint_id=6").status_code == 403   # situs lain tidak boleh memicu
+    assert c.get("/api/printify/providers?blueprint_id=6", headers=H).get_json()["providers"] == [
+        {"id": 99, "title": "Monster Digital"}]
 
 
 def test_picked_types_api(home, fake):
@@ -199,3 +202,13 @@ def test_disconnect_keeps_data(home, fake):
     assert not (home / "printify-token").exists()
     html = c.get("/printify").get_data(as_text=True)
     assert "Connect Printify" in html and "Monster Digital" in html
+
+
+def test_token_is_cleaned_and_odd_tokens_are_refused(home, fake, caplog):
+    caplog.set_level(logging.DEBUG)
+    _, c = printify_app(home, fake)
+    assert c.post("/api/printify/token", json={"token": "Bearer secret\nPART"}, headers=H).status_code == 200
+    assert fake.requests[-1][3]["Authorization"] == "Bearer secretPART"
+    r = c.post("/api/printify/token", json={"token": "sécret-tök"}, headers=H)
+    assert r.status_code == 400 and r.get_json()["error"] == "That does not look like a Printify token."
+    assert "sécret" not in caplog.text

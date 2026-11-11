@@ -1,9 +1,10 @@
 """Halaman dan API Printify (spec Tahap 4 §10–§11). Token Printify tidak pernah dikirim ke browser."""
 from __future__ import annotations
 
+import secrets
 from datetime import datetime
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 
 from ..keywords import add_keywords
 from ..margin import money, parse_usd_cents
@@ -11,7 +12,7 @@ from ..printify_api import PrintifyError
 from ..printify_store import PrintifyStore
 from ..printify_suggestions import suggest
 from ..printify_sync import NotConnected, SyncBusy, handling_days, us_shipping_cents
-from ..printify_token import clean_token, delete_token, load_token, save_token, token_hint
+from ..printify_token import clean_token, delete_token, load_token, looks_like_token, save_token, token_hint
 from ..product_fit import match_counts
 from ..store import normalize_keyword
 from . import ctx, get_store, home
@@ -94,6 +95,8 @@ def save():
     cleaned = clean_token(str(_body().get("token") or ""))
     if not cleaned:
         return _error("Paste your Printify token.")
+    if not looks_like_token(cleaned):
+        return _error("That does not look like a Printify token.")
     try:
         shops = ctx().printify_client(cleaned).shops()
     except PrintifyError as exc:
@@ -125,7 +128,11 @@ def choose_shop():
     if shop_id is None:
         return _error("Choose a shop.")
     PrintifyStore(get_store()).set_meta("shop_id", str(shop_id))
-    return jsonify(ok=True)
+    try:  # langsung lanjutkan sync dengan toko yang dipilih
+        ctx().printify_job.start()
+    except (NotConnected, SyncBusy) as exc:
+        return _error(exc.message, 409)
+    return jsonify(ok=True), 202
 
 
 @bp.post("/api/printify/sync")
@@ -148,6 +155,10 @@ def catalog():
 
 @bp.get("/api/printify/providers")
 def providers():
+    # Endpoint ini memakai token Printify Anda, jadi situs lain tidak boleh memanggilnya (wajib kode aplikasi).
+    supplied = request.headers.get("X-App-Token", "")
+    if not secrets.compare_digest(supplied, current_app.config["APP_TOKEN"]):
+        return _error("Forbidden", 403)
     blueprint_id = _int(request.args.get("blueprint_id"))
     if blueprint_id is None:
         return _error("Choose a product.")

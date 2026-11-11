@@ -1,6 +1,7 @@
 """Klien API Printify yang hanya membaca (GET), dengan jeda antar permintaan dan coba ulang (spec Tahap 4 §5)."""
 from __future__ import annotations
 
+import http.client
 import json
 import socket
 import time
@@ -70,16 +71,24 @@ def _retry_after(value: str | None) -> float:
     return seconds if seconds >= 0 else RETRY_AFTER_DEFAULT
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Jangan pernah ikuti redirect: header Authorization tidak boleh sampai ke host lain."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
 class PrintifyClient:
     def __init__(self, token: str, *, base_url: str = BASE_URL, min_interval: float = 1.0, timeout: float = 30,
-                 clock=time.monotonic, sleep=time.sleep, opener: urllib.request.OpenerDirector | None = None) -> None:
+                 clock=time.monotonic, sleep=time.sleep, no_proxy: bool = False) -> None:
         self._token = token
         self._base = base_url.rstrip("/")
         self._min_interval = min_interval
         self._timeout = timeout
         self._clock = clock
         self._sleep = sleep
-        self._opener = opener or urllib.request.build_opener()
+        handlers = [_NoRedirect] + ([urllib.request.ProxyHandler({})] if no_proxy else [])
+        self._opener = urllib.request.build_opener(*handlers)
         self._last: float | None = None
 
     def _pace(self) -> None:
@@ -107,7 +116,8 @@ class PrintifyClient:
         while True:
             try:
                 status, body, headers = self._once(url)
-            except (urllib.error.URLError, socket.timeout, TimeoutError, ConnectionError, OSError):
+            except (urllib.error.URLError, socket.timeout, TimeoutError, ConnectionError, OSError,
+                    http.client.HTTPException):
                 status, body, headers = None, "", {}
             if status == 429:
                 if rate_retries >= MAX_RATE_RETRIES:

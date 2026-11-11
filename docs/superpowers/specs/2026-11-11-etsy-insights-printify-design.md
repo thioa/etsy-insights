@@ -214,8 +214,10 @@ Sync yang gagal hanya menulis `last_sync_error`.
 **Normalisasi:** huruf kecil. `-`, `_`, `/`, dan `&` menjadi spasi. Tanda baca lain dibuang.
 Dipecah menjadi kata. Setiap kata dibuat bentuk dasar sederhana, dalam dua langkah:
 
-1. **Jamak:** `ies` → `ie`. Akhiran `es` dibuang untuk kata berakhiran `ses`/`xes`/`ches`/`shes`.
-   Selain itu, akhiran `s` dibuang kecuali untuk `ss`.
+1. **Jamak:** `ies` → `ie`. Akhiran `es` dibuang untuk kata berakhiran `sses`/`xes`/`ches`/`shes`.
+   Kata tunggal berakhiran -s (`canvas`, `atlas`, `bus`, `lens`, `iris`) tetap utuh, dan bentuk
+   jamaknya (`canvases`) kembali ke kata itu. Selain itu, akhiran `s` dibuang kecuali untuk `ss`
+   (*cases* → `case`, *vases* → `vase`).
 2. **Akhiran y:** konsonan + `y` di akhir kata menjadi konsonan + `ie`.
 
 Contoh: *hoodies*, *hoodie*, dan *hoody* → `hoodie`; *babies* dan *baby* → `babie`; *glasses* →
@@ -253,8 +255,11 @@ selalu memakai teks aslinya.
 
 `shirt` hanya cocok dengan kata utuh `shirt`, tidak dengan `sweatshirt`.
 
-**Kata produk untuk satu jenis produk:** semua entri kamus yang kata utama atau salah satu
-sinonimnya muncul sebagai kata utuh di judul blueprint. Kalau tidak ada yang cocok, daftarnya kosong.
+**Kata produk untuk satu jenis produk:** entri kamus untuk **kata benda utama** judul blueprint,
+yaitu kecocokan (kata utama atau sinonim, sebagai kata utuh) yang berakhir paling belakang di judul.
+Kalau dua kecocokan berakhir di posisi yang sama, frasa terpanjang menang. Contoh: "Hooded
+Sweatshirt" → *hoodie* (bukan *sweatshirt*), "Cotton Canvas Tote Bag" → *tote bag* (bukan
+*canvas*). Kalau tidak ada yang cocok, daftarnya kosong.
 Halaman Printify lalu menampilkan "Add product words". Pengguna bisa mengedit daftar ini
 (`words_edited = 1`).
 

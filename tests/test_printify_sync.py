@@ -11,7 +11,7 @@ from etsy_insights.printify_sync import (NeedShopChoice, NotConnected, SyncBusy,
 from etsy_insights.printify_token import save_token
 from etsy_insights.store import Store
 from tests import printify_data as data
-from tests.printify_fake import FakePrintify, no_proxy_opener
+from tests.printify_fake import FakePrintify
 
 NOW = datetime(2026, 11, 11, 5, 0, tzinfo=timezone.utc)
 TOKEN = "secret-tok-9876"
@@ -25,7 +25,7 @@ def fake():
 
 def client_for(fake):
     return lambda token: PrintifyClient(token, base_url=fake.url, min_interval=0, sleep=lambda s: None,
-                                        opener=no_proxy_opener())
+                                        no_proxy=True)
 
 
 def job(tmp_path, fake, spawn=lambda f: f()):
@@ -162,3 +162,14 @@ def test_job_busy_and_not_connected(tmp_path, fake):
     with pytest.raises(SyncBusy) as err:
         j.start()
     assert err.value.message == "A sync is already running."
+
+
+def test_disabled_variants_need_no_cost(fake):
+    page = copy.deepcopy(data.PRODUCTS_PAGE_1)
+    variants = page["data"][0]["variants"]
+    variants[2]["cost"] = None                      # varian tidak aktif tanpa biaya
+    variants[1]["is_enabled"] = None                # null = tetap aktif
+    fake.set("/v1/shops/111/products.json?page=1", page)
+    result = build_result(client_for(fake)("tok"), data.SHOPS[0], [], lambda *a: None)
+    sweat = next(p for p in result.products if p.id == "p-sweat")
+    assert (sweat.cost_min_cents, sweat.cost_max_cents) == (1350, 1600)

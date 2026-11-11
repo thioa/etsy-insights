@@ -38,7 +38,9 @@ def _half_up(value: Decimal, places: str = "1") -> Decimal:
 
 def parse_usd_cents(text: str | None) -> int | None:
     """"US$15.30" / "$1,234.50" → sen. Mata uang lain atau format lain → None."""
-    match = _USD.match((text or "").strip())
+    if not isinstance(text, str):
+        return None
+    match = _USD.match(text.strip())
     if not match:
         return None
     dollars = int(match.group(1).replace(",", ""))
@@ -76,7 +78,7 @@ def compute(price_cents: int | None, cost_cents: int | None, shipping_cents: int
               if cost_cents is not None and shipping_cents is not None else None)
     base = dict(price_cents=price_cents, cost_cents=cost_cents, shipping_cents=shipping_cents,
                 price_needed_cents=needed)
-    if price_cents is None:
+    if price_cents is None or price_cents <= 0:
         return Margin(status="no_price", **base)
     if cost_cents is None:
         return Margin(status="cost_unknown", **base)
@@ -84,7 +86,7 @@ def compute(price_cents: int | None, cost_cents: int | None, shipping_cents: int
         return Margin(status="no_shipping", **base)
     fee = fee_cents(price_cents, fees)
     margin = price_cents - cost_cents - shipping_cents - fee
-    percent = float(_half_up(Decimal(margin) * 100 / price_cents, "0.1")) if price_cents else None
+    percent = float(_half_up(Decimal(margin) * 100 / price_cents, "0.1"))
     return Margin(status="ok", fee_cents=fee, margin_cents=margin, margin_percent=percent, **base)
 
 

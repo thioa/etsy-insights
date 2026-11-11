@@ -28,3 +28,19 @@ def test_words_for_title():
     assert words_for_title("Kiss-Cut Vinyl Decals") == ["sticker", "decal"]
     assert words_for_title("Something Unusual") == []
     assert DICTIONARY[0] == ("sweatshirt", ("crewneck", "crew neck", "jumper"))
+
+
+def test_plural_cases_and_canvas():
+    assert normalize_words("cases case canvases canvas vases purses phrases glasses") == (
+        "case", "case", "canvas", "canvas", "vase", "purse", "phrase", "glass")
+    assert words_for_title("Tough Phone Cases")[0] == "phone case"
+    assert matches("iphone cases for women", words_for_title("Tough Phone Cases"))
+    assert matches("canvases wall decor", ["canvas"])
+
+
+def test_head_noun_wins():
+    hoodie = words_for_title("Unisex Heavy Blend™ Hooded Sweatshirt")
+    assert hoodie[0] == "hoodie" and "sweatshirt" not in hoodie
+    assert words_for_title("Cotton Canvas Tote Bag") == ["tote bag", "tote"]
+    assert words_for_title("Travel Mug")[0] == "tumbler"
+    assert words_for_title("Canvas Gallery Wraps") == ["canvas", "canvas print"]
